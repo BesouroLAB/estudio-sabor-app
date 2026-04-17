@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🌶️ Estúdio & Sabor 2.0 - Hub de Marketing IA para Delivery
 
-## Getting Started
+O **Estúdio & Sabor 2.0** é uma plataforma SaaS (Software as a Service) desenvolvida para transformar a presença digital de restaurantes e deliveries. Utilizando a potência da inteligência artificial do Google Gemini, o app permite que donos de restaurantes transformem fotos simples de celular em pacotes de marketing profissionais em segundos.
 
-First, run the development server:
+## 🚀 Funcionalidades Principais
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **✨ Exportação Mágica (Image Enhancement)**: Processamento de fotos brutas para o padrão estético do iFood e redes sociais.
+- **✍️ Neuro-Copywriter**: Geração de descrições persuasivas, descritivas e de urgência para aumentar a taxa de conversão do cardápio.
+- **📐 Formatos Inteligentes**: Geração automática de formatos (1:1 Cardápio, 4:1 Capa iFood, 9:16 Stories).
+- **📊 Registro de Uso**: Monitoramento de custos e tokens integrado ao Supabase.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠️ Tech Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Frontend**: Next.js 16 (App Router), React, Tailwind CSS, Framer Motion.
+- **Backend**: Next.js API Routes.
+- **IA**: Google Gemini 1.5 Flash & Gemini 2.5 Flash Image.
+- **Banco de Dados/Logs**: Supabase.
+- **Ícones**: Lucide React.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📦 Como rodar localmente
 
-## Learn More
+1. **Clone o repositório:**
+   ```bash
+   git clone https://github.com/BesouroLAB/estudio-sabor-app.git
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+2. **Instale as dependências:**
+   ```bash
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. **Configure as variáveis de ambiente:**
+   Crie um arquivo `.env.local` na raiz do projeto com as seguintes chaves:
+   ```env
+   GEMINI_API_KEY=sua_chave_aqui
+   GEMINI_FALLBACK_KEY=sua_chave_fallback_aqui
+   NEXT_PUBLIC_SUPABASE_URL=seu_url_supabase
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=sua_key_anonima_supabase
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. **Inicie o servidor de desenvolvimento:**
+   ```bash
+   npm run dev
+   ```
+   Acesse `http://localhost:3000` ou a porta indicada.
 
-## Deploy on Vercel
+## ⚖️ Licença
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Este projeto está sob a licença [MIT](LICENSE).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+Desenvolvido com ❤️ por **BesouroLAB**
