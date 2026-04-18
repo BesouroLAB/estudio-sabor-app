@@ -15,7 +15,7 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
-import type { UploadedImage, GenerationResult } from "@/app/page";
+import type { UploadedImage, GenerationResult } from "@/types/app";
 
 interface ResultDashboardProps {
   uploadedImage: UploadedImage;

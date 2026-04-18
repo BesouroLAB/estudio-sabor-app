@@ -3,7 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Flame, RotateCcw } from "lucide-react";
-import type { AppStep } from "@/app/page";
+import type { AppStep } from "@/types/app";
 
 interface HeaderProps {
   onReset: () => void;

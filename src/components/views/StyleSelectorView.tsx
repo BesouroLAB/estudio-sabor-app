@@ -5,38 +5,30 @@ import { motion } from "framer-motion";
 import {
   ArrowLeft,
   Wand2,
-  Pizza,
-  Beef,
-  Fish,
-  Cake,
-  Salad,
-  Coffee,
-  Sandwich,
-  Soup,
   Sun,
   Moon,
   Leaf,
   Crown,
 } from "lucide-react";
-import type { UploadedImage } from "@/app/page";
+import { FOOD_PRESETS } from "@/constants/photography";
+import type { UploadedImage } from "@/types/app";
 import Image from "next/image";
 
 interface StyleSelectorViewProps {
   uploadedImage: UploadedImage;
+  initialFood?: string;
+  initialStyle?: string;
   onConfirm: (food: string, style: string) => void;
   onBack: () => void;
 }
 
-const foodTypes = [
-  { id: "pizza", label: "Pizza", icon: Pizza, color: "from-red-500 to-orange-500" },
-  { id: "hamburger", label: "Hambúrguer", icon: Beef, color: "from-amber-600 to-yellow-500" },
-  { id: "sushi", label: "Sushi/Japonesa", icon: Fish, color: "from-rose-400 to-pink-500" },
-  { id: "sobremesa", label: "Sobremesa", icon: Cake, color: "from-pink-400 to-purple-400" },
-  { id: "salada", label: "Salada/Fit", icon: Salad, color: "from-green-500 to-emerald-400" },
-  { id: "cafe", label: "Café/Bebida", icon: Coffee, color: "from-amber-700 to-amber-500" },
-  { id: "lanche", label: "Lanche/Wrap", icon: Sandwich, color: "from-orange-500 to-yellow-500" },
-  { id: "prato-feito", label: "Prato Feito", icon: Soup, color: "from-amber-500 to-red-500" },
-];
+
+const foodTypes = FOOD_PRESETS.map(preset => ({
+  id: preset.id,
+  label: preset.name,
+  icon: preset.icon,
+  color: preset.color
+}));
 
 const visualStyles = [
   {
@@ -71,11 +63,26 @@ const visualStyles = [
 
 export function StyleSelectorView({
   uploadedImage,
+  initialFood,
+  initialStyle,
   onConfirm,
   onBack,
 }: StyleSelectorViewProps) {
-  const [selectedFood, setSelectedFood] = useState<string | null>(null);
-  const [selectedStyle, setSelectedStyle] = useState<string | null>(null);
+  // Helper to find initial match by ID or Label
+  const findFoodId = (val?: string) => {
+    if (!val) return null;
+    const match = foodTypes.find(f => f.id === val || f.label.toLowerCase() === val.toLowerCase());
+    return match ? match.id : null;
+  };
+
+  const findStyleId = (val?: string) => {
+    if (!val) return null;
+    const match = visualStyles.find(v => v.id === val || v.label.toLowerCase() === val.toLowerCase());
+    return match ? match.id : null;
+  };
+
+  const [selectedFood, setSelectedFood] = useState<string | null>(findFoodId(initialFood));
+  const [selectedStyle, setSelectedStyle] = useState<string | null>(findStyleId(initialStyle));
 
   const canGenerate = selectedFood && selectedStyle;
 

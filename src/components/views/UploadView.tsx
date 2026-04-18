@@ -3,7 +3,7 @@
 import { useCallback, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { Upload, ImagePlus, Sparkles, Camera } from "lucide-react";
-import type { UploadedImage } from "@/app/page";
+import type { UploadedImage } from "@/types/app";
 
 interface UploadViewProps {
   onImageUpload: (image: UploadedImage) => void;
