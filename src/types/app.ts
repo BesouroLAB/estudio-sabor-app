@@ -1,6 +1,6 @@
 import type { CopyText } from "@/services/api";
 
-export type AppStep = "upload" | "style" | "loading" | "result";
+export type AppStep = "hub" | "store" | "upload" | "style" | "loading" | "result";
 
 export interface UploadedImage {
   file: File;

@@ -61,11 +61,11 @@ export default function LoginPage() {
         {/* Logo Area */}
         <div className="flex flex-col items-center mb-10">
           <Image
-            src="https://res.cloudinary.com/do8gdtozt/image/upload/v1766242394/logo_V2_branca_sem_fundo_ujkf0t.png"
+            src="https://res.cloudinary.com/do8gdtozt/image/upload/v1761865865/logo_estudio_sabor_horizontal-upscale-scale-6_00x_nmbn9t.png"
             alt="Estúdio Sabor Logo"
-            width={192}
-            height={80}
-            className="w-48 h-auto mb-4 drop-shadow-[0_0_20px_rgba(255,94,58,0.4)]"
+            width={240}
+            height={60}
+            className="w-56 h-auto mb-4 drop-shadow-[0_0_20px_rgba(255,94,58,0.2)] invert brightness-200"
             priority
             unoptimized
           />

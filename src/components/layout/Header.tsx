@@ -27,15 +27,14 @@ export function Header({ onReset, currentStep }: HeaderProps) {
         {/* Logo */}
         <button
           onClick={onReset}
-          className="flex items-center gap-2 group focus-ring rounded-lg"
+          className="flex items-center group focus-ring rounded-lg overflow-hidden"
           aria-label="Voltar ao início"
         >
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-pepper-red to-pepper-orange flex items-center justify-center shadow-lg transition-transform group-hover:scale-105">
-            <Flame size={18} className="text-white" />
-          </div>
-          <span className="font-display font-bold text-sm tracking-tight text-text-primary hidden sm:block">
-            Estúdio & Sabor
-          </span>
+          <img 
+            src="https://res.cloudinary.com/do8gdtozt/image/upload/v1761865865/logo_estudio_sabor_horizontal-upscale-scale-6_00x_nmbn9t.png" 
+            alt="Estúdio & Sabor" 
+            className="h-10 w-auto object-contain transition-transform group-hover:scale-105"
+          />
         </button>
 
         {/* Step Indicator */}

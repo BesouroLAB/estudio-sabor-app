@@ -6,6 +6,7 @@ import {
 } from "@/lib/prompt-builder";
 import { trackUsage, checkCircuitBreaker } from "@/lib/usage-tracker";
 import { createClient } from "@/lib/supabase/server";
+import { saveUserCreation } from "@/lib/creations";
 
 export const maxDuration = 60;
 
@@ -26,7 +27,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { imageBase64, mimeType, foodType, visualStyle } = body;
+    const { imageBase64, mimeType, foodType, visualStyle, formatSelected = "1:1" } = body;
 
     if (!imageBase64 || !mimeType || !foodType || !visualStyle) {
       return NextResponse.json(
@@ -41,8 +42,10 @@ export async function POST(req: NextRequest) {
     // Get authenticated user (if any)
     let userId: string | undefined;
     let userEmail: string | undefined;
+    
+    const supabase = await createClient();
+
     try {
-      const supabase = await createClient();
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -52,6 +55,22 @@ export async function POST(req: NextRequest) {
       }
     } catch {
       // Not authenticated — proceed without user context
+    }
+
+    if (userId) {
+      // Checagem do Kit Semanal (Créditos)
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("credits")
+        .eq("id", userId)
+        .single();
+        
+      if (!profile || (profile.credits || 0) <= 0) {
+        return NextResponse.json(
+          { error: "Você não possui créditos suficientes. Recarregue na Loja para criar mais Kits Semanais." },
+          { status: 403 }
+        );
+      }
     }
 
     const enhancementPrompt = buildEnhancementPrompt({ foodType, visualStyle });
@@ -107,6 +126,35 @@ export async function POST(req: NextRequest) {
             userEmail,
             metadata: { foodType, visualStyle, aspectRatio },
           });
+
+          // Consumir 1 crédito do usuário pelo "Kit Semanal" entregue
+          if (userId) {
+             const { error: rpcError } = await supabase.rpc('decrement_credits', { user_id: userId });
+             if (rpcError) {
+                console.error("⚠️ Fallback para decremento manual de crédito", rpcError);
+                const { data: p } = await supabase.from('profiles').select('credits').eq('id', userId).single();
+                if (p) {
+                   await supabase.from('profiles').update({ credits: Math.max(0, (p.credits || 0) - 1) }).eq('id', userId);
+                }
+             }
+
+             // --- NOVO: PERSISTÊNCIA NO HISTÓRICO ---
+             try {
+                await saveUserCreation({
+                   userId,
+                   imageBase64: part.inlineData.data,
+                   mimeType: part.inlineData.mimeType || "image/png",
+                   foodType,
+                   visualStyle,
+                   formatSelected
+                });
+                console.log("💾 Creation saved to history successfully");
+             } catch (saveError) {
+                console.error("⚠️ Failed to save creation to history:", saveError);
+                // We don't fail the whole request if saving to history fails, 
+                // but ideally it shouldn't.
+             }
+          }
 
           return NextResponse.json({
             base64Image: part.inlineData.data,

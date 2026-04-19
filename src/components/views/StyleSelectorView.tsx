@@ -18,7 +18,7 @@ interface StyleSelectorViewProps {
   uploadedImage: UploadedImage;
   initialFood?: string;
   initialStyle?: string;
-  onConfirm: (food: string, style: string) => void;
+  onConfirm: (food: string, style: string, format: string) => void;
   onBack: () => void;
 }
 
@@ -61,6 +61,11 @@ const visualStyles = [
   },
 ];
 
+const aspectRatios = [
+  { id: "1:1", label: "Quadrado (iFood)", desc: "Feed & Cardápio", icon: "aspect-square" },
+  { id: "9:16", label: "Vertical (Stories)", desc: "Reels & Whats", icon: "aspect-video rotate-90" },
+];
+
 export function StyleSelectorView({
   uploadedImage,
   initialFood,
@@ -83,6 +88,7 @@ export function StyleSelectorView({
 
   const [selectedFood, setSelectedFood] = useState<string | null>(findFoodId(initialFood));
   const [selectedStyle, setSelectedStyle] = useState<string | null>(findStyleId(initialStyle));
+  const [selectedFormat, setSelectedFormat] = useState<string>("1:1"); // Default to 1:1
 
   const canGenerate = selectedFood && selectedStyle;
 
@@ -280,13 +286,40 @@ export function StyleSelectorView({
               </div>
             </div>
 
+            {/* Aspect Ratio */}
+            <div className="bg-bg-elevated/30 p-4 rounded-2xl border border-white/5">
+              <h2 className="font-display font-medium text-xs text-text-secondary mb-3 uppercase tracking-wider">
+                Formato da Campanha
+              </h2>
+              <div className="grid grid-cols-2 gap-3">
+                {aspectRatios.map((ratio) => (
+                  <button
+                    key={ratio.id}
+                    onClick={() => setSelectedFormat(ratio.id)}
+                    className={`
+                      flex items-center gap-3 p-3 rounded-xl border transition-all
+                      ${selectedFormat === ratio.id 
+                        ? "border-pepper-orange/30 bg-pepper-orange/5 text-pepper-orange shadow-sm" 
+                        : "border-border-subtle hover:border-white/10 bg-bg-surface text-text-muted"}
+                    `}
+                  >
+                    <div className={`border-2 border-current rounded-[2px] opacity-70 ${ratio.id === "9:16" ? "w-3 h-5" : "w-4 h-4"}`} />
+                    <div className="text-left">
+                      <p className="text-xs font-bold leading-none">{ratio.label.split(" (")[0]}</p>
+                      <p className="text-[10px] mt-1 opacity-60 leading-none">{ratio.desc}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Generate CTA */}
             <div className="mt-auto pt-4">
               <motion.button
                 whileTap={{ scale: 0.97 }}
                 disabled={!canGenerate}
                 onClick={() => {
-                  if (canGenerate) onConfirm(selectedFood!, selectedStyle!);
+                  if (canGenerate) onConfirm(selectedFood!, selectedStyle!, selectedFormat);
                 }}
                 className={`
                   w-full flex items-center justify-center gap-3 py-4 px-8 rounded-2xl

@@ -44,13 +44,21 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith("/auth");
 
   if (!user && isProtectedRoute) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    return NextResponse.redirect(url);
+    // TEMPORARY: Bypass login
+    // const url = request.nextUrl.clone();
+    // url.pathname = "/login";
+    // return NextResponse.redirect(url);
   }
 
   // If user is already logged in, redirect away from auth pages to dashboard
   if (user && isAuthRoute) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/dashboard";
+    return NextResponse.redirect(url);
+  }
+
+  // TEMPORARY: Bypass login completely. If anyone hits /login without user, force them into dashboard
+  if (!user && (isAuthRoute || request.nextUrl.pathname === "/")) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);
