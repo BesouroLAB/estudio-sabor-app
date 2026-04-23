@@ -160,7 +160,6 @@ export function StoreView({ onBack, userId }: StoreViewProps) {
               );
             })}
           </div>
-        )}
       </div>
     </div>
   );

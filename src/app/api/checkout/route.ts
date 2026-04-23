@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { MercadoPagoConfig, Preference } from 'mercadopago';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { createClient } from '@/lib/supabase/server';
 
 // Definição dos nossos pacotes (fonte da verdade)
 const PACKAGES = {
@@ -28,8 +27,7 @@ const PACKAGES = {
 export async function POST(request: Request) {
   try {
     // 1. Verificar se o usuário está logado
-    const cookieStore = cookies();
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+    const supabase = await createClient();
     const { data: { session } } = await supabase.auth.getSession();
 
     // Para desenvolvimento/teste, se não tiver sessão, a gente pode usar um ID mockado,

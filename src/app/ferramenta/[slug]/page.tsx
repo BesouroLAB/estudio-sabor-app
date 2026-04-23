@@ -120,4 +120,3 @@ export default function ToolLandingPage({ params }: Props) {
     </div>
   );
 }
-}
