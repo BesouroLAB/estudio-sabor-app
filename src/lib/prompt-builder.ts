@@ -48,7 +48,7 @@ const STYLE_ENVIRONMENTS: Record<string, {
 };
 
 export function buildEnhancementPrompt(config: PromptConfig): string {
-  // 1. Resolve the Base Preset (from 20 options)
+  // 1. Resolve the Base Preset
   const foodPreset = FOOD_PRESETS.find(p => p.id === config.foodType) || FOOD_PRESETS.find(p => p.id === "brasileira")!;
   const { preset } = foodPreset;
 
@@ -57,85 +57,63 @@ export function buildEnhancementPrompt(config: PromptConfig): string {
 
   // 3. Resolve Technical Photography Tokens
   const camera = CAMERAS.find(c => c.name === preset.cameraName) || CAMERAS[0];
-  
-  // Use Style-specific lighting if available, else fallback to Preset lighting
   const resolvedLightingName = styleEnv.lightingName || preset.lightingName;
   const lighting = LIGHTING_STYLES.find(l => l.name === resolvedLightingName) || LIGHTING_STYLES.find(l => l.name === preset.lightingName) || LIGHTING_STYLES[0];
-  
   const angle = ANGLES.find(a => a.name === preset.angle) || ANGLES[0];
   const dof = DEPTHS_OF_FIELD.find(d => d.name === preset.depthOfFieldName) || DEPTHS_OF_FIELD[0];
 
-  // 4. Combine Keywords
-  const allKeywords = [
-    "professional food photography", "ultra realistic", "high detail",
-    "appetizing", "gourmet aesthetic", "subtle imperfections",
-    "natural textures", "slight film grain", "culinary accuracy",
-    "culturally authentic plating", "realistic plating", "authentic food styling",
-    ...camera.keywords,
-    ...lighting.keywords,
-    ...angle.keywords,
-    ...dof.keywords,
-    ...styleEnv.extraKeywords,
-  ].join(", ");
+  // 4. Mapeamento da Matriz de Prompting (AI-SUITE SOTA)
+  
+  const layer1_Subject = `[SUJEITO DETALHADO E ESTADO DO ALIMENTO]: MANTENHA A GEOMETRIA E A VERDADE INALIENÁVEL DO PRODUTO original ("${foodPreset.name}"). Isole perfeitamente o alimento da imagem fornecida, mantendo suas irregularidades, texturas orgânicas, crostas, brilho de gordura natural, queijos derretidos de forma caótica e imperfeições estruturais. A comida real física do cliente NÃO pode ser substituída por uma versão irreal idealizada.`;
+  
+  const layer2_Lighting = `[CONFIGURAÇÃO DE ESTÚDIO E FÍSICA DA ILUMINAÇÃO]: ${lighting.name}. Aplique iluminação de estúdio profissional rigorosa. ${lighting.keywords.join(", ")}. Garanta reflexos especulares sutis e contidos nas superfícies úmidas (molhos, carnes, caldos) e mapeamento de sombras denso e preciso.`;
+  
+  const layer3_Composition = `[COMPOSIÇÃO CÊNICA, FUNDO E ÂNGULO]: Perspectiva rigorosa em ${angle.name}, profundidade de campo ${dof.name} simulando lente fotográfica luminosa (ex: f/2.8 ou f/4). O alimento repousa exclusivamente sobre: ${styleEnv.sceneDescription}. ${styleEnv.extraKeywords.join(", ")}. SUBSTITUA INTEGRALMENTE e apague completamente a pia, bancada suja, azulejos, azulejo esverdeado, chapa ou embalagens originais amadoras por este novo fundo de estúdio de altíssimo padrão.`;
+  
+  const layer4_Rendering = `[ATRIBUTOS DE QUALIDADE FOTOGRÁFICA E RENDERIZAÇÃO]: Fotorrealismo absoluto, ultra-detalhado, resolução 8K, iluminação volumétrica, estilo comercial de publicidade de alimentos de alto orçamento, correção de cores profissional (color grading avançado). Câmera emulada: ${camera.name}, ${camera.keywords.join(", ")}.`;
+  
+  const layer5_Negative = `[PROMPTS NEGATIVOS / CONDIÇÃO CRÍTICA]: REMOVA ATIVAMENTE: mãos humanas, dedos desproporcionais, talheres flutuantes no ar, ingredientes extras espalhados aleatoriamente que não estão no prato original, textos em qualquer idioma, logomarcas inventadas, marcas d'água, texturas embaçadas, distorções geométricas severas, aspecto de plástico, brilho cgi irreal, fundos caseiros, mesa de fórmica suja, ambiente original amador da foto fonte.`;
 
-  const allNegativeKeywords = [
-    "blurry", "disfigured", "deformed", "cartoon", "3d render",
-    "illustration", "painting", "ugly", "bad quality", "bad proportions",
-    "unrealistic", "plastic look", "waxy", "soggy", "unnatural gloss",
-    "fake cgi smoke", "cartoonish steam", "illogical composition",
-    "unrealistic plating", "floating food", "mixed cuisines",
-    ...camera.negative_keywords,
-    ...lighting.negative_keywords,
-    ...angle.negative_keywords,
-    ...dof.negative_keywords,
-  ].join(", ");
+  return `TASK: IMAGE-TO-IMAGE PROFESSIONAL FOOD PHOTOGRAPHY INPAINTING & RECOMPOSITION.
 
-  return `TASK: Professional Food Photography — Background Replacement & Environment Swap.
+Atue como um Restaurador Digital e Diretor de Arte de Gastronomia de Elite. Sua tarefa é aplicar o workflow híbrido: extrair cirurgicamente o alimento principal da foto amadora do cliente e recriar o ambiente fotográfico ao redor dele em nível de publicidade comercial (iFood premium).
 
-**REQUESTED ENVIRONMENT:** "${styleEnv.sceneDescription}"
-**REQUESTED CAMERA:** ${camera.name}
-**REQUESTED LIGHTING:** ${lighting.name}
-**REQUESTED ANGLE:** ${angle.name}
-**TECHNICAL STYLE KEYWORDS:** ${allKeywords}
+${layer1_Subject}
 
-**CRITICAL RULES FOR RECOMPOSITION:**
-1. **SUBJECT PRESERVATION:** The main food object MUST be preserved visually — its core ingredients, shape, textures, and style MUST remain intact.
-2. **STRICT ANGLE COMPLIANCE (MANDATORY):** Render from the EXACT camera angle: "${angle.name}". If the original was shot from a different angle, logically rotate the camera perspective to perfectly match.
-3. **ENVIRONMENT CREATION:** Produce the exact environment: "${styleEnv.sceneDescription}". Background, table, plates, and props must match this description perfectly.
-4. **STRICT LIGHTING COMPLIANCE:** Apply "${lighting.name}". Shadows and highlights MUST match this setup, overriding the original light.
-5. **NO "BEAUTIFYING":** Keep the food's authentic appearance — crumbs, irregular textures, organic imperfections. Do not make it look like perfectly symmetrical plastic.
+${layer2_Lighting}
 
-${PHOTOGRAPHIC_REALISM_DIRECTIVE}
+${layer3_Composition}
 
-**PROMPT NEGATIVO (O QUE EVITAR):**
-${allNegativeKeywords}
+${layer4_Rendering}
 
-**EXECUTION:**
-Render this food in the new environment using ONLY the EXACT specified camera angle (${angle.name}) and lighting (${lighting.name}). Failure to adopt the specified angle is unacceptable.`;
+${layer5_Negative}
+
+DIRETRIZ DE REALISMO ABSOLUTO (ANTI UNCANNY VALLEY):
+${PHOTOGRAPHIC_REALISM_DIRECTIVE}`;
 }
 
 export function buildCopywritingPrompt(foodType: string, visualStyle: string): string {
   const foodPreset = FOOD_PRESETS.find(p => p.id === foodType) || FOOD_PRESETS[0];
   const foodLabel = foodPreset.name;
 
-  return `Você é um copywriter especialista em marketing de delivery (iFood, Rappi, Uber Eats).
+  return `Você é um Diretor de Arte e Copywriter Senior especialista em Neuromarketing Gastronômico para Delivery (iFood, Instagram).
 
-TAREFA: Gere EXATAMENTE 3 textos curtos de descrição/promoção para um prato de "${foodLabel}" com estilo visual "${visualStyle}" para usar no cardápio do iFood.
+TAREFA: Gere 3 textos estratégicos para vender este prato de "${foodLabel}" com estilo visual "${visualStyle}".
 
-FORMATO DE SAÍDA (JSON estrito, sem markdown):
-[
-  {"id": "persuasivo", "label": "Persuasivo", "text": "..."},
-  {"id": "descritivo", "label": "Descritivo", "text": "..."},
-  {"id": "urgencia", "label": "Urgência", "text": "..."}
-]
+FORMATO DE SAÍDA (JSON estrito, SEM markdown, SEM explicações):
+{
+  "legenda": "...",
+  "story": "...",
+  "emocional": "..."
+}
 
-REGRAS:
-1. Persuasivo: Use emojis, apelo emocional, gatilhos ("imagine o aroma…"). Max 280 chars.
-2. Descritivo: Profissional, factual. Ingredientes, tempo de preparo, porções. Max 250 chars.
-3. Urgência: FOMO ("só hoje", "últimas unidades"), emojis de velocidade. Max 200 chars.
-4. Linguagem: PT-BR coloquial de delivery.
-5. NÃO mencione preço.
-6. RETORNE APENAS O JSON, sem explicação.`;
+REGRAS DE CONTEÚDO:
+1. "legenda" (Legenda Curta para Instagram/iFood): Foco em apetite appeal, emojis estratégicos, hashtags discretas. Max 220 chars.
+2. "story" (Texto para Story - Direto e Urgência): Curto, impactante, call-to-action forte ("Clique no link", "Peça agora"), emojis de movimento/fome. Max 180 chars.
+3. "emocional" (Descritivo Emocional): Foco no cheiro, na textura, na experiência sensorial, palavras que dão água na boca (crocante, suculento, derretendo). Max 350 chars.
+
+Linguagem: PT-BR coloquial, "trincheira" (fala direto com o cliente faminto). 
+NÃO mencione preço ou promoções genéricas. Foque na QUALIDADE do produto "${foodLabel}".`;
 }
 
 export function getAspectRatioForFood(foodType: string): string {

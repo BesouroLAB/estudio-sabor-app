@@ -11,7 +11,8 @@ import {
   ShieldCheck
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 
 const pricingPackages = [
   {
@@ -50,16 +51,42 @@ const pricingPackages = [
   }
 ];
 
-export default function StorePage() {
+function StorePageContent() {
   const [loading, setLoading] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
-  const handlePurchase = (id: string) => {
+  useEffect(() => {
+    const paymentStatus = searchParams.get("payment");
+    if (paymentStatus === "failure") {
+      alert("⚠️ Ocorreu um erro no pagamento. Por favor, tente novamente.");
+      router.replace("/dashboard/store", { scroll: false });
+    }
+  }, [searchParams, router]);
+
+  const handlePurchase = async (id: string) => {
     setLoading(id);
-    // Simulating checkout logic (Mercado Pago redirect would go here)
-    setTimeout(() => {
-       alert("Simulando redirecionamento para o checkout Mercado Pago...");
-       setLoading(null);
-    }, 1000);
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ packageId: id })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Erro ao processar checkout');
+      }
+
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      }
+    } catch (error: any) {
+      console.error('Checkout error:', error);
+      alert(error.message || 'Falha ao iniciar pagamento. Tente novamente.');
+      setLoading(null);
+    }
   };
 
   return (
@@ -106,6 +133,14 @@ export default function StorePage() {
 
       </div>
     </div>
+  );
+}
+
+export default function StorePage() {
+  return (
+    <Suspense fallback={<div className="flex-1 flex items-center justify-center p-8">Carregando loja...</div>}>
+      <StorePageContent />
+    </Suspense>
   );
 }
 

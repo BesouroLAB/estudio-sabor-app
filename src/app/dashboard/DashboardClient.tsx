@@ -18,7 +18,7 @@ import { UploadView } from "@/components/views/UploadView";
 import { StyleSelectorView } from "@/components/views/StyleSelectorView";
 import { LoadingView } from "@/components/views/LoadingView";
 import { ResultDashboard } from "@/components/views/ResultDashboard";
-import { generateImage, generateCopywriting } from "@/services/api";
+import { generateImage, generateCopywriting, classifyImage } from "@/services/api";
 import type { AppStep, UploadedImage, GenerationResult } from "@/types/app";
 
 const stepLabels: Record<AppStep, string> = {
@@ -60,6 +60,20 @@ export default function DashboardClient({
     }
   }, [step, currentIndex, setTitle, setShowProgress, setCurrentIndex, setStepsCount]);
 
+  // Capturar retorno do Mercado Pago
+  useEffect(() => {
+    const paymentStatus = searchParams.get("payment");
+    if (paymentStatus === "success") {
+      alert("🎉 Pagamento Aprovado! Seus créditos já estão disponíveis na sua conta.");
+      // Limpa os params para não mostrar o alert toda vez que renderizar
+      router.replace("/dashboard", { scroll: false });
+    } else if (paymentStatus === "failure") {
+      alert("⚠️ Ocorreu um erro no pagamento. Por favor, tente novamente.");
+      router.replace("/dashboard", { scroll: false });
+      setStep("store"); // Volta para a loja em caso de falha
+    }
+  }, [searchParams, router]);
+
   const [uploadedImage, setUploadedImage] = useState<UploadedImage | null>(
     null
   );
@@ -76,11 +90,22 @@ export default function DashboardClient({
   const [generationResult, setGenerationResult] =
     useState<GenerationResult | null>(null);
   const [loadingError, setLoadingError] = useState<string | null>(null);
+  const [isClassifying, setIsClassifying] = useState(false);
   const abortRef = useRef(false);
 
-  const handleImageUpload = useCallback((image: UploadedImage) => {
+  const handleImageUpload = useCallback(async (image: UploadedImage) => {
     setUploadedImage(image);
     setStep("style");
+    setIsClassifying(true);
+    
+    try {
+      const detectedFood = await classifyImage(image.base64, image.file.type);
+      setSelectedFood(detectedFood);
+    } catch (error) {
+      console.error("Classification failed:", error);
+    } finally {
+      setIsClassifying(false);
+    }
   }, []);
 
   const handleStyleConfirm = useCallback(
@@ -189,9 +214,9 @@ export default function DashboardClient({
               key="style"
               uploadedImage={uploadedImage!}
               initialFood={selectedFood || undefined}
-              initialStyle={selectedStyle || undefined}
+              isDetecting={isClassifying}
               onConfirm={handleStyleConfirm}
-              onBack={handleBack}
+              onBack={() => setStep("upload")}
             />
           )}
           {step === "loading" && (
@@ -211,6 +236,7 @@ export default function DashboardClient({
               generationResult={generationResult}
               foodType={selectedFood!}
               style={selectedStyle!}
+              format={selectedFormat!}
               onNewPackage={handleReset}
             />
           )}

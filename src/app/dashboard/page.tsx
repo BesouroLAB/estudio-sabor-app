@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import DashboardClient from "./DashboardClient";
 
@@ -33,11 +34,13 @@ export default async function DashboardPage() {
   }
 
   return (
-    <DashboardClient 
-      user={user!}
-      initialCredits={creditsRemaining}
-      userName={userName}
-      initialStep="hub"
-    />
+    <Suspense fallback={<div className="flex-1 flex items-center justify-center p-8">Carregando...</div>}>
+      <DashboardClient 
+        user={user!}
+        initialCredits={creditsRemaining}
+        userName={userName}
+        initialStep="hub"
+      />
+    </Suspense>
   );
 }

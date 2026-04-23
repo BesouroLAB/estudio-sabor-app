@@ -32,7 +32,7 @@ export function DashboardHeader({
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white/70 backdrop-blur-md border-b border-black/[0.03]">
+    <header className="sticky top-0 z-50 bg-white/70 backdrop-blur-md shadow-sm">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         
         {/* Left Side: Contextual Info */}
@@ -56,14 +56,14 @@ export function DashboardHeader({
 
           {/* Step Indicator (Only during active creation) */}
           {showProgress && (
-            <div className="hidden md:flex items-center gap-1.5 ml-4 pl-4 border-l border-border-default">
+            <div className="hidden md:flex items-center gap-1.5 ml-4 pl-4">
               {Array.from({ length: stepsCount }).map((_, i) => (
                 <div key={i} className="flex items-center gap-1.5">
                   <motion.div
                     className={`h-1.5 rounded-full transition-all duration-500 ${
                       i <= currentIndex
                         ? "bg-gradient-to-r from-pepper-red to-pepper-orange w-8"
-                        : "bg-black/[0.05] w-6"
+                        : "bg-border-default w-6"
                     }`}
                     layout
                   />
@@ -91,7 +91,7 @@ export function DashboardHeader({
             </span>
           </motion.div>
 
-          <div className="h-8 w-px bg-border-default mx-1 hidden sm:block" />
+          <div className="h-8 w-px bg-bg-elevated mx-1 hidden sm:block" />
 
           {/* User Profile Dropdown */}
           <div className="flex items-center gap-3">
@@ -103,12 +103,12 @@ export function DashboardHeader({
             </div>
             
             <div className="relative group">
-              <div className="w-9 h-9 rounded-xl bg-bg-elevated border border-border-default flex items-center justify-center transition-all group-hover:border-pepper-orange/30 group-hover:shadow-soft cursor-pointer">
+              <div className="w-9 h-9 rounded-xl bg-bg-elevated flex items-center justify-center transition-all group-hover:shadow-soft cursor-pointer">
                 <UserIcon size={18} className="text-text-secondary group-hover:text-pepper-orange transition-colors" />
               </div>
               
               {/* Dropdown menu */}
-              <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-2xl shadow-2xl border border-black/[0.05] opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 transition-all p-2 z-[60]">
+              <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-2xl shadow-2xl opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 transition-all p-2 z-[60]">
                 <p className="px-3 py-2 text-[10px] uppercase font-bold text-text-muted tracking-wider">Gestão</p>
                 <button 
                   onClick={() => router.push('/dashboard/settings')}
@@ -116,7 +116,7 @@ export function DashboardHeader({
                 >
                   Configurações <RotateCcw size={12} className="opacity-0 group-hover/item:opacity-100 transition-opacity" />
                 </button>
-                <form action="/auth/signout" method="post" className="mt-1 pt-1 border-t border-black/[0.03]">
+                <form action="/auth/signout" method="post" className="mt-1 pt-1">
                   <button
                     type="submit"
                     className="w-full text-left px-3 py-2 text-sm text-pepper-red hover:bg-pepper-red/[0.04] rounded-xl transition-colors flex items-center justify-between group/logout"

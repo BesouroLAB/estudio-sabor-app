@@ -17,7 +17,7 @@ export interface PackageOption {
 
 const packages: PackageOption[] = [
   {
-    id: "kit_emergencia",
+    id: "emergencia",
     name: "Kit Emergência",
     credits: 10,
     priceBRL: 29.90,
@@ -26,7 +26,7 @@ const packages: PackageOption[] = [
     color: "from-blue-500 to-indigo-600",
   },
   {
-    id: "kit_agencia",
+    id: "agencia",
     name: "Agência Digital",
     credits: 30,
     priceBRL: 59.90,
@@ -36,7 +36,7 @@ const packages: PackageOption[] = [
     popular: true,
   },
   {
-    id: "kit_imperio",
+    id: "imperio",
     name: "Kit Império Pro",
     credits: 100,
     priceBRL: 149.90,
@@ -53,42 +53,29 @@ interface StoreViewProps {
 
 export function StoreView({ onBack, userId }: StoreViewProps) {
   const [loadingPkg, setLoadingPkg] = useState<string | null>(null);
-  const [qrCodeData, setQrCodeData] = useState<{
-    qrCodeBase64: string;
-    qrCodeString: string;
-  } | null>(null);
 
   const handlePurchase = async (pkg: PackageOption) => {
     setLoadingPkg(pkg.id);
     try {
-      // Faz fetch na rota de checkout do backend
-      const res = await fetch("/api/checkout/mercadopago", {
+      const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, packageId: pkg.id }),
+        body: JSON.stringify({ packageId: pkg.id }),
       });
-
-      if (!res.ok) {
-        throw new Error("Erro ao gerar pagamento PIX");
-      }
 
       const data = await res.json();
-      setQrCodeData({
-        qrCodeBase64: data.qr_code_base64,
-        qrCodeString: data.qr_code,
-      });
-    } catch (error) {
-      console.error(error);
-      alert("Erro ao conectar com Mercado Pago. Tente novamente.");
-    } finally {
-      setLoadingPkg(null);
-    }
-  };
 
-  const handleCopyPix = () => {
-    if (qrCodeData?.qrCodeString) {
-      navigator.clipboard.writeText(qrCodeData.qrCodeString);
-      alert("Código PIX 'Copia e Cola' copiado!");
+      if (!res.ok) {
+        throw new Error(data.error || "Erro ao gerar checkout");
+      }
+
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      }
+    } catch (error: any) {
+      console.error(error);
+      alert(error.message || "Erro ao conectar com Mercado Pago. Tente novamente.");
+      setLoadingPkg(null);
     }
   };
 
@@ -112,46 +99,8 @@ export function StoreView({ onBack, userId }: StoreViewProps) {
           </p>
         </div>
 
-        {qrCodeData ? (
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="glass rounded-2xl p-8 max-w-md mx-auto text-center border border-pepper-orange/30 shadow-[0_0_40px_rgba(255,87,34,0.15)]"
-          >
-            <h2 className="text-xl font-bold mb-2">Escaneie para Pagar</h2>
-            <p className="text-text-secondary text-sm mb-6">
-              Aprovação via PIX costuma ser imediata.
-            </p>
-            <div className="bg-white p-4 rounded-xl inline-block mb-6 shadow-md">
-              <img 
-                src={`data:image/jpeg;base64,${qrCodeData.qrCodeBase64}`} 
-                alt="QR Code PIX do Mercado Pago" 
-                className="w-48 h-48 object-contain"
-              />
-            </div>
-            
-            <div className="space-y-4">
-              <button
-                onClick={handleCopyPix}
-                className="w-full py-3 px-4 bg-bg-elevated hover:bg-bg-subtle border border-border-default rounded-xl font-medium transition-colors focus-ring"
-              >
-                Copiar PIX Copia e Cola
-              </button>
-              <button
-                onClick={() => setQrCodeData(null)}
-                className="w-full py-3 px-4 text-text-muted hover:text-text-primary font-medium transition-colors"
-              >
-                Cancelar
-              </button>
-            </div>
-            <div className="mt-6 flex flex-col items-center justify-center text-xs text-text-muted gap-2">
-               <Loader2 size={16} className="animate-spin text-pepper-orange" />
-               <p>Aguardando confirmação do pagamento...</p>
-               <p className="text-center max-w-[200px]">Os créditos entrarão automaticamente na sua conta.</p>
-            </div>
-          </motion.div>
-        ) : (
-          <div className="grid md:grid-cols-3 gap-6">
+        {/* Packages Grid */}
+        <div className="grid md:grid-cols-3 gap-6">
             {packages.map((pkg) => {
               const Icon = pkg.icon;
               return (

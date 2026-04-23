@@ -29,7 +29,7 @@ export function DashboardSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden md:flex flex-col w-64 bg-bg-surface border-r border-border-default fixed h-screen z-40">
+    <aside className="hidden md:flex flex-col w-64 bg-bg-surface fixed h-screen z-40">
       <div className="px-2 py-12">
         <Link href="/dashboard" className="flex items-center group">
           <img 
@@ -76,7 +76,7 @@ export function DashboardSidebar() {
         })}
       </nav>
 
-      <div className="p-4 border-t border-border-subtle flex flex-col gap-1">
+      <div className="p-4 flex flex-col gap-1">
         <Link 
           href="/dashboard/settings"
           className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-text-muted hover:text-text-primary hover:bg-bg-elevated transition-all"

@@ -1,14 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
   Wand2,
-  Sun,
-  Moon,
-  Leaf,
-  Crown,
+  ShoppingBag,
+  Layout,
+  Smartphone,
+  Megaphone,
+  ImageIcon,
+  BookOpen,
+  Sparkles,
+  Loader2,
+  Camera,
+  Layers,
+  Maximize2,
+  Monitor,
+  Square,
+  Sun
 } from "lucide-react";
 import { FOOD_PRESETS } from "@/constants/photography";
 import type { UploadedImage } from "@/types/app";
@@ -17,330 +27,359 @@ import Image from "next/image";
 interface StyleSelectorViewProps {
   uploadedImage: UploadedImage;
   initialFood?: string;
-  initialStyle?: string;
+  isDetecting?: boolean;
   onConfirm: (food: string, style: string, format: string) => void;
   onBack: () => void;
 }
 
-
-const foodTypes = FOOD_PRESETS.map(preset => ({
-  id: preset.id,
-  label: preset.name,
-  icon: preset.icon,
-  color: preset.color
-}));
-
 const visualStyles = [
   {
+    id: "ifood",
+    label: "iFood / Delivery",
+    desc: "Foco no prato, conversão direta.",
+    icon: ShoppingBag,
+  },
+  {
+    id: "capa",
+    label: "Capa iFood",
+    desc: "Banner de destaque widescreen.",
+    icon: Layout,
+  },
+  {
+    id: "stories",
+    label: "Stories / Reels",
+    desc: "Vertical impactante. Food porn.",
+    icon: Smartphone,
+  },
+  {
+    id: "promocao",
+    label: "Promoção",
+    desc: "Alto impacto para combos.",
+    icon: Megaphone,
+  },
+  {
+    id: "feed",
+    label: "Feed / Post",
+    desc: "Editorial premium pro Instagram.",
+    icon: ImageIcon,
+  },
+  {
+    id: "cardapio",
+    label: "Cardápio",
+    desc: "Foto limpa para impressão.",
+    icon: BookOpen,
+  },
+];
+
+const photographicStyles = [
+  {
     id: "rustico",
-    label: "Rústico & Aconchegante",
-    desc: "Madeira, luz quente, caseiro",
-    icon: Sun,
-    preview: "bg-gradient-to-br from-amber-900/40 to-orange-900/30",
+    label: "Rústico",
+    desc: "Madeira, luz quente e clima caseiro.",
+  },
+  {
+    id: "clean",
+    label: "Clean",
+    desc: "Mármore branco, iluminação clara e moderna.",
   },
   {
     id: "premium-escuro",
     label: "Premium Escuro",
-    desc: "Fundo escuro, luxo, contraste",
-    icon: Moon,
-    preview: "bg-gradient-to-br from-zinc-900 to-black",
-  },
-  {
-    id: "clean",
-    label: "Claro & Clean",
-    desc: "Minimalista, fundo claro, moderno",
-    icon: Leaf,
-    preview: "bg-gradient-to-br from-stone-100/10 to-white/5",
+    desc: "Ardósia preta, luz dramática lateral.",
   },
   {
     id: "gourmet",
-    label: "Gourmet Chef",
-    desc: "Mármore, elegante, sofisticado",
-    icon: Crown,
-    preview: "bg-gradient-to-br from-stone-800/40 to-zinc-900/40",
+    label: "Gourmet Editorial",
+    desc: "Bancada sofisticada, softbox natural.",
   },
 ];
 
 const aspectRatios = [
-  { id: "1:1", label: "Quadrado (iFood)", desc: "Feed & Cardápio", icon: "aspect-square" },
-  { id: "9:16", label: "Vertical (Stories)", desc: "Reels & Whats", icon: "aspect-video rotate-90" },
+  { id: "1:1", label: "Quadrado", desc: "iFood • Feed", icon: Square },
+  { id: "9:16", label: "Vertical", desc: "Stories • Reels", icon: Smartphone },
+  { id: "16:9", label: "Widescreen", desc: "Capa • Banner", icon: Monitor },
+  { id: "4:3", label: "Paisagem", desc: "Cardápio Físico", icon: Layout },
 ];
 
 export function StyleSelectorView({
   uploadedImage,
   initialFood,
-  initialStyle,
+  isDetecting = false,
   onConfirm,
   onBack,
 }: StyleSelectorViewProps) {
-  // Helper to find initial match by ID or Label
-  const findFoodId = (val?: string) => {
-    if (!val) return null;
-    const match = foodTypes.find(f => f.id === val || f.label.toLowerCase() === val.toLowerCase());
-    return match ? match.id : null;
+  const [selectedFood, setSelectedFood] = useState<string | null>(initialFood || "hamburger");
+  const [selectedObjective, setSelectedObjective] = useState<string>("ifood");
+  const [selectedEnvironment, setSelectedEnvironment] = useState<string>("rustico");
+  const [selectedFormat, setSelectedFormat] = useState<string>("1:1");
+
+  // Sync with AI classification
+  useEffect(() => {
+    if (initialFood) {
+      setSelectedFood(initialFood);
+    }
+  }, [initialFood]);
+
+  const handleObjectiveChange = (id: string) => {
+    setSelectedObjective(id);
+    if (id === "stories") setSelectedFormat("9:16");
+    if (id === "capa") setSelectedFormat("16:9");
+    if (id === "ifood" || id === "feed") setSelectedFormat("1:1");
+    if (id === "cardapio") setSelectedFormat("4:3");
   };
 
-  const findStyleId = (val?: string) => {
-    if (!val) return null;
-    const match = visualStyles.find(v => v.id === val || v.label.toLowerCase() === val.toLowerCase());
-    return match ? match.id : null;
-  };
+  const foodData = useMemo(() => {
+    return FOOD_PRESETS.find(p => p.id === selectedFood) || FOOD_PRESETS[0];
+  }, [selectedFood]);
 
-  const [selectedFood, setSelectedFood] = useState<string | null>(findFoodId(initialFood));
-  const [selectedStyle, setSelectedStyle] = useState<string | null>(findStyleId(initialStyle));
-  const [selectedFormat, setSelectedFormat] = useState<string>("1:1"); // Default to 1:1
-
-  const canGenerate = selectedFood && selectedStyle;
+  const canGenerate = selectedFood && selectedEnvironment;
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: 40 }}
+      initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -40 }}
-      transition={{ duration: 0.4 }}
-      className="flex-1 flex flex-col px-[var(--space-page)] py-8"
+      exit={{ opacity: 0, x: -20 }}
+      className="flex-1 flex flex-col px-[var(--space-page)] py-8 overflow-y-auto"
     >
-      <div className="max-w-5xl mx-auto w-full flex-1 flex flex-col">
-        {/* Back button */}
-        <button
-          onClick={onBack}
-          className="flex items-center gap-1.5 text-text-muted hover:text-text-primary text-sm font-medium mb-6 transition-colors self-start focus-ring rounded-lg px-2 py-1"
-          id="back-to-upload"
-        >
-          <ArrowLeft size={16} />
-          Trocar foto
-        </button>
+      <div className="max-w-7xl mx-auto w-full flex-1 flex flex-col">
+        {/* Header Actions */}
+        <div className="flex items-center justify-between mb-8">
+          <button
+            onClick={onBack}
+            className="flex items-center gap-1.5 text-text-muted hover:text-text-primary text-sm font-medium transition-colors"
+          >
+            <ArrowLeft size={16} />
+            Voltar
+          </button>
+          
+          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-bg-surface border border-border-subtle text-[10px] font-bold text-text-secondary uppercase tracking-widest">
+            <Sparkles size={12} className="text-pepper-orange" />
+            Motor Fotográfico AI Ativado
+          </div>
+        </div>
 
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
-          {/* Left: Preview */}
-          <div className="flex flex-col items-center lg:items-start">
-            <div className="relative w-full max-w-[280px] aspect-square rounded-2xl overflow-hidden border border-border-subtle">
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-10">
+          {/* Left: Preview & Recipe */}
+          <div className="flex flex-col gap-6">
+            <div className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl ring-1 ring-white/10">
               <Image
                 src={uploadedImage.preview}
-                alt="Foto enviada"
+                alt="Original"
                 fill
                 className="object-cover"
-                sizes="280px"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-              <span className="absolute bottom-3 left-3 text-xs font-bold text-white/80 bg-black/40 px-2 py-1 rounded-lg backdrop-blur-sm">
-                Sua foto original
-              </span>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              
+              <div className="absolute bottom-4 left-4 flex flex-col gap-1.5">
+                <span className="inline-flex items-center w-fit px-2 py-0.5 rounded-md bg-white/10 backdrop-blur-md text-[10px] font-bold text-white/70 uppercase tracking-wider">
+                  Foto Original
+                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-medium text-white/90">Detectado:</span>
+                  <span className="text-xs font-bold text-pepper-orange bg-pepper-orange/10 px-2 py-0.5 rounded-md backdrop-blur-sm">
+                    {isDetecting ? "Identificando..." : foodData.name}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Recipe Details */}
+            <div className="bg-bg-surface/50 rounded-2xl p-6 border border-border-subtle/50">
+              <h3 className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-4">
+                Receita Fotográfica
+              </h3>
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-bg-elevated flex items-center justify-center text-pepper-orange">
+                    <Camera size={14} />
+                  </div>
+                  <span className="text-xs text-text-secondary">{foodData.preset.cameraName}</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-bg-elevated flex items-center justify-center text-pepper-orange">
+                    <Sparkles size={14} />
+                  </div>
+                  <span className="text-xs text-text-secondary">{foodData.preset.lightingName}</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-bg-elevated flex items-center justify-center text-pepper-orange">
+                    <Maximize2 size={14} />
+                  </div>
+                  <span className="text-xs text-text-secondary">Formato: {selectedFormat}</span>
+                </div>
+              </div>
+              <p className="mt-5 text-[10px] text-text-muted leading-relaxed">
+                12 camadas profissionais serão aplicadas automaticamente.
+              </p>
+            </div>
+            
+            {/* CTA - Moved to bottom of left column for better flow on desktop */}
+            <div className="pt-2">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                disabled={!canGenerate || isDetecting}
+                onClick={() => onConfirm(selectedFood!, selectedEnvironment!, selectedFormat)}
+                className={`
+                  w-full flex items-center justify-center gap-3 py-4 rounded-2xl
+                  font-display font-bold text-base transition-all duration-300
+                  ${canGenerate && !isDetecting
+                    ? "bg-pepper-red text-white shadow-xl shadow-pepper-red/20 hover:bg-red-600"
+                    : "bg-bg-surface text-text-muted cursor-not-allowed border border-border-subtle"
+                  }
+                `}
+              >
+                {isDetecting ? (
+                  <>
+                    <Loader2 size={18} className="animate-spin" />
+                    Preparando...
+                  </>
+                ) : (
+                  <>
+                    <Wand2 size={18} />
+                    Gerar Fotografia
+                  </>
+                )}
+              </motion.button>
             </div>
           </div>
 
-          {/* Right: Selectors */}
-          <div className="flex flex-col gap-8">
-            {/* Food Type */}
+          {/* Right: Objectives, Environment, & Format */}
+          <div className="flex flex-col gap-8 bg-bg-surface/30 p-8 rounded-[2rem] border border-border-subtle/30">
+            
+            {/* 1. Objetivos */}
             <div>
-              <h2 className="font-display font-bold text-lg text-text-primary mb-1">
-                Qual é o prato?
-              </h2>
-              <p className="text-text-muted text-sm mb-4">
-                Isso ajuda a IA a acertar os detalhes de textura e cores
-              </p>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {foodTypes.map((food) => {
-                  const Icon = food.icon;
-                  const isSelected = selectedFood === food.id;
-                  return (
-                    <motion.button
-                      key={food.id}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => setSelectedFood(food.id)}
-                      className={`
-                        relative flex flex-col items-center gap-2 p-4 rounded-xl
-                        border transition-all duration-200 cursor-pointer
-                        focus-ring
-                        ${
-                          isSelected
-                            ? "border-pepper-red/50 bg-pepper-red/8 shadow-lg shadow-pepper-red/10"
-                            : "border-border-subtle bg-bg-surface hover:border-white/15 hover:bg-bg-elevated"
-                        }
-                      `}
-                      id={`food-type-${food.id}`}
-                    >
-                      <div
-                        className={`
-                          w-10 h-10 rounded-xl flex items-center justify-center transition-all
-                          ${
-                            isSelected
-                              ? `bg-gradient-to-br ${food.color} text-white shadow-md`
-                              : "bg-white/5 text-text-muted"
-                          }
-                        `}
-                      >
-                        <Icon size={20} />
-                      </div>
-                      <span
-                        className={`text-xs font-semibold tracking-wide ${
-                          isSelected ? "text-text-primary" : "text-text-secondary"
-                        }`}
-                      >
-                        {food.label}
-                      </span>
-                      {isSelected && (
-                        <motion.div
-                          layoutId="food-check"
-                          className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-pepper-red flex items-center justify-center"
-                        >
-                          <svg
-                            className="w-3 h-3 text-white"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            strokeWidth={3}
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M5 13l4 4L19 7"
-                            />
-                          </svg>
-                        </motion.div>
-                      )}
-                    </motion.button>
-                  );
-                })}
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-6 h-6 rounded-full bg-pepper-orange/20 text-pepper-orange flex items-center justify-center text-xs font-bold">1</div>
+                <h2 className="font-display font-bold text-xl text-text-primary">
+                  Para que vai usar essa foto?
+                </h2>
               </div>
-            </div>
-
-            {/* Visual Style */}
-            <div>
-              <h2 className="font-display font-bold text-lg text-text-primary mb-1">
-                Qual o estilo visual?
-              </h2>
-              <p className="text-text-muted text-sm mb-4">
-                Escolha a &quot;vibe&quot; que combina com sua marca
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
                 {visualStyles.map((style) => {
                   const Icon = style.icon;
-                  const isSelected = selectedStyle === style.id;
+                  const isSelected = selectedObjective === style.id;
                   return (
                     <motion.button
                       key={style.id}
-                      whileTap={{ scale: 0.97 }}
-                      onClick={() => setSelectedStyle(style.id)}
+                      whileHover={{ y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => handleObjectiveChange(style.id)}
                       className={`
-                        relative flex items-center gap-4 p-4 rounded-xl
-                        border transition-all duration-200 cursor-pointer text-left
-                        focus-ring
-                        ${
-                          isSelected
-                            ? "border-pepper-orange/50 bg-pepper-orange/8 shadow-lg shadow-pepper-orange/10"
-                            : "border-border-subtle bg-bg-surface hover:border-white/15 hover:bg-bg-elevated"
+                        relative flex flex-col items-start gap-3 p-4 rounded-2xl text-left transition-all duration-300
+                        ${isSelected 
+                          ? "bg-white ring-2 ring-pepper-red shadow-lg" 
+                          : "bg-bg-surface hover:bg-bg-elevated border border-border-subtle"
                         }
                       `}
-                      id={`visual-style-${style.id}`}
                     >
-                      <div
-                        className={`
-                          w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0
-                          ${style.preview} border border-white/5
-                          ${isSelected ? "ring-2 ring-pepper-orange/30" : ""}
-                        `}
-                      >
-                        <Icon
-                          size={20}
-                          className={
-                            isSelected ? "text-pepper-orange" : "text-text-muted"
-                          }
-                        />
+                      <div className={`
+                        w-8 h-8 rounded-lg flex items-center justify-center
+                        ${isSelected ? "bg-pepper-red/10 text-pepper-red" : "bg-bg-elevated text-text-muted"}
+                      `}>
+                        <Icon size={16} />
                       </div>
-                      <div className="min-w-0">
-                        <p
-                          className={`font-semibold text-sm ${
-                            isSelected ? "text-text-primary" : "text-text-secondary"
-                          }`}
-                        >
+                      <div className="flex-1">
+                        <h4 className={`font-bold text-sm mb-1 ${isSelected ? "text-slate-900" : "text-text-primary"}`}>
                           {style.label}
-                        </p>
-                        <p className="text-text-muted text-xs mt-0.5">
+                        </h4>
+                        <p className={`text-[10px] leading-relaxed ${isSelected ? "text-slate-500" : "text-text-muted"}`}>
                           {style.desc}
                         </p>
                       </div>
-                      {isSelected && (
-                        <motion.div
-                          layoutId="style-check"
-                          className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-pepper-orange flex items-center justify-center"
-                        >
-                          <svg
-                            className="w-3 h-3 text-white"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            strokeWidth={3}
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M5 13l4 4L19 7"
-                            />
-                          </svg>
-                        </motion.div>
-                      )}
                     </motion.button>
                   );
                 })}
               </div>
             </div>
 
-            {/* Aspect Ratio */}
-            <div className="bg-bg-elevated/30 p-4 rounded-2xl border border-white/5">
-              <h2 className="font-display font-medium text-xs text-text-secondary mb-3 uppercase tracking-wider">
-                Formato da Campanha
-              </h2>
-              <div className="grid grid-cols-2 gap-3">
-                {aspectRatios.map((ratio) => (
-                  <button
-                    key={ratio.id}
-                    onClick={() => setSelectedFormat(ratio.id)}
-                    className={`
-                      flex items-center gap-3 p-3 rounded-xl border transition-all
-                      ${selectedFormat === ratio.id 
-                        ? "border-pepper-orange/30 bg-pepper-orange/5 text-pepper-orange shadow-sm" 
-                        : "border-border-subtle hover:border-white/10 bg-bg-surface text-text-muted"}
-                    `}
-                  >
-                    <div className={`border-2 border-current rounded-[2px] opacity-70 ${ratio.id === "9:16" ? "w-3 h-5" : "w-4 h-4"}`} />
-                    <div className="text-left">
-                      <p className="text-xs font-bold leading-none">{ratio.label.split(" (")[0]}</p>
-                      <p className="text-[10px] mt-1 opacity-60 leading-none">{ratio.desc}</p>
-                    </div>
-                  </button>
-                ))}
+            {/* 2. Ambiente/Estilo */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-6 h-6 rounded-full bg-pepper-orange/20 text-pepper-orange flex items-center justify-center text-xs font-bold">2</div>
+                <h2 className="font-display font-bold text-xl text-text-primary">
+                  Ambiente / Estilo
+                </h2>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {photographicStyles.map((env) => {
+                  const isSelected = selectedEnvironment === env.id;
+                  return (
+                    <motion.button
+                      key={env.id}
+                      whileHover={{ y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => setSelectedEnvironment(env.id)}
+                      className={`
+                        relative flex items-center gap-4 p-4 rounded-2xl text-left transition-all duration-300
+                        ${isSelected 
+                          ? "bg-slate-900 ring-2 ring-slate-900 shadow-lg text-white" 
+                          : "bg-bg-surface hover:bg-bg-elevated border border-border-subtle"
+                        }
+                      `}
+                    >
+                      <div className={`
+                        w-10 h-10 rounded-xl flex items-center justify-center shrink-0
+                        ${isSelected ? "bg-white/10 text-white" : "bg-bg-elevated text-text-muted"}
+                      `}>
+                        <Sun size={20} />
+                      </div>
+                      <div>
+                        <h4 className={`font-bold text-sm mb-1 ${isSelected ? "text-white" : "text-text-primary"}`}>
+                          {env.label}
+                        </h4>
+                        <p className={`text-[10px] leading-relaxed ${isSelected ? "text-white/70" : "text-text-muted"}`}>
+                          {env.desc}
+                        </p>
+                      </div>
+                    </motion.button>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Generate CTA */}
-            <div className="mt-auto pt-4">
-              <motion.button
-                whileTap={{ scale: 0.97 }}
-                disabled={!canGenerate}
-                onClick={() => {
-                  if (canGenerate) onConfirm(selectedFood!, selectedStyle!, selectedFormat);
-                }}
-                className={`
-                  w-full flex items-center justify-center gap-3 py-4 px-8 rounded-2xl
-                  font-display font-bold text-lg tracking-tight
-                  transition-all duration-300
-                  focus-ring
-                  ${
-                    canGenerate
-                      ? "bg-gradient-to-r from-pepper-red to-pepper-orange text-white shadow-xl shadow-pepper-red/25 hover:shadow-pepper-red/40 cursor-pointer active:scale-[0.98]"
-                      : "bg-white/5 text-text-muted cursor-not-allowed"
-                  }
-                `}
-                id="generate-package-btn"
-              >
-                <Wand2 size={22} />
-                🪄 Gerar Pacote iFood
-              </motion.button>
+            {/* 3. Formato */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-6 h-6 rounded-full bg-pepper-orange/20 text-pepper-orange flex items-center justify-center text-xs font-bold">3</div>
+                <h2 className="font-display font-bold text-xl text-text-primary">
+                  Formato da Imagem
+                </h2>
+              </div>
+              
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {aspectRatios.map((ratio) => {
+                  const Icon = ratio.icon;
+                  const isSelected = selectedFormat === ratio.id;
+                  return (
+                    <button
+                      key={ratio.id}
+                      onClick={() => setSelectedFormat(ratio.id)}
+                      className={`
+                        flex flex-col items-center gap-2 p-3 rounded-2xl transition-all duration-300
+                        ${isSelected 
+                          ? "bg-pepper-red text-white shadow-lg ring-2 ring-pepper-red" 
+                          : "bg-bg-surface hover:bg-bg-elevated text-text-muted border border-border-subtle"
+                        }
+                      `}
+                    >
+                      <Icon size={18} className={isSelected ? "text-white" : "text-text-muted"} />
+                      <div className="text-center">
+                        <p className="text-[11px] font-bold">{ratio.label}</p>
+                        <p className="text-[9px] opacity-70 mt-0.5">{ratio.id}</p>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
+
           </div>
         </div>
       </div>
     </motion.div>
   );
 }
+

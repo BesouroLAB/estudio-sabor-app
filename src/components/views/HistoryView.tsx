@@ -95,11 +95,11 @@ function CreationCard({ creation, index }: { creation: Creation, index: number }
         </div>
 
         {/* Hover Actions */}
-        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-           <button className="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center hover:scale-110 transition-transform shadow-xl">
+        <div className="absolute inset-0 bg-pepper-red/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+           <button className="w-10 h-10 rounded-full bg-white text-pepper-red flex items-center justify-center hover:scale-110 transition-transform shadow-xl">
               <Eye size={18} />
            </button>
-           <button className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md text-white border border-white/20 flex items-center justify-center hover:scale-110 transition-transform shadow-xl">
+           <button className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/20 flex items-center justify-center hover:scale-110 transition-transform shadow-xl">
               <Download size={18} />
            </button>
         </div>

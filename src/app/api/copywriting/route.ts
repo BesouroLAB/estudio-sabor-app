@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withFallback } from "@/lib/gemini";
+import { generateContentUnified } from "@/lib/gemini";
 import { buildCopywritingPrompt } from "@/lib/prompt-builder";
 import { trackUsage } from "@/lib/usage-tracker";
 import { createClient } from "@/lib/supabase/server";
@@ -47,35 +47,14 @@ export async function POST(req: NextRequest) {
       `✍️ Generating copywriting: food=${foodType}, style=${visualStyle}`
     );
 
-    const parts: Array<
-      { text: string } | { inlineData: { data: string; mimeType: string } }
-    > = [];
+    const response = await generateContentUnified(
+      model,
+      prompt,
+      imageBase64,
+      mimeType
+    );
 
-    if (imageBase64 && mimeType) {
-      parts.push({
-        inlineData: {
-          data: imageBase64,
-          mimeType: mimeType,
-        },
-      });
-    }
-
-    parts.push({ text: prompt });
-
-    const result = await withFallback(async (ai) => {
-      return await ai.models.generateContent({
-        model,
-        contents: {
-          parts: parts,
-        },
-      });
-    });
-
-    const usageMetadata = result.usageMetadata;
-    const tokensInput = usageMetadata?.promptTokenCount ?? 0;
-    const tokensOutput = usageMetadata?.candidatesTokenCount ?? 0;
-
-    const responseText = result.text || "";
+    const responseText = response.text() || "";
     console.log(
       "📝 Raw copywriting response:",
       responseText.substring(0, 200)

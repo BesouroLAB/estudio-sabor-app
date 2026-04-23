@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withFallback } from "@/lib/gemini";
+import { generateContentUnified } from "@/lib/gemini";
 import {
   buildEnhancementPrompt,
   getAspectRatioForFood,
@@ -81,28 +81,13 @@ export async function POST(req: NextRequest) {
       `🎨 Generating image: food=${foodType}, style=${visualStyle}, ratio=${aspectRatio}`
     );
 
-    const result = await withFallback(async (ai) => {
-      return await ai.models.generateContent({
-        model,
-        contents: {
-          parts: [
-            {
-              inlineData: {
-                data: imageBase64,
-                mimeType: mimeType,
-              },
-            },
-            { text: enhancementPrompt },
-          ],
-        },
-        config: {
-          responseModalities: ["image", "text"],
-          imageConfig: {
-            aspectRatio: aspectRatio,
-          },
-        },
-      });
-    });
+    const result = await generateContentUnified(
+      model,
+      enhancementPrompt,
+      imageBase64,
+      mimeType,
+      aspectRatio
+    );
 
     const usageMetadata = result.usageMetadata;
     const tokensInput = usageMetadata?.promptTokenCount ?? 0;

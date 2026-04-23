@@ -51,8 +51,8 @@ export default async function DashboardLayout({
              userName={userName}
            />
 
-           {/* Internal content area (Fixed Canvas) */}
-           <div className="flex-1 h-full overflow-hidden relative">
+           {/* Internal content area (Scrollable Canvas) */}
+           <div className="flex-1 overflow-y-auto relative">
               {children}
            </div>
         </main>

@@ -9,6 +9,28 @@ export interface CopyText {
   text: string;
 }
 
+export async function classifyImage(
+  imageBase64: string,
+  mimeType: string
+): Promise<string> {
+  const MOCK = process.env.NODE_ENV === "development";
+  if (MOCK) {
+    await new Promise(r => setTimeout(r, 1000));
+    return "hamburger";
+  }
+
+  const response = await fetch("/api/classify", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ imageBase64, mimeType }),
+  });
+
+  if (!response.ok) return "brasileira"; // Fallback on error
+
+  const data = await response.json();
+  return data.foodId || "brasileira";
+}
+
 export async function generateImage(
   imageBase64: string,
   mimeType: string,

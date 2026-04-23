@@ -27,8 +27,8 @@
   --color-text-inverse: #FFFFFF;
 
   /* --- Border (Light) --- */
-  --color-border-subtle: rgba(26, 4, 2, 0.06);
-  --color-border-default: rgba(26, 4, 2, 0.12);
+  --color-border-subtle: #F3F1F0;
+  --color-border-default: #EAE5E2;
   --color-border-accent: rgba(220, 38, 38, 0.2);
 
   /* --- Typography --- */

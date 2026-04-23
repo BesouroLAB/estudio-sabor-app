@@ -38,15 +38,15 @@ export default function ToolLandingPage({ params }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white selection:bg-orange-500/30">
+    <div className="min-h-screen bg-bg-main text-text-primary selection:bg-pepper-red/10">
       {/* Editorial Navigation */}
-      <nav className="border-b border-white/10 py-6 px-8 flex justify-between items-center backdrop-blur-md sticky top-0 z-50 bg-black/50">
+      <nav className="border-b border-border-subtle py-6 px-8 flex justify-between items-center backdrop-blur-md sticky top-0 z-50 bg-white/70">
         <Link href="/" className="text-xl font-bold tracking-tighter hover:opacity-80 transition-opacity">
-          ESTÚDIO<span className="text-orange-500">SABOR</span>
+          ESTÚDIO<span className="text-pepper-red">SABOR</span>
         </Link>
         <Link 
           href={`/?foodType=${encodeURIComponent(tool.foodType)}&visualStyle=${encodeURIComponent(tool.visualStyle)}`}
-          className="bg-white text-black px-6 py-2 rounded-full font-semibold hover:bg-orange-500 hover:text-white transition-all duration-300"
+          className="bg-pepper-red text-white px-6 py-2 rounded-full font-bold hover:bg-pepper-red/90 transition-all duration-300 shadow-lg shadow-pepper-red/20"
         >
           Acessar App
         </Link>
@@ -56,39 +56,39 @@ export default function ToolLandingPage({ params }: Props) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           {/* Hero Content */}
           <div className="space-y-8">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-sm font-medium">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pepper-red/10 border border-pepper-red/20 text-pepper-red text-sm font-bold uppercase tracking-wider">
               <Zap className="w-4 h-4" />
               <span>Ferramenta de IA Especializada</span>
             </div>
             
-            <h1 className="text-5xl lg:text-7xl font-bold leading-tight tracking-tight">
+            <h1 className="text-5xl lg:text-7xl font-bold leading-tight tracking-tight text-text-primary">
               {tool.title}
             </h1>
             
-            <p className="text-xl text-zinc-400 leading-relaxed max-w-lg">
+            <p className="text-xl text-text-secondary leading-relaxed max-w-lg">
               {tool.description} Use o poder da Inteligência Artificial Criativa para dar um salto de qualidade nas fotos do seu negócio.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Link
                 href={`/?foodType=${encodeURIComponent(tool.foodType)}&visualStyle=${encodeURIComponent(tool.visualStyle)}`}
-                className="bg-orange-600 hover:bg-orange-500 text-white px-8 py-4 rounded-2xl font-bold text-lg text-center transition-all shadow-lg shadow-orange-900/20 flex items-center justify-center gap-2"
+                className="bg-gradient-to-r from-pepper-red to-pepper-orange hover:scale-[1.02] text-white px-8 py-4 rounded-2xl font-bold text-lg text-center transition-all shadow-xl shadow-pepper-red/25 flex items-center justify-center gap-2"
               >
-                Começar agora com este Preset
-                <Shield className="w-5 h-5" />
+                COMEÇAR AGORA GRÁTIS
+                <Zap className="w-5 h-5" />
               </Link>
             </div>
           </div>
 
           {/* Visual Showcase (Mockup placeholder) */}
           <div className="relative group">
-            <div className="absolute -inset-4 bg-gradient-to-tr from-orange-500/20 to-purple-500/20 rounded-[2rem] blur-2xl opacity-50 group-hover:opacity-100 transition duration-1000"></div>
-            <div className="relative aspect-square rounded-[2rem] bg-zinc-900 border border-white/10 flex items-center justify-center overflow-hidden">
-                <Camera className="w-20 h-20 text-zinc-800" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-8">
-                    <div className="space-y-2">
-                        <p className="text-orange-400 font-mono text-sm tracking-widest uppercase">Preset Ativado</p>
-                        <p className="text-2xl font-bold">{tool.visualStyle}</p>
+            <div className="absolute -inset-4 bg-gradient-to-tr from-pepper-red/10 to-pepper-orange/10 rounded-[2rem] blur-2xl opacity-50 group-hover:opacity-100 transition duration-1000"></div>
+            <div className="relative aspect-square rounded-[2rem] bg-white border border-border-default shadow-2xl flex items-center justify-center overflow-hidden">
+                <Camera className="w-20 h-20 text-bg-elevated" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-8">
+                    <div className="space-y-1">
+                        <p className="text-white/70 font-bold text-xs tracking-widest uppercase">Preset Ativado</p>
+                        <p className="text-2xl font-bold text-white">{tool.visualStyle}</p>
                     </div>
                 </div>
             </div>
@@ -102,21 +102,22 @@ export default function ToolLandingPage({ params }: Props) {
             { icon: <Shield className="w-6 h-6" />, title: "Segurança de Dados", desc: "Suas fotos são processadas e armazenadas em ambiente seguro e privado." },
             { icon: <Zap className="w-6 h-6" />, title: "Alta Velocidade", desc: "Resultados profissionais prontos para uso em menos de 15 segundos." }
           ].map((feat, i) => (
-            <div key={i} className="p-8 rounded-3xl bg-zinc-900/50 border border-white/5 hover:border-orange-500/30 transition-colors group">
-              <div className="p-3 rounded-2xl bg-zinc-800 w-fit mb-6 group-hover:bg-orange-500/10 group-hover:text-orange-500 transition-colors">
+            <div key={i} className="p-8 rounded-3xl bg-white border border-border-subtle hover:border-pepper-red/30 transition-all group shadow-sm hover:shadow-md">
+              <div className="p-3 rounded-2xl bg-bg-elevated w-fit mb-6 group-hover:bg-pepper-red/10 group-hover:text-pepper-red transition-colors">
                 {feat.icon}
               </div>
-              <h3 className="text-xl font-bold mb-3">{feat.title}</h3>
-              <p className="text-zinc-500 leading-relaxed">{feat.desc}</p>
+              <h3 className="text-xl font-bold mb-3 text-text-primary">{feat.title}</h3>
+              <p className="text-text-secondary leading-relaxed">{feat.desc}</p>
             </div>
           ))}
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-white/10 py-12 px-8 text-center text-zinc-600 text-sm">
+      <footer className="border-t border-border-subtle py-12 px-8 text-center text-text-muted text-sm bg-bg-surface">
         <p>&copy; 2026 Estúdio Sabor AI - One Click Expert para Gastronomia.</p>
       </footer>
     </div>
   );
+}
 }

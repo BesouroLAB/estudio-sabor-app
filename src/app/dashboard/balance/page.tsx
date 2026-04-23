@@ -38,7 +38,7 @@ export default function BalancePage() {
           
           <Link 
             href="/dashboard/store"
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-text-primary text-white font-black rounded-xl hover:bg-pepper-black transition-all shadow-xl shadow-black/5 active:scale-95"
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-pepper-red text-white font-black rounded-xl hover:bg-pepper-red/90 transition-all shadow-xl shadow-pepper-red/15 active:scale-95"
           >
             <ShoppingBag size={18} />
             ADQUIRIR CRÉDITOS
@@ -58,7 +58,7 @@ export default function BalancePage() {
                  </p>
               </div>
               
-              <div className="p-4 rounded-2xl bg-black/10 backdrop-blur-sm border border-white/10 text-white/80 space-y-2">
+              <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10 text-white/80 space-y-2">
                  <div className="flex items-center gap-2 text-xs font-bold">
                     <Info size={14} className="text-white/40" />
                     POR QUE USAR CRÉDITOS?

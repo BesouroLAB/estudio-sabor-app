@@ -22,6 +22,7 @@ interface ResultDashboardProps {
   generationResult: GenerationResult;
   foodType: string;
   style: string;
+  format: string;
   onNewPackage: () => void;
 }
 
@@ -76,6 +77,7 @@ export function ResultDashboard({
   generationResult,
   foodType,
   style,
+  format,
   onNewPackage,
 }: ResultDashboardProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -96,13 +98,18 @@ export function ResultDashboard({
     setShowPaywall(true);
   };
 
+  // Determine aspect ratio for containers
+  const aspectClass = 
+    format === "stories" ? "aspect-[9/16]" :
+    format === "capa" ? "aspect-[4/1]" : "aspect-square";
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.98 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
-      className="flex-1 px-[var(--space-page)] py-8"
+      className="flex-1 px-[var(--space-page)] py-8 overflow-y-auto"
     >
       <div className="max-w-6xl mx-auto">
         {/* Success Header */}
@@ -132,23 +139,28 @@ export function ResultDashboard({
               className="grid grid-cols-2 gap-3"
             >
               {/* Original */}
-              <div className="relative rounded-xl overflow-hidden border border-border-subtle bg-bg-surface">
-                <div className="relative aspect-square">
+              <div className="relative rounded-xl overflow-hidden shadow-lg bg-bg-surface flex items-center justify-center bg-black/20">
+                <div className={`relative w-full ${aspectClass}`}>
                   <img
                     src={uploadedImage.preview}
                     alt="Foto original"
-                    className="object-cover w-full h-full"
+                    className="object-contain w-full h-full opacity-60 blur-sm absolute inset-0"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                  <span className="absolute bottom-2 left-2 text-[10px] font-bold text-white/70 bg-black/40 px-2 py-0.5 rounded-md backdrop-blur-sm uppercase tracking-wider">
+                  <img
+                    src={uploadedImage.preview}
+                    alt="Foto original"
+                    className="object-contain w-full h-full relative z-10"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent z-20" />
+                  <span className="absolute bottom-2 left-2 text-[10px] font-bold text-white/70 bg-bg-elevated/40 px-2 py-0.5 rounded-md backdrop-blur-sm uppercase tracking-wider z-20">
                     Original
                   </span>
                 </div>
               </div>
 
-              {/* Generated */}
-              <div className="relative rounded-xl overflow-hidden border border-pepper-orange/20 bg-bg-surface ring-1 ring-pepper-orange/10">
-                <div className="relative aspect-square">
+              {/* Generated Mockup */}
+              <div className="relative rounded-xl overflow-hidden shadow-xl bg-bg-surface ring-1 ring-pepper-orange/30 flex items-center justify-center bg-black/20 group">
+                <div className={`relative w-full ${aspectClass}`}>
                   <img
                     src={generatedImageUrl}
                     alt="Imagem gerada pela IA"
@@ -156,20 +168,54 @@ export function ResultDashboard({
                   />
 
                   {/* Watermark Overlay */}
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10 opacity-60">
                     <div className="rotate-[-30deg] select-none">
-                      <p className="text-white/15 font-display font-black text-2xl sm:text-3xl tracking-widest uppercase whitespace-nowrap">
+                      <p className="text-white/20 font-display font-black text-xl sm:text-2xl tracking-widest uppercase whitespace-nowrap drop-shadow-md">
                         ESTÚDIO & SABOR
                       </p>
-                      <p className="text-white/10 font-display font-black text-2xl sm:text-3xl tracking-widest uppercase whitespace-nowrap mt-8">
+                      <p className="text-white/10 font-display font-black text-xl sm:text-2xl tracking-widest uppercase whitespace-nowrap mt-8 drop-shadow-md">
                         ESTÚDIO & SABOR
                       </p>
                     </div>
                   </div>
 
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                  <span className="absolute bottom-2 left-2 text-[10px] font-bold text-pepper-orange bg-black/40 px-2 py-0.5 rounded-md backdrop-blur-sm uppercase tracking-wider">
-                    ✨ IA
+                  {/* MOCKUP UI OVERLAYS */}
+                  {format === "stories" && (
+                    <>
+                      <div className="absolute top-0 left-0 right-0 p-3 flex items-center gap-2 bg-gradient-to-b from-black/60 to-transparent z-20">
+                        <div className="w-6 h-6 rounded-full bg-white/20 overflow-hidden border border-white/40 flex-shrink-0" />
+                        <span className="text-white text-[10px] font-bold drop-shadow-md">Seu Restaurante</span>
+                        <span className="text-white/80 text-[10px] ml-auto drop-shadow-md">Agora</span>
+                      </div>
+                      <div className="absolute bottom-4 left-0 right-0 flex justify-center z-20">
+                        <div className="px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white text-[10px] font-bold shadow-lg">
+                          Ver Cardápio
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {format === "capa" && (
+                    <>
+                      <div className="absolute -bottom-3 sm:-bottom-6 left-4 sm:left-6 w-8 h-8 sm:w-16 sm:h-16 rounded-full border-2 sm:border-4 border-bg-surface bg-bg-elevated z-20" />
+                      <div className="absolute bottom-1 sm:bottom-2 left-14 sm:left-24 text-white text-[8px] sm:text-xs font-bold drop-shadow-md z-20">
+                        Seu Restaurante
+                      </div>
+                    </>
+                  )}
+
+                  {format === "quadrada" && (
+                    <>
+                      <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-20 flex flex-col justify-end">
+                         <h4 className="text-white text-[11px] sm:text-sm font-bold leading-tight drop-shadow-md">{foodLabels[foodType] || "Prato Premium"}</h4>
+                         <p className="text-white/80 text-[9px] sm:text-xs line-clamp-1 sm:line-clamp-2 mt-0.5 drop-shadow-md">O sabor que você esperava, agora no iFood.</p>
+                         <p className="text-green-400 font-bold text-[10px] sm:text-sm mt-1 drop-shadow-md">R$ 39,90</p>
+                      </div>
+                    </>
+                  )}
+
+                  <span className="absolute top-2 right-2 text-[10px] font-bold text-pepper-orange bg-bg-elevated/80 px-2 py-0.5 rounded-md backdrop-blur-md uppercase tracking-wider z-20 flex items-center gap-1 shadow-lg border border-pepper-orange/20">
+                    <Sparkles size={10} /> IA Mockup
                   </span>
                 </div>
               </div>
@@ -198,7 +244,7 @@ export function ResultDashboard({
                   <button
                     key={format.id}
                     onClick={handleLockedAction}
-                    className="group relative flex items-center gap-3 p-4 rounded-xl border border-border-subtle bg-bg-surface hover:bg-bg-elevated transition-all focus-ring"
+                    className="group relative flex items-center gap-3 p-4 rounded-xl bg-bg-surface hover:bg-bg-elevated transition-all shadow-sm hover:shadow-md focus-ring"
                     id={`export-${format.id}`}
                   >
                     <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-text-muted group-hover:text-pepper-orange transition-colors">
@@ -240,7 +286,7 @@ export function ResultDashboard({
               {generationResult.copyTexts.map((copy) => (
                 <div
                   key={copy.id}
-                  className="p-4 rounded-xl border border-border-subtle bg-bg-surface group"
+                  className="p-4 rounded-xl bg-bg-surface group shadow-sm"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-[11px] font-bold uppercase tracking-wider text-pepper-orange">
@@ -278,7 +324,7 @@ export function ResultDashboard({
               transition={{ delay: 0.6 }}
               className="relative rounded-2xl overflow-hidden"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-pepper-red/20 via-bg-surface to-pepper-orange/10 border border-pepper-red/20 rounded-2xl" />
+              <div className="absolute inset-0 bg-gradient-to-br from-pepper-red/20 via-bg-surface to-pepper-orange/10 rounded-2xl" />
               <div className="relative p-6 flex flex-col items-center text-center">
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-pepper-red to-pepper-orange flex items-center justify-center mb-4 shadow-lg shadow-pepper-red/30 animate-pulse-glow">
                   <Crown size={24} className="text-white" />
@@ -300,7 +346,7 @@ export function ResultDashboard({
                   </button>
                   <button
                     onClick={handleLockedAction}
-                    className="w-full py-3 px-6 rounded-xl border border-border-default text-text-secondary font-semibold text-sm hover:bg-white/5 transition-all focus-ring"
+                    className="w-full py-3 px-6 rounded-xl bg-bg-elevated text-text-secondary font-semibold text-sm hover:bg-bg-main transition-all focus-ring"
                     id="paywall-single-btn"
                   >
                     Desbloquear este pacote — R$ 9,90
@@ -315,7 +361,7 @@ export function ResultDashboard({
             {/* New Package */}
             <button
               onClick={onNewPackage}
-              className="flex items-center justify-center gap-2 py-3 rounded-xl border border-border-subtle text-text-muted hover:text-text-primary hover:border-white/15 transition-all text-sm font-medium focus-ring"
+              className="flex items-center justify-center gap-2 py-3 rounded-xl text-text-muted hover:text-text-primary transition-all text-sm font-medium focus-ring"
               id="new-package-btn"
             >
               <RefreshCw size={14} />
@@ -330,14 +376,14 @@ export function ResultDashboard({
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-bg-main/80 backdrop-blur-md"
           onClick={() => setShowPaywall(false)}
         >
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "spring", damping: 25 }}
-            className="bg-bg-elevated rounded-3xl border border-border-default p-8 max-w-md w-full relative"
+            className="bg-bg-surface rounded-3xl p-8 max-w-md w-full relative shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <button

@@ -66,7 +66,7 @@ export function UploadView({ onImageUpload }: UploadViewProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.4 }}
-      className="flex-1 flex flex-col items-center justify-center px-[var(--space-page)] py-12"
+      className="flex-1 flex flex-col items-center justify-center px-[var(--space-page)] py-12 overflow-y-auto"
     >
       {/* Hero Copy */}
       <div className="text-center mb-10 max-w-xl">
