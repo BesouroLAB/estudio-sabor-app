@@ -1,5 +1,5 @@
 import { getAdminSupabase } from "./admin";
-import { v4 as uuidv4 } from "uuid";
+
 
 interface SaveCreationParams {
   userId: string;
@@ -21,7 +21,7 @@ export async function saveUserCreation({
   copywritingTexts = []
 }: SaveCreationParams) {
   const supabase = getAdminSupabase();
-  const creationId = uuidv4();
+  const creationId = crypto.randomUUID();
   const fileName = `${userId}/${creationId}.${mimeType.split("/")[1] || "png"}`;
 
   // 1. Convert Base64 to Buffer for upload

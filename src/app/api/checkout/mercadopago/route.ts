@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MercadoPagoConfig, Payment } from "mercadopago";
-import { v4 as uuidv4 } from "uuid";
+
 
 interface CheckoutRequest {
   userId: string;
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
     const client = new MercadoPagoConfig({ accessToken, options: { timeout: 5000 } });
     const payment = new Payment(client);
 
-    const idempotencyKey = uuidv4();
+    const idempotencyKey = crypto.randomUUID();
 
     // Criação de pagamento PIX Direto
     const response = await payment.create({
