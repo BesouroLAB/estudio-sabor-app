@@ -7,10 +7,11 @@ import {
   RefreshCw, LogOut, Shield
 } from "lucide-react";
 
-import { Tab, Stats, UserProfile, UsageRecord } from "./types";
+import { Tab, Stats, UserProfile, UsageRecord, SystemSetting } from "./types";
 import { OverviewTab } from "./TabOverview";
 import { UsageTab } from "./TabUsage";
 import { CRMTab } from "./TabCRM";
+import { SettingsTab } from "./TabSettings";
 
 // --- Component ---
 export default function AdminDashboard({
@@ -24,6 +25,7 @@ export default function AdminDashboard({
   const [usersTotal, setUsersTotal] = useState(0);
   const [usage, setUsage] = useState<UsageRecord[]>([]);
   const [usageTotal, setUsageTotal] = useState(0);
+  const [settings, setSettings] = useState<SystemSetting[]>([]);
 
   // Filters
   const [userSearch, setUserSearch] = useState("");
@@ -97,19 +99,29 @@ const fetchUsage = useCallback(async () => {
   }
 }, [usagePage, usageType, usageEmail, usageDateFrom, usageDateTo]);
 
-// --- Initial Load ---
-useEffect(() => {
-  setLoading(true);
-  Promise.all([fetchStats(), fetchUsers(), fetchUsage()]).finally(() =>
-    setLoading(false)
-  );
-}, [fetchStats, fetchUsers, fetchUsage]);
+  const fetchSettings = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/settings");
+      if (res.ok) setSettings(await res.json());
+    } catch (e) {
+      console.error("Settings fetch failed:", e);
+    }
+  }, []);
+
+  // --- Initial Load ---
+  useEffect(() => {
+    setLoading(true);
+    Promise.all([fetchStats(), fetchUsers(), fetchUsage(), fetchSettings()]).finally(() =>
+      setLoading(false)
+    );
+  }, [fetchStats, fetchUsers, fetchUsage, fetchSettings]);
 
 // --- Tab Config ---
 const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: "overview", label: "Painel", icon: <TrendingUp size={16} /> },
   { id: "usage", label: "Histórico", icon: <Zap size={16} /> },
   { id: "crm", label: "Clientes", icon: <Users size={16} /> },
+  { id: "settings", label: "Configurações", icon: <Shield size={16} /> },
 ];
 
 // --- Helpers ---
@@ -282,6 +294,13 @@ return (
               setUserSearch={setUserSearch}
               fetchUsers={fetchUsers}
               fmtDate={fmtDate}
+            />
+          )}
+          {activeTab === "settings" && (
+            <SettingsTab
+              key="settings"
+              settings={settings}
+              fetchSettings={fetchSettings}
             />
           )}
         </AnimatePresence>

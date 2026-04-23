@@ -43,11 +43,10 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith("/signup") ||
     request.nextUrl.pathname.startsWith("/auth");
 
-  if (!user && isProtectedRoute) {
-    // TEMPORARY: Bypass login
-    // const url = request.nextUrl.clone();
-    // url.pathname = "/login";
-    // return NextResponse.redirect(url);
+  if (!user && request.nextUrl.pathname.startsWith("/admin")) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    return NextResponse.redirect(url);
   }
 
   // If user is already logged in, redirect away from auth pages to dashboard
@@ -57,12 +56,8 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // TEMPORARY: Bypass login completely. If anyone hits /login without user, force them into dashboard
-  if (!user && (isAuthRoute || request.nextUrl.pathname === "/")) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
-    return NextResponse.redirect(url);
-  }
+  // No automatic redirect to dashboard for guests on public routes
+  // This allows users to see the landing page and login flow naturally.
 
   return supabaseResponse;
 }

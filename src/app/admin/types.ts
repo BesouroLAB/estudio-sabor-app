@@ -36,4 +36,11 @@ export interface UsageRecord {
   created_at: string;
 }
 
-export type Tab = "overview" | "usage" | "crm";
+export interface SystemSetting {
+  key: string;
+  value: any;
+  description: string;
+  updated_at: string;
+}
+
+export type Tab = "overview" | "usage" | "crm" | "settings";

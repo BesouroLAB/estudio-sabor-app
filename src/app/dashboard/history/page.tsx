@@ -7,14 +7,12 @@ export default async function HistoryPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Handle Mock
-  let currentUser = user;
-  if (!currentUser) {
-     currentUser = {
-      id: "mock-temporario",
-      email: "mock@teste.com",
-    } as any;
+  // Ensure user is authenticated
+  if (!user) {
+    redirect("/login");
   }
+
+  const currentUser = user;
 
   // Fetch real creations from Supabase
   const { data: creations, error } = await supabase

@@ -21,9 +21,36 @@ export function DashboardHub({ onStartKit, onOpenStore, creditsRemaining, userNa
   return (
     <div className="flex flex-col h-full p-8 lg:p-12 gap-8 overflow-y-auto select-none bg-bg-main relative">
       
+      {/* Guest Banner */}
+      {userName === "Visitante" && (
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex-none max-w-4xl bg-pepper-orange/10 border border-pepper-orange/20 rounded-2xl p-4 flex items-center justify-between gap-4"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-pepper-orange/20 text-pepper-orange flex items-center justify-center">
+              <Sparkles size={20} />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-pepper-black">Você está em modo demonstração</h3>
+              <p className="text-xs text-text-secondary">Crie uma conta para salvar seus projetos e ganhar créditos bônus.</p>
+            </div>
+          </div>
+          <Link 
+            href="/login"
+            className="bg-pepper-black text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-pepper-red transition-all whitespace-nowrap"
+          >
+            Criar Conta Grátis
+          </Link>
+        </motion.div>
+      )}
+
       {/* Welcome */}
       <header className="flex-none max-w-4xl">
-        <h1 className="text-3xl font-extrabold text-text-primary tracking-tight">Bom dia, Chef.</h1>
+        <h1 className="text-3xl font-extrabold text-text-primary tracking-tight">
+          {userName === "Visitante" ? "Olá, futuro Chef." : `Bom dia, ${userName}.`}
+        </h1>
         <p className="text-sm text-text-secondary mt-1">O que vamos servir para seus clientes hoje?</p>
       </header>
 

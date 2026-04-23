@@ -28,10 +28,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing parameters" }, { status: 400 });
     }
 
+    const PACKAGE_CREDITS: Record<string, number> = {
+      kit_emergencia: 10,
+      kit_agencia: 30,
+      kit_imperio: 100,
+    };
+
     const price = PACKAGE_PRICES[packageId];
     const description = PACKAGE_NAMES[packageId];
+    const credits = PACKAGE_CREDITS[packageId];
 
-    if (!price) {
+    if (!price || !credits) {
       return NextResponse.json({ error: "Invalid package" }, { status: 400 });
     }
 
@@ -53,9 +60,14 @@ export async function POST(req: NextRequest) {
         description: description,
         payment_method_id: "pix",
         payer: {
-          email: "comprador@estudiosabor.com.br", // Dummy since we are tracking by external_reference
+          email: "comprador@estudiosabor.com.br", 
         },
-        external_reference: `${userId}|${packageId}`, // Crucial para o webhook
+        external_reference: userId, // Simplificado apenas para o ID do usuário
+        metadata: {
+          user_id: userId,
+          credits: credits,
+          package_name: packageId
+        }
       },
       requestOptions: {
         idempotencyKey,

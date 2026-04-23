@@ -31,6 +31,15 @@ export default async function DashboardLayout({
     credits = profile?.credits ?? 0;
     userName = profile?.full_name ?? undefined;
   }
+
+  // Buscar configurações globais (Suporte e Anúncios)
+  const { data: settings } = await supabase
+    .from('system_settings')
+    .select('key, value')
+    .in('key', ['whatsapp_support_link', 'global_announcement']);
+
+  const supportLink = settings?.find(s => s.key === 'whatsapp_support_link')?.value as string || 'https://wa.me/5516988031505';
+  const announcement = settings?.find(s => s.key === 'global_announcement')?.value as any || null;
   
   return (
     <DashboardProvider>
@@ -49,6 +58,8 @@ export default async function DashboardLayout({
              user={user || { id: 'mock', email: 'visitante@mock.com' } as any} 
              credits={credits} 
              userName={userName}
+             supportLink={supportLink}
+             announcement={announcement}
            />
 
            {/* Internal content area (Scrollable Canvas) */}
