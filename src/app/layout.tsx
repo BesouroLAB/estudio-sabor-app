@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
-import { Inter, Outfit } from "next/font/google";
+import { Plus_Jakarta_Sans, Inter } from "next/font/google";
 import "./globals.css";
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: "--font-plus-jakarta",
+  subsets: ["latin"],
+  display: "swap",
+});
 
 const inter = Inter({
   variable: "--font-inter",
@@ -8,27 +14,21 @@ const inter = Inter({
   display: "swap",
 });
 
-const outfit = Outfit({
-  variable: "--font-outfit",
-  subsets: ["latin"],
-  display: "swap",
-});
-
 export const metadata: Metadata = {
-  title: "Estúdio & Sabor | Sua Agência de Delivery no Bolso",
+  title: "Estúdio & Sabor | Fotos Profissionais para iFood com IA",
   description:
-    "Transforme fotos de celular em imagens, capas e textos que vendem no iFood em 30 segundos. Food Styling com IA + Copywriting automático.",
+    "Transforme fotos de celular em imagens profissionais para cardápio iFood. IA gastronômica com entrega instantânea. Teste grátis.",
   keywords: [
-    "fotografia gastronomica",
-    "fotos ifood",
-    "capa ifood",
-    "imagens cardápio",
-    "food styling ia",
-    "marketing delivery",
+    "fotos para ifood",
+    "tamanho capa ifood",
+    "imagens cardápio ifood tamanho",
+    "foto profissional delivery",
+    "ia fotografia gastronomica",
+    "melhorar foto comida ia",
   ],
   openGraph: {
-    title: "Estúdio & Sabor | Marketing 1-Click para Delivery",
-    description: "Transforme fotos de celular em pacotes de marketing profissional para iFood em 30 segundos.",
+    title: "Estúdio & Sabor | Fotos Profissionais para iFood com IA",
+    description: "Transforme fotos de celular em imagens profissionais para cardápio iFood. Teste grátis com 30 créditos.",
     type: "website",
     locale: "pt_BR",
   },
@@ -46,10 +46,13 @@ export default function RootLayout({
   return (
     <html
       lang="pt-BR"
-      className={`${inter.variable} ${outfit.variable} h-full antialiased`}
+      className={`${plusJakartaSans.variable} ${inter.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-dvh flex flex-col bg-bg-base text-text-primary font-body" suppressHydrationWarning>
+      <head>
+        <link rel="icon" href="https://res.cloudinary.com/do8gdtozt/image/upload/v1761782366/pimenta_sem__fundo_qur83u.png" sizes="any" />
+      </head>
+      <body className="min-h-dvh flex flex-col bg-stone-50 text-stone-900 font-sans" suppressHydrationWarning>
         {children}
       </body>
     </html>

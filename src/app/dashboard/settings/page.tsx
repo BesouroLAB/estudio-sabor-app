@@ -1,124 +1,115 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { 
-  User, 
-  Store, 
-  MapPin, 
-  Link as LinkIcon, 
-  Smartphone,
-  Shield,
-  Bell,
-  Save,
-  Camera
-} from "lucide-react";
 import { useState } from "react";
+import { User, Store, LinkIcon, Shield, Bell, Save, Camera } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 export default function SettingsPage() {
   const [loading, setLoading] = useState(false);
 
+  const handleSave = () => {
+    setLoading(true);
+    setTimeout(() => setLoading(false), 1500);
+  };
+
   return (
-    <div className="flex-1 px-[var(--space-page)] py-8 overflow-y-auto">
-      <div className="max-w-3xl mx-auto space-y-10">
-        
-        {/* Header */}
-        <div className="flex items-center justify-between">
-           <div>
-             <h1 className="font-display font-bold text-3xl text-text-primary tracking-tight">
-               Configurações
-             </h1>
-             <p className="text-text-muted text-sm mt-1">Gerencie seu perfil e dados do seu delivery.</p>
-           </div>
-           
-           <button 
-             onClick={() => {
-                setLoading(true);
-                setTimeout(() => setLoading(false), 1500);
-             }}
-             className="flex items-center gap-2 px-6 py-2.5 bg-pepper-orange text-white font-bold rounded-xl hover:bg-pepper-red transition-all shadow-lg shadow-pepper-orange/10 disabled:opacity-50"
-             disabled={loading}
-           >
-             {loading ? <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : <Save size={18} />}
-             Salvar Alterações
-           </button>
+    <div className="flex-1 bg-[#F7F7F7] min-h-screen select-none overflow-y-auto">
+      <div className="max-w-3xl mx-auto px-6 py-8 pb-24 md:pb-8 space-y-8">
+
+        {/* Page Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-[#3E3E3E] tracking-tight">Configurações</h1>
+            <p className="text-sm text-[#717171] mt-1">Gerencie seu perfil e os dados do seu delivery.</p>
+          </div>
+          <button
+            onClick={handleSave}
+            disabled={loading}
+            className="flex items-center gap-2 px-5 py-2.5 bg-[#EA1D2C] text-white text-sm font-bold rounded-lg hover:bg-[#d1192a] transition-all shadow-sm active:scale-95 disabled:opacity-60"
+          >
+            {loading
+              ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              : <Save size={16} />
+            }
+            Salvar Alterações
+          </button>
         </div>
 
-        {/* Sections */}
-        <div className="space-y-6">
-           
-           {/* Perfil */}
-           <section className="bg-bg-surface border border-border-default rounded-3xl p-6 space-y-6 shadow-[0_10px_30px_rgba(0,0,0,0.02)]">
-              <div className="flex items-center gap-2 border-b border-border-subtle pb-4">
-                 <User size={18} className="text-pepper-orange" />
-                 <h2 className="font-display font-bold text-lg text-text-primary uppercase tracking-wider">Perfil Pessoal</h2>
+        {/* Profile Section */}
+        <Section icon={<User size={16} className="text-[#EA1D2C]" />} title="Perfil Pessoal">
+          <div className="flex flex-col md:flex-row gap-8 items-start">
+            {/* Avatar */}
+            <div className="relative group shrink-0">
+              <div className="w-20 h-20 rounded-full bg-[#F7F7F7] border-2 border-dashed border-[#DDDDE0] flex items-center justify-center overflow-hidden">
+                <User size={28} className="text-[#A6A6A6]" />
               </div>
-              
-              <div className="flex flex-col md:flex-row gap-8 items-start">
-                 <div className="relative group">
-                    <div className="w-24 h-24 rounded-full bg-bg-elevated border-2 border-dashed border-border-default flex items-center justify-center overflow-hidden">
-                       <User size={32} className="text-text-muted/40" />
-                    </div>
-                    <button className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-pepper-orange text-white flex items-center justify-center shadow-lg border-4 border-bg-surface hover:scale-110 transition-transform">
-                       <Camera size={14} />
-                    </button>
-                 </div>
-                 
-                 <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-                    <InputField label="Nome Completo" placeholder="Tiago ... " value="Tiago Alvim" />
-                    <InputField label="E-mail de Acesso" placeholder="seu@email.com" value="tiago@estudiosabor.com.br" disabled />
-                    <InputField label="Celular (WhatsApp)" placeholder="(11) 99999-9999" value="(16) 99343-2211" />
-                 </div>
-              </div>
-           </section>
+              <button className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-[#EA1D2C] text-white flex items-center justify-center shadow-md border-2 border-white hover:scale-110 transition-transform">
+                <Camera size={13} />
+              </button>
+            </div>
 
-           {/* Delivery Data */}
-           <section className="bg-bg-surface border border-border-default rounded-3xl p-6 space-y-6 shadow-[0_10px_30px_rgba(0,0,0,0.02)]">
-              <div className="flex items-center gap-2 border-b border-border-subtle pb-4">
-                 <Store size={18} className="text-pepper-orange" />
-                 <h2 className="font-display font-bold text-lg text-text-primary uppercase tracking-wider">Dados do Restaurante</h2>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                 <InputField label="Nome do Estabelecimento" placeholder="Ex: Burger King" value="Pizzaria do Sabor" />
-                 <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest px-1">Tipo de Culinária</label>
-                    <select className="w-full bg-bg-elevated border border-border-default rounded-xl px-4 py-3 text-sm text-text-primary outline-none focus:border-pepper-orange/50 transition-all appearance-none shadow-sm focus:shadow-md">
-                       <option>Pizzaria</option>
-                       <option>Hamburgueria</option>
-                       <option>Sushi / Japonesa</option>
-                       <option>Comida Brasileira</option>
-                       <option>Doceria / Cafeteria</option>
-                    </select>
-                 </div>
-                 <div className="md:col-span-2">
-                    <InputField label="Link do Cardápio (iFood/Próprio)" placeholder="https://www.ifood.com.br/delivery/..." icon={<LinkIcon size={14} />} />
-                 </div>
-              </div>
-           </section>
+            {/* Fields */}
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+              <InputField label="Nome Completo" placeholder="Seu nome" defaultValue="Tiago Fernandes" />
+              <InputField label="E-mail de Acesso" placeholder="seu@email.com" defaultValue="tiago@estudiosabor.com.br" disabled />
+              <InputField label="WhatsApp" placeholder="(11) 99999-9999" defaultValue="(16) 99343-2211" />
+            </div>
+          </div>
+        </Section>
 
-           {/* App Preferences */}
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <section className="bg-bg-surface border border-border-default rounded-3xl p-6 space-y-4 shadow-[0_10px_30px_rgba(0,0,0,0.02)]">
-                 <div className="flex items-center gap-2 mb-2">
-                    <Bell size={18} className="text-pepper-orange" />
-                    <h3 className="font-display font-medium text-text-primary">Notificações</h3>
-                 </div>
-                 <ToggleItem label="Alertas de novas promoções" active />
-                 <ToggleItem label="Lembretes de missões" active />
-              </section>
+        {/* Restaurant Section */}
+        <Section icon={<Store size={16} className="text-[#EA1D2C]" />} title="Dados do Restaurante">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <InputField label="Nome do Estabelecimento" placeholder="Ex: Pizzaria do Sabor" defaultValue="Pizzaria do Sabor" />
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-bold text-[#717171] uppercase tracking-wider">Tipo de Culinária</label>
+              <select className="w-full bg-white border border-[#DDDDE0] rounded-lg px-4 py-2.5 text-sm text-[#3E3E3E] outline-none focus:border-[#EA1D2C]/50 transition-all appearance-none cursor-pointer">
+                <option>Pizzaria</option>
+                <option>Hamburgueria</option>
+                <option>Sushi / Japonesa</option>
+                <option>Comida Brasileira</option>
+                <option>Doceria / Cafeteria</option>
+              </select>
+            </div>
+            <div className="md:col-span-2">
+              <InputField label="Link do Cardápio (iFood / Próprio)" placeholder="https://www.ifood.com.br/delivery/..." icon={<LinkIcon size={14} />} />
+            </div>
+          </div>
+        </Section>
 
-              <section className="bg-bg-surface border border-border-default rounded-3xl p-6 space-y-4 shadow-[0_10px_30px_rgba(0,0,0,0.02)]">
-                 <div className="flex items-center gap-2 mb-2">
-                    <Shield size={18} className="text-pepper-orange" />
-                    <h3 className="font-display font-medium text-text-primary">Segurança</h3>
-                 </div>
-                 <Link href="#" className="text-xs text-pepper-orange font-bold hover:underline block">Alterar senha de acesso</Link>
-                 <Link href="#" className="text-xs text-pepper-orange font-bold hover:underline block">Gerenciar sessões ativas</Link>
-              </section>
-           </div>
+        {/* Preferences Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <Section icon={<Bell size={16} className="text-[#EA1D2C]" />} title="Notificações">
+            <div className="space-y-3">
+              <ToggleItem label="Alertas de novas promoções" defaultActive />
+              <ToggleItem label="Lembretes de missões" defaultActive />
+              <ToggleItem label="Novidades e releases" />
+            </div>
+          </Section>
 
+          <Section icon={<Shield size={16} className="text-[#EA1D2C]" />} title="Segurança">
+            <div className="space-y-3">
+              <Link href="#" className="block text-sm text-[#EA1D2C] font-semibold hover:underline">
+                Alterar senha de acesso
+              </Link>
+              <Link href="#" className="block text-sm text-[#EA1D2C] font-semibold hover:underline">
+                Gerenciar sessões ativas
+              </Link>
+              <p className="text-xs text-[#A6A6A6]">Última sessão: hoje às {new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>
+            </div>
+          </Section>
+        </div>
+
+        {/* Danger Zone */}
+        <div className="bg-white border border-red-100 rounded-xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h4 className="font-bold text-[#3E3E3E] text-sm">Zona de Perigo</h4>
+            <p className="text-xs text-[#717171] mt-0.5">Ao excluir sua conta, todos os dados e créditos são removidos permanentemente.</p>
+          </div>
+          <button className="text-red-500 text-sm font-bold border border-red-200 px-4 py-2 rounded-lg hover:bg-red-50 transition-all shrink-0">
+            Excluir Conta
+          </button>
         </div>
 
       </div>
@@ -126,43 +117,67 @@ export default function SettingsPage() {
   );
 }
 
-function InputField({ label, placeholder, value, disabled, icon }: any) {
-   return (
-      <div className="space-y-2">
-         <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest px-1">
-            {label}
-         </label>
-         <div className="relative flex items-center">
-            {icon && <div className="absolute left-4 text-text-muted">{icon}</div>}
-            <input 
-               type="text" 
-               defaultValue={value} 
-               placeholder={placeholder}
-               disabled={disabled}
-               className={cn(
-                  "w-full bg-bg-elevated border border-border-default rounded-xl py-3 text-sm text-text-primary outline-none focus:border-pepper-orange/50 transition-all shadow-sm focus:shadow-md",
-                  icon ? "pl-11 pr-4" : "px-4",
-                  disabled && "opacity-50 cursor-not-allowed"
-               )}
-            />
-         </div>
+// --- Sub-components ---
+
+function Section({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
+  return (
+    <section className="bg-white border border-[#EAEAEC] rounded-xl p-6 space-y-5">
+      <div className="flex items-center gap-2 border-b border-[#F3F1F0] pb-4">
+        {icon}
+        <h2 className="font-bold text-sm text-[#3E3E3E] uppercase tracking-wider">{title}</h2>
       </div>
-   );
+      {children}
+    </section>
+  );
 }
 
-function ToggleItem({ label, active }: { label: string, active?: boolean }) {
-   return (
-      <div className="flex items-center justify-between py-1">
-         <span className="text-xs text-text-muted">{label}</span>
-         <div className={cn(
-            "w-10 h-5 rounded-full relative transition-colors cursor-pointer",
-            active ? "bg-pepper-orange" : "bg-bg-elevated border border-border-default"
-         )}>
-            <div className={cn(
-               "absolute top-[2px] w-3 h-3 rounded-full transition-all shadow-sm",
-               active ? "right-1 bg-white" : "left-1 bg-text-muted"
-            )} />
-         </div>
+function InputField({ label, placeholder, defaultValue, disabled, icon }: {
+  label: string;
+  placeholder?: string;
+  defaultValue?: string;
+  disabled?: boolean;
+  icon?: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <label className="text-[11px] font-bold text-[#717171] uppercase tracking-wider">{label}</label>
+      <div className="relative flex items-center">
+        {icon && <div className="absolute left-3.5 text-[#A6A6A6]">{icon}</div>}
+        <input
+          type="text"
+          defaultValue={defaultValue}
+          placeholder={placeholder}
+          disabled={disabled}
+          className={cn(
+            "w-full bg-white border border-[#DDDDE0] rounded-lg py-2.5 text-sm text-[#3E3E3E] outline-none focus:border-[#EA1D2C]/50 transition-all",
+            icon ? "pl-10 pr-4" : "px-4",
+            disabled && "bg-[#F7F7F7] text-[#A6A6A6] cursor-not-allowed"
+          )}
+        />
       </div>
-   );
+    </div>
+  );
+}
+
+function ToggleItem({ label, defaultActive }: { label: string; defaultActive?: boolean }) {
+  const [active, setActive] = useState(defaultActive ?? false);
+  return (
+    <div className="flex items-center justify-between py-0.5">
+      <span className="text-sm text-[#3E3E3E]">{label}</span>
+      <button
+        onClick={() => setActive(!active)}
+        className={cn(
+          "w-10 h-5 rounded-full relative transition-colors",
+          active ? "bg-[#EA1D2C]" : "bg-[#DDDDE0]"
+        )}
+        role="switch"
+        aria-checked={active}
+      >
+        <div className={cn(
+          "absolute top-[2px] w-4 h-4 rounded-full bg-white shadow-sm transition-all",
+          active ? "right-[2px]" : "left-[2px]"
+        )} />
+      </button>
+    </div>
+  );
 }

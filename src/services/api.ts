@@ -36,7 +36,8 @@ export async function generateImage(
   mimeType: string,
   foodType: string,
   visualStyle: string,
-  formatSelected: string = "1:1"
+  formatSelected: string = "1:1",
+  options: { keepAngle: boolean; keepBackground: boolean } = { keepAngle: false, keepBackground: false }
 ): Promise<GenerateImageResult> {
   const MOCK = process.env.NODE_ENV === "development";
   if (MOCK) {
@@ -51,7 +52,15 @@ export async function generateImage(
   const response = await fetch("/api/generate", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ imageBase64, mimeType, foodType, visualStyle, formatSelected }),
+    body: JSON.stringify({ 
+      imageBase64, 
+      mimeType, 
+      foodType, 
+      visualStyle, 
+      formatSelected,
+      keepAngle: options.keepAngle,
+      keepBackground: options.keepBackground
+    }),
   });
 
   if (!response.ok) {

@@ -2,95 +2,279 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  Home, 
-  PlusSquare, 
-  LayoutTemplate, 
-  History, 
-  CreditCard, 
+import {
+  Home,
+  PlusSquare,
+  LayoutTemplate,
+  History,
+  CreditCard,
   ShoppingBag,
   Settings,
   LogOut,
-  Sparkles
+  Shield,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { createClient } from "@/lib/supabase/client";
+import { useDashboard } from "@/context/DashboardContext";
 
-const navItems = [
-  { name: "Início", href: "/dashboard", icon: Home },
-  { name: "Criar Kit Mágico", href: "/dashboard/create", icon: PlusSquare, highlight: true },
-  { name: "Meus Projetos", href: "/dashboard/history", icon: History },
-  { name: "Templates & Promos", href: "/dashboard/templates", icon: LayoutTemplate },
-  { name: "Extrato de Créditos", href: "/dashboard/balance", icon: CreditCard },
-  { name: "Loja de Créditos", href: "/dashboard/store", icon: ShoppingBag },
+const LOGO_LIGHT_BG =
+  "https://res.cloudinary.com/do8gdtozt/image/upload/v1761865865/logo_estudio_sabor_horizontal-upscale-scale-6_00x_nmbn9t.png";
+const LOGO_PEPPER =
+  "https://res.cloudinary.com/do8gdtozt/image/upload/f_auto,q_auto/v1761782366/pimenta_sem__fundo_qur83u.png";
+
+const navSections = [
+  {
+    label: null,
+    items: [
+      { name: "Início", href: "/dashboard", icon: Home },
+      { name: "Criar Foto", href: "/dashboard/create", icon: PlusSquare, highlight: true },
+    ],
+  },
+  {
+    label: "Meus Dados",
+    items: [
+      { name: "Minhas Criações", href: "/dashboard/history", icon: History },
+      { name: "Templates & Promos", href: "/dashboard/templates", icon: LayoutTemplate },
+    ],
+  },
+  {
+    label: "Financeiro",
+    items: [
+      { name: "Extrato de Créditos", href: "/dashboard/balance", icon: CreditCard },
+      { name: "Loja de Créditos", href: "/dashboard/store", icon: ShoppingBag },
+    ],
+  },
 ];
 
-export function DashboardSidebar() {
+interface DashboardSidebarProps {
+  isAdmin?: boolean;
+}
+
+export function DashboardSidebar({ isAdmin = false }: DashboardSidebarProps) {
   const pathname = usePathname();
+  const { sidebarCollapsed, toggleSidebar } = useDashboard();
 
   return (
-    <aside className="hidden md:flex flex-col w-64 bg-bg-surface fixed h-screen z-40">
-      <div className="px-2 py-12">
-        <Link href="/dashboard" className="flex items-center group">
-          <img 
-            src="https://res.cloudinary.com/do8gdtozt/image/upload/v1761865865/logo_estudio_sabor_horizontal-upscale-scale-6_00x_nmbn9t.png" 
-            alt="Estúdio & Sabor" 
-            className="w-full h-auto object-contain transition-transform group-hover:scale-[1.02]"
-          />
-        </Link>
-      </div>
+    <>
+      {/* Desktop Sidebar */}
+      <motion.aside
+        animate={{ width: sidebarCollapsed ? 72 : 240 }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        className="hidden md:flex flex-col fixed h-screen z-40 bg-white border-r border-[#EAEAEC] select-none"
+      >
+        {/* Logo */}
+        <div className="flex items-center justify-center border-b border-[#EAEAEC] h-28 px-4">
+          <Link href="/dashboard" className="flex items-center shrink-0">
+            {sidebarCollapsed ? (
+              <img
+                src={LOGO_PEPPER}
+                alt="Estúdio & Sabor"
+                className="w-14 h-14 object-contain"
+              />
+            ) : (
+              <img
+                src={LOGO_LIGHT_BG}
+                alt="Estúdio & Sabor"
+                className="h-20 w-auto object-contain"
+              />
+            )}
+          </Link>
+        </div>
 
-      <nav className="flex-1 px-4 py-4 flex flex-col gap-1 overflow-y-auto scrollbar-hide">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href;
-          const Icon = item.icon;
-          
-          return (
+        {/* Navigation */}
+        <nav className="flex-1 py-4 overflow-y-auto scrollbar-hide">
+          {navSections.map((section, sIdx) => (
+            <div key={sIdx} className={cn(sIdx > 0 && "mt-4")}>
+              {/* Section Label */}
+              <AnimatePresence>
+                {section.label && !sidebarCollapsed && (
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="px-5 mb-2 text-[10px] font-bold text-[#A6A6A6] uppercase tracking-[0.15em]"
+                  >
+                    {section.label}
+                  </motion.p>
+                )}
+              </AnimatePresence>
+
+              {/* Section Items */}
+              <div className={cn("flex flex-col gap-0.5", sidebarCollapsed ? "px-2" : "px-3")}>
+                {section.items.map((item) => {
+                  const isActive = pathname === item.href;
+                  const Icon = item.icon;
+
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      title={sidebarCollapsed ? item.name : undefined}
+                      className={cn(
+                        "flex items-center gap-3 rounded-xl text-sm font-medium transition-all relative overflow-hidden group",
+                        sidebarCollapsed ? "justify-center px-0 py-3" : "px-3 py-2.5",
+                        isActive
+                          ? "text-white"
+                          : "text-[#717171] hover:text-[#3E3E3E] hover:bg-[#F7F7F7]",
+                        item.highlight && !isActive && "text-pepper-red"
+                      )}
+                    >
+                      <Icon
+                        size={18}
+                        className={cn(
+                          "shrink-0 relative z-10 transition-colors",
+                          isActive ? "text-white" : "",
+                          item.highlight && !isActive && "text-pepper-red"
+                        )}
+                      />
+                      <AnimatePresence>
+                        {!sidebarCollapsed && (
+                          <motion.span
+                            initial={{ opacity: 0, width: 0 }}
+                            animate={{ opacity: 1, width: "auto" }}
+                            exit={{ opacity: 0, width: 0 }}
+                            className="relative z-10 whitespace-nowrap overflow-hidden"
+                          >
+                            {item.name}
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
+
+                      {/* Active indicator pill */}
+                      {isActive && (
+                        <motion.div
+                          layoutId="sidebar-active"
+                          className="absolute inset-0 bg-[#EA1D2C] rounded-xl"
+                          transition={{ type: "spring", stiffness: 400, damping: 35 }}
+                        />
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </nav>
+
+        {/* Bottom Actions */}
+        <div className={cn("border-t border-[#EAEAEC] py-3 flex flex-col gap-0.5", sidebarCollapsed ? "px-2" : "px-3")}>
+          <Link
+            href="/dashboard/settings"
+            title={sidebarCollapsed ? "Configurações" : undefined}
+            className={cn(
+              "flex items-center gap-3 rounded-xl text-sm font-medium text-[#717171] hover:text-[#3E3E3E] hover:bg-[#F7F7F7] transition-all",
+              sidebarCollapsed ? "justify-center px-0 py-3" : "px-3 py-2.5"
+            )}
+          >
+            <Settings size={18} className="shrink-0" />
+            <AnimatePresence>
+              {!sidebarCollapsed && (
+                <motion.span
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="whitespace-nowrap"
+                >
+                  Configurações
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </Link>
+
+          {isAdmin && (
             <Link
-              key={item.href}
-              href={item.href}
+              href="/admin"
+              title={sidebarCollapsed ? "Painel Admin" : undefined}
               className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all group relative overflow-hidden",
-                isActive 
-                  ? "text-white shadow-md shadow-pepper-orange/20" 
-                  : "text-text-muted hover:text-text-primary hover:bg-bg-elevated/50",
-                item.highlight && !isActive && "text-pepper-orange bg-pepper-orange/5"
+                "flex items-center gap-3 rounded-xl text-sm font-bold text-white bg-[#EA1D2C] hover:bg-[#d1192a] transition-all",
+                sidebarCollapsed ? "justify-center px-0 py-3" : "px-3 py-2.5"
               )}
             >
-              <Icon size={18} className={cn(
-                "transition-colors relative z-10",
-                isActive ? "text-white" : "group-hover:text-pepper-orange",
-                item.highlight && !isActive && "text-pepper-orange"
-              )} />
-              <span className="relative z-10">{item.name}</span>
-              
-              {isActive && (
-                <motion.div 
-                  layoutId="active-pill-bg"
-                  className="absolute inset-0 bg-gradient-to-r from-pepper-red to-pepper-orange rounded-xl"
-                  transition={{ type: "spring", stiffness: 400, damping: 35 }}
-                />
-              )}
+              <Shield size={18} className="shrink-0" />
+              <AnimatePresence>
+                {!sidebarCollapsed && (
+                  <motion.span
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="whitespace-nowrap"
+                  >
+                    Painel Admin
+                  </motion.span>
+                )}
+              </AnimatePresence>
             </Link>
-          );
-        })}
-      </nav>
+          )}
 
-      <div className="p-4 flex flex-col gap-1">
-        <Link 
-          href="/dashboard/settings"
-          className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-text-muted hover:text-text-primary hover:bg-bg-elevated transition-all"
+          <button
+            onClick={async () => {
+              const supabase = createClient();
+              await supabase.auth.signOut();
+              window.location.href = "/login";
+            }}
+            title={sidebarCollapsed ? "Sair" : undefined}
+            className={cn(
+              "flex items-center gap-3 rounded-xl text-sm font-medium text-[#717171] hover:text-[#EA1D2C] hover:bg-red-50 transition-all w-full text-left",
+              sidebarCollapsed ? "justify-center px-0 py-3" : "px-3 py-2.5"
+            )}
+          >
+            <LogOut size={18} className="shrink-0" />
+            <AnimatePresence>
+              {!sidebarCollapsed && (
+                <motion.span
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="whitespace-nowrap"
+                >
+                  Sair
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </button>
+        </div>
+
+        {/* Collapse Toggle */}
+        <button
+          onClick={toggleSidebar}
+          className="absolute -right-3 top-20 w-6 h-6 bg-white border border-[#EAEAEC] rounded-full flex items-center justify-center shadow-sm hover:bg-[#F7F7F7] transition-colors z-50"
+          aria-label={sidebarCollapsed ? "Expandir menu" : "Recolher menu"}
         >
-          <Settings size={18} />
-          Configurações
-        </Link>
-        <button 
-          className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-text-muted hover:text-red-500 hover:bg-red-50 transition-all w-full text-left"
-        >
-          <LogOut size={18} />
-          Sair
+          {sidebarCollapsed ? <ChevronRight size={12} className="text-[#717171]" /> : <ChevronLeft size={12} className="text-[#717171]" />}
         </button>
-      </div>
-    </aside>
+      </motion.aside>
+
+      {/* Mobile Bottom Bar - compact and functional */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-[#EAEAEC] safe-area-bottom">
+        <div className="flex items-center justify-around py-2 px-1">
+          {[
+            { name: "Início", href: "/dashboard", icon: Home },
+            { name: "Criar", href: "/dashboard/create", icon: PlusSquare },
+            { name: "Projetos", href: "/dashboard/history", icon: History },
+            { name: "Loja", href: "/dashboard/store", icon: ShoppingBag },
+            { name: "Config", href: "/dashboard/settings", icon: Settings },
+          ].map((item) => {
+            const isActive = pathname === item.href;
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-colors",
+                  isActive ? "text-[#EA1D2C]" : "text-[#A6A6A6]"
+                )}
+              >
+                <Icon size={20} />
+                <span className="text-[10px] font-medium">{item.name}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
+    </>
   );
 }

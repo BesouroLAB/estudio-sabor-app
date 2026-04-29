@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 import { HistoryView } from "@/components/views/HistoryView";
 
 export default async function HistoryPage() {

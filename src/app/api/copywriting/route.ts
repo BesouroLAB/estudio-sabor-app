@@ -55,6 +55,9 @@ export async function POST(req: NextRequest) {
     );
 
     const responseText = response.text() || "";
+    const tokensInput = response.usageMetadata?.promptTokenCount || 0;
+    const tokensOutput = response.usageMetadata?.candidatesTokenCount || 0;
+
     console.log(
       "📝 Raw copywriting response:",
       responseText.substring(0, 200)

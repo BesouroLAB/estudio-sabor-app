@@ -33,6 +33,14 @@ export default async function DashboardPage() {
     creditsRemaining = 30;
   }
 
+  // Buscar criações recentes do banco (limitado a 5)
+  const { data: creations } = await supabase
+    .from("creations")
+    .select("*")
+    .eq("user_id", user!.id)
+    .order("created_at", { ascending: false })
+    .limit(5);
+
   return (
     <Suspense fallback={<div className="flex-1 flex items-center justify-center p-8">Carregando...</div>}>
       <DashboardClient 
@@ -40,6 +48,7 @@ export default async function DashboardPage() {
         initialCredits={creditsRemaining}
         userName={userName}
         initialStep="hub"
+        recentCreations={creations || []}
       />
     </Suspense>
   );

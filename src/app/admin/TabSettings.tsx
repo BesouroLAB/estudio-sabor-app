@@ -43,19 +43,20 @@ export function SettingsTab({ settings, fetchSettings }: SettingsTabProps) {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0 }}
       className="space-y-6"
     >
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-text-primary">Configurações do Sistema</h2>
-          <p className="text-sm text-text-muted">Gerencie variáveis globais e comportamentos da plataforma</p>
+          <h2 className="text-xl font-bold text-[#3E3E3E] tracking-tight">Configurações Globais</h2>
+          <p className="text-xs text-[#A6A6A6] font-bold uppercase tracking-widest mt-1">Variáveis de Ambiente & Lógica de Negócio</p>
         </div>
         <button
           onClick={() => fetchSettings()}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-bg-surface border border-border-default text-xs font-bold text-text-muted hover:text-text-primary transition-all"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white border border-[#EAEAEC] text-xs font-bold text-[#717171] hover:text-[#EA1D2C] hover:border-[#EA1D2C]/30 transition-all shadow-sm"
         >
           <RefreshCw size={14} />
-          Atualizar
+          Atualizar Dados
         </button>
       </div>
 
@@ -63,14 +64,14 @@ export function SettingsTab({ settings, fetchSettings }: SettingsTabProps) {
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
-          className={`p-4 rounded-xl flex items-center gap-3 border ${
+          className={`p-4 rounded-xl flex items-center gap-3 border shadow-sm ${
             message.type === "success" 
-              ? "bg-green-500/10 border-green-500/20 text-green-400" 
-              : "bg-pepper-red/10 border-pepper-red/20 text-pepper-red"
+              ? "bg-emerald-50 border-emerald-500/20 text-emerald-600" 
+              : "bg-red-50 border-red-500/20 text-[#EA1D2C]"
           }`}
         >
           {message.type === "success" ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
-          <span className="text-sm font-medium">{message.text}</span>
+          <span className="text-sm font-bold tracking-tight">{message.text}</span>
         </motion.div>
       )}
 
@@ -78,17 +79,16 @@ export function SettingsTab({ settings, fetchSettings }: SettingsTabProps) {
         {settings.map((setting) => (
           <div
             key={setting.key}
-            className="p-5 rounded-2xl bg-bg-surface border border-border-subtle hover:border-border-default transition-all group"
+            className="p-6 rounded-xl bg-white border border-[#EAEAEC] hover:border-[#EA1D2C]/20 transition-all group shadow-sm"
           >
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-black uppercase tracking-widest text-pepper-orange bg-pepper-orange/10 px-2 py-0.5 rounded">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#EA1D2C] bg-red-50 px-2.5 py-1 rounded-md border border-red-100">
                 {setting.key}
               </span>
               <button
                 onClick={() => {
                   const input = document.getElementById(`input-${setting.key}`) as HTMLInputElement;
                   let val: any = input.value;
-                  // Basic type inference
                   if (val === "true") val = true;
                   else if (val === "false") val = false;
                   else if (!isNaN(Number(val)) && val.trim() !== "") val = Number(val);
@@ -96,7 +96,7 @@ export function SettingsTab({ settings, fetchSettings }: SettingsTabProps) {
                   handleUpdate(setting.key, val);
                 }}
                 disabled={updating === setting.key}
-                className="opacity-0 group-hover:opacity-100 p-2 rounded-lg bg-bg-elevated border border-border-default text-text-muted hover:text-pepper-red transition-all disabled:opacity-50"
+                className="p-1.5 rounded-lg bg-[#F7F7F7] border border-[#EAEAEC] text-[#A6A6A6] hover:text-[#EA1D2C] hover:bg-red-50 hover:border-red-100 transition-all disabled:opacity-50"
               >
                 {updating === setting.key ? (
                   <RefreshCw size={14} className="animate-spin" />
@@ -106,7 +106,7 @@ export function SettingsTab({ settings, fetchSettings }: SettingsTabProps) {
               </button>
             </div>
             
-            <p className="text-xs text-text-muted mb-4 line-clamp-2 h-8">
+            <p className="text-xs text-[#717171] mb-4 leading-relaxed font-medium line-clamp-2 h-8">
               {setting.description}
             </p>
 
@@ -114,20 +114,20 @@ export function SettingsTab({ settings, fetchSettings }: SettingsTabProps) {
               <input
                 id={`input-${setting.key}`}
                 defaultValue={typeof setting.value === "object" ? JSON.stringify(setting.value) : String(setting.value)}
-                className="w-full bg-bg-base border border-border-default rounded-xl p-3 text-sm text-text-primary outline-none focus:ring-1 focus:ring-pepper-orange/50 transition-all font-mono"
+                className="w-full bg-[#F7F7F7] border border-[#EAEAEC] rounded-lg px-4 py-3 text-sm text-[#3E3E3E] outline-none focus:ring-1 focus:ring-[#EA1D2C]/30 focus:bg-white transition-all font-mono"
               />
             </div>
           </div>
         ))}
       </div>
 
-      <div className="p-6 rounded-2xl bg-pepper-red/5 border border-pepper-red/10">
-        <div className="flex gap-3">
-          <AlertCircle className="text-pepper-red shrink-0" size={20} />
+      <div className="p-6 rounded-xl bg-red-50 border border-red-100 shadow-sm">
+        <div className="flex gap-4">
+          <AlertCircle className="text-[#EA1D2C] shrink-0" size={20} />
           <div>
-            <h4 className="text-sm font-bold text-pepper-red mb-1">Cuidado Administrativo</h4>
-            <p className="text-xs text-text-muted leading-relaxed">
-              Alterar estas configurações afeta todos os usuários em tempo real. Certifique-se de usar os formatos corretos (true/false para booleanos, números para custos e links válidos).
+            <h4 className="text-xs font-bold text-[#EA1D2C] mb-1 uppercase tracking-widest">Aviso de Segurança</h4>
+            <p className="text-[11px] text-[#717171] leading-relaxed font-medium">
+              Alterações nestas chaves impactam o comportamento global da aplicação (Custo de API, Cotas, Moeda). Use true/false para booleanos e certifique-se de que os valores numéricos estão corretos.
             </p>
           </div>
         </div>

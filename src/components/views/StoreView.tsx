@@ -55,6 +55,10 @@ export function StoreView({ onBack, userId }: StoreViewProps) {
   const [loadingPkg, setLoadingPkg] = useState<string | null>(null);
 
   const handlePurchase = async (pkg: PackageOption) => {
+    if (userId === "mock-temporario") {
+      alert("Você está no Modo Demonstração. Para realizar uma compra real, por favor, faça login ou crie uma conta.");
+      return;
+    }
     setLoadingPkg(pkg.id);
     try {
       const res = await fetch("/api/checkout", {

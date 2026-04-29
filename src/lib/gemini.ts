@@ -4,30 +4,19 @@ import { VertexAI } from "@google-cloud/vertexai";
 const PRIMARY_KEY = process.env.GEMINI_API_KEY || "";
 const FALLBACK_KEY = process.env.GEMINI_FALLBACK_KEY || "";
 const GCP_PROJECT_ID = process.env.GCP_PROJECT_ID || "";
-const GCP_LOCATION = "us-central1"; // Default location for Vertex AI
+const GCP_LOCATION = "us-central1";
 
-let primaryInstance: GoogleGenAI | null = null;
-let fallbackInstance: GoogleGenAI | null = null;
-let vertexInstance: VertexAI | null = null;
-
-function getAI(useFallback = false): GoogleGenAI {
-  if (useFallback) {
-    if (!fallbackInstance) fallbackInstance = new GoogleGenAI({ apiKey: FALLBACK_KEY });
-    return fallbackInstance;
-  }
-  if (!primaryInstance) primaryInstance = new GoogleGenAI({ apiKey: PRIMARY_KEY });
-  return primaryInstance;
+function getAI(useFallback = false) {
+  const apiKey = useFallback ? FALLBACK_KEY : PRIMARY_KEY;
+  return new GoogleGenAI({ apiKey });
 }
 
 export function getVertexAI(): VertexAI | null {
   if (!GCP_PROJECT_ID) return null;
-  if (!vertexInstance) {
-    vertexInstance = new VertexAI({
-      project: GCP_PROJECT_ID,
-      location: GCP_LOCATION,
-    });
-  }
-  return vertexInstance;
+  return new VertexAI({
+    project: GCP_PROJECT_ID,
+    location: GCP_LOCATION,
+  });
 }
 
 export async function withFallback<T>(operation: (ai: GoogleGenAI) => Promise<T>): Promise<T> {
@@ -44,16 +33,19 @@ export async function withFallback<T>(operation: (ai: GoogleGenAI) => Promise<T>
   }
 }
 
-/**
- * Unified generation helper that prioritizes Vertex AI (burning GCP credits)
- * and falls back to standard Google AI SDK (API Keys).
- */
-export async function generateContentUnified(modelName: string, prompt: string, imageBase64?: string, mimeType?: string, aspectRatio?: string) {
+export interface UnifiedAIResponse {
+  text: () => string;
+  usageMetadata?: any;
+  candidates?: any[];
+  [key: string]: any;
+}
+
+export async function generateContentUnified(modelName: string, prompt: string, imageBase64?: string, mimeType?: string, aspectRatio?: string): Promise<UnifiedAIResponse> {
   const vertex = getVertexAI();
   
   if (vertex) {
     try {
-      console.log(`🚀 Using Vertex AI for ${modelName} (Project: ${GCP_PROJECT_ID})`);
+      console.log(`🚀 Using Vertex AI for ${modelName}`);
       const model = vertex.getGenerativeModel({ model: modelName });
       
       const parts: any[] = [{ text: prompt }];
@@ -69,21 +61,29 @@ export async function generateContentUnified(modelName: string, prompt: string, 
       const result = await model.generateContent({
         contents: [{ role: 'user', parts }],
         generationConfig: {
-          // @ts-ignore - Some models support aspectRatio in config
+          // @ts-ignore
           aspectRatio: aspectRatio,
           responseModalities: ["image", "text"],
         }
       });
       
-      return result.response;
+      return {
+        ...result.response,
+        // Force bypass SDK type inconsistencies
+        text: () => {
+          const resp = result.response as any;
+          return typeof resp.text === 'function' ? resp.text() : (resp.text || "");
+        },
+        candidates: result.response.candidates,
+        usageMetadata: result.response.usageMetadata
+      };
     } catch (vertexError) {
       console.error("⚠️ Vertex AI failed, falling back to Google AI SDK:", vertexError);
     }
   }
 
-  // Fallback to Google AI SDK
+  // Fallback to Google AI SDK (@google/genai style)
   return await withFallback(async (ai) => {
-    const model = ai.getGenerativeModel({ model: modelName });
     const parts: any[] = [{ text: prompt }];
     if (imageBase64 && mimeType) {
       parts.unshift({
@@ -94,15 +94,22 @@ export async function generateContentUnified(modelName: string, prompt: string, 
       });
     }
 
-    const result = await model.generateContent({
+    const result = await ai.models.generateContent({
+      model: modelName,
       contents: [{ role: 'user', parts }],
-      generationConfig: {
+      config: {
         // @ts-ignore
         aspectRatio: aspectRatio,
         responseModalities: ["image", "text"],
       }
     });
-    return result.response;
+
+    return {
+      ...result,
+      text: () => result.text || "",
+      candidates: result.candidates,
+      usageMetadata: result.usageMetadata
+    };
   });
 }
 

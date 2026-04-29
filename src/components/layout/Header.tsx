@@ -11,6 +11,8 @@ interface HeaderProps {
 }
 
 const stepLabels: Record<AppStep, string> = {
+  hub: "Início",
+  store: "Loja",
   upload: "Enviar Foto",
   style: "Escolher Estilo",
   loading: "Gerando...",
@@ -31,7 +33,7 @@ export function Header({ onReset, currentStep }: HeaderProps) {
           aria-label="Voltar ao início"
         >
           <img 
-            src="https://res.cloudinary.com/do8gdtozt/image/upload/v1761865865/logo_estudio_sabor_horizontal-upscale-scale-6_00x_nmbn9t.png" 
+            src="https://res.cloudinary.com/do8gdtozt/image/upload/v1766242394/logo_V2_branca_sem_fundo_ujkf0t.png" 
             alt="Estúdio & Sabor" 
             className="h-10 w-auto object-contain transition-transform group-hover:scale-105"
           />

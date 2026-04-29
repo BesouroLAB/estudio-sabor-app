@@ -2,14 +2,15 @@
 
 import { useCallback, useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { Upload, ImagePlus, Sparkles, Camera } from "lucide-react";
+import { Upload, ImagePlus, Sparkles, Camera, ArrowLeft } from "lucide-react";
 import type { UploadedImage } from "@/types/app";
 
 interface UploadViewProps {
   onImageUpload: (image: UploadedImage) => void;
+  onBack: () => void;
 }
 
-export function UploadView({ onImageUpload }: UploadViewProps) {
+export function UploadView({ onImageUpload, onBack }: UploadViewProps) {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -66,38 +67,51 @@ export function UploadView({ onImageUpload }: UploadViewProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.4 }}
-      className="flex-1 flex flex-col items-center justify-center px-[var(--space-page)] py-12 overflow-y-auto"
+      className="flex-1 flex flex-col px-[var(--space-page)] py-8 overflow-y-auto"
     >
+      <div className="max-w-7xl mx-auto w-full flex-1 flex flex-col">
+        {/* Header Actions */}
+        <div className="flex items-center justify-between mb-8">
+          <button
+            onClick={onBack}
+            className="flex items-center gap-1.5 text-text-muted hover:text-text-primary text-sm font-medium transition-colors"
+          >
+            <ArrowLeft size={16} />
+            Voltar
+          </button>
+        </div>
+
+        <div className="flex-1 flex flex-col items-center justify-center py-4">
       {/* Hero Copy */}
       <div className="text-center mb-10 max-w-xl">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.1 }}
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-light text-pepper-orange text-xs font-bold tracking-wider uppercase mb-6"
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-50 text-[#EA1D2C] text-xs font-bold tracking-wider uppercase mb-6"
         >
           <Sparkles size={14} />
-          Marketing 1-Click para Delivery
+          Inteligência Artificial para Delivery
         </motion.div>
 
         <motion.h1
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="text-3xl sm:text-4xl md:text-5xl font-display font-extrabold tracking-tight leading-[1.1] mb-4"
+          className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-[1.1] mb-4 text-[#3E3E3E]"
         >
-          Envie a foto do seu prato{" "}
-          <span className="text-gradient-pepper">e veja a mágica</span>
+          Transforme fotos comuns em{" "}
+          <span className="text-[#EA1D2C]">imagens profissionais</span>
         </motion.h1>
 
         <motion.p
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="text-text-secondary text-base sm:text-lg leading-relaxed"
+          className="text-[#717171] text-base sm:text-lg leading-relaxed"
         >
-          Transforme fotos de celular em imagens profissionais, capas para iFood
-          e textos que vendem — tudo em 30 segundos.
+          Nossa IA remove fundos feios, ajusta reflexos e cria cenários premium. 
+          Basta enviar a foto do prato e nós fazemos o resto.
         </motion.p>
       </div>
 
@@ -121,8 +135,8 @@ export function UploadView({ onImageUpload }: UploadViewProps) {
             py-16 px-8
             ${
               isDragging
-                ? "border-pepper-red bg-pepper-red/5 scale-[1.02]"
-                : "border-white/10 hover:border-white/20 bg-bg-surface"
+                ? "border-[#EA1D2C] bg-red-50 scale-[1.02]"
+                : "border-[#EAEAEC] hover:border-[#EA1D2C] bg-white"
             }
           `}
           role="button"
@@ -137,8 +151,8 @@ export function UploadView({ onImageUpload }: UploadViewProps) {
               transition-all duration-500
               ${
                 isDragging
-                  ? "bg-pepper-red/20 text-pepper-red scale-110"
-                  : "bg-white/5 text-text-muted group-hover:bg-white/8 group-hover:text-pepper-orange"
+                  ? "bg-red-100 text-[#EA1D2C] scale-110"
+                  : "bg-[#F7F7F7] text-[#717171] group-hover:bg-red-50 group-hover:text-[#EA1D2C]"
               }
             `}
           >
@@ -149,15 +163,15 @@ export function UploadView({ onImageUpload }: UploadViewProps) {
             )}
           </div>
 
-          <p className="text-text-primary font-display font-bold text-lg mb-2">
+          <p className="text-[#3E3E3E] font-bold text-lg mb-2">
             {isDragging ? "Solte a foto aqui!" : "Arraste a foto do prato"}
           </p>
-          <p className="text-text-muted text-sm mb-6">
+          <p className="text-[#717171] text-sm mb-6">
             ou clique para selecionar do celular
           </p>
 
           {/* CTA Button */}
-          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-pepper-red to-pepper-orange text-white font-bold text-sm shadow-lg shadow-pepper-red/20 transition-transform group-hover:scale-105 active:scale-95">
+          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#EA1D2C] hover:bg-[#D01925] text-white font-bold text-sm shadow-md transition-transform group-hover:scale-105 active:scale-95">
             <Camera size={16} />
             Escolher Foto
           </div>
@@ -174,7 +188,7 @@ export function UploadView({ onImageUpload }: UploadViewProps) {
         </div>
 
         {/* Trust indicators */}
-        <div className="flex items-center justify-center gap-6 mt-6 text-text-muted text-xs">
+        <div className="flex items-center justify-center gap-6 mt-6 text-[#717171] text-xs">
           <span className="flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
             JPG, PNG, WEBP
@@ -188,7 +202,9 @@ export function UploadView({ onImageUpload }: UploadViewProps) {
             100% privado
           </span>
         </div>
-      </motion.div>
-    </motion.div>
+        </motion.div>
+      </div>
+    </div>
+  </motion.div>
   );
 }

@@ -4,11 +4,12 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   Lock,
+  ArrowRight,
   Eye,
   EyeOff,
   Mail,
-  Sparkles,
   User,
+  Zap,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -18,213 +19,177 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [success, setSuccess] = useState(false);
 
   async function handleSubmit(formData: FormData) {
     setLoading(true);
     setError(null);
-
     const result = await signup(formData);
     if (result?.error) {
       setError(result.error);
       setLoading(false);
-    } else {
-      setSuccess(true);
     }
   }
 
-  if (success) {
-    return (
-      <div className="min-h-dvh flex flex-col items-center justify-center p-6 bg-bg-main bg-grain relative overflow-hidden">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-40">
-          <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-pepper-orange/10 blur-[120px] rounded-full" />
-          <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-pepper-red/10 blur-[120px] rounded-full" />
-        </div>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-md text-center relative z-10"
-        >
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#22c55e] to-[#16a34a] flex items-center justify-center mx-auto mb-6 shadow-lg">
-            <Mail size={28} className="text-white" />
-          </div>
-          <h1 className="font-display text-2xl font-black text-pepper-black mb-2 uppercase tracking-tight">
-            Verifique seu e-mail
-          </h1>
-          <p className="text-pepper-black/60 text-sm mb-8 font-medium">
-            Enviamos um link de confirmação para o seu e-mail. Clique nele para
-            ativar sua conta e começar a usar o Estúdio & Sabor.
-          </p>
-          <Link
-            href="/login"
-            className="inline-flex items-center gap-2 text-pepper-orange hover:text-pepper-red transition-all font-black text-xs uppercase tracking-widest px-6 py-3 bg-white border border-black/[0.05] rounded-xl shadow-sm hover:shadow-md active:scale-95"
-          >
-            ← Voltar para o Login
-          </Link>
-        </motion.div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-dvh flex flex-col items-center justify-center p-6 bg-bg-main bg-grain relative overflow-hidden">
-      {/* Background Decorative Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-40">
-        <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-pepper-orange/10 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-pepper-red/10 blur-[120px] rounded-full" />
-      </div>
+    <div className="min-h-dvh flex flex-col items-center justify-center p-6 bg-[#050505] relative overflow-hidden">
+      {/* Background Radial Gradient */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,94,58,0.12)_0%,transparent_70%)] pointer-events-none" />
+      
+      {/* Edge Glow (Blue Vignette) */}
+      <div className="absolute inset-0 shadow-[inset_0_0_120px_rgba(59,130,246,0.08)] pointer-events-none" />
 
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md relative z-10"
-      >
-        {/* Logo Area */}
-        <div className="flex flex-col items-center mb-10 group cursor-pointer">
+      <div className="w-full max-w-6xl px-4 lg:px-8 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+          
+          {/* Left Side: Branding & Offer */}
           <motion.div 
-            className="relative group"
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex flex-col items-center lg:items-start text-center lg:text-left"
           >
-            <div className="absolute -inset-2 bg-gradient-to-r from-pepper-red/20 to-pepper-orange/20 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <Image
-              src="https://vgrfjwwbqflfjfvfsbjd.supabase.co/storage/v1/object/public/creations/LogoHorizontal.png"
-              alt="Estúdio & Sabor"
-              width={240}
-              height={60}
-              className="relative drop-shadow-sm group-hover:drop-shadow-md transition-all"
-              priority
-            />
-          </motion.div>
-          <p className="text-sm font-medium mt-1 uppercase tracking-[0.3em] bg-clip-text text-transparent bg-gradient-to-r from-pepper-red to-pepper-orange font-display font-black text-center">
-            Crie sua conta gratuita
-          </p>
-        </div>
-
-        {/* Free trial badge */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="flex items-center justify-center mb-6"
-        >
-          <div className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-pepper-orange/10 border border-pepper-orange/20">
-            <Sparkles size={14} className="text-pepper-orange" />
-            <span className="text-pepper-orange text-[10px] font-black uppercase tracking-widest">
-              1 geração grátis inclusa
-            </span>
-          </div>
-        </motion.div>
-
-        {/* Signup Card */}
-        <motion.div 
-          className="bg-white/80 backdrop-blur-xl border border-black/[0.05] p-8 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] relative overflow-hidden"
-        >
-          <div className="relative z-10">
-            {/* Social Login: Google */}
-            <button 
-              type="button"
-              onClick={() => signInWithGoogle()}
-              className="w-full flex items-center justify-center gap-3 bg-white text-pepper-black font-black py-4 rounded-xl hover:bg-slate-50 transition-all active:scale-[0.98] mb-8 shadow-sm border border-black/[0.05] uppercase tracking-widest text-xs"
+            {/* Logo */}
+            <motion.div 
+              className="relative group mb-10"
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
-              <svg width="20" height="20" viewBox="0 0 20 20">
-                <path d="M19.6 10.23c0-.66-.06-1.29-.16-1.91H10v3.61h5.38c-.23 1.25-.94 2.31-2 2.97v2.47h3.24c1.89-1.74 2.98-4.3 2.98-7.14z" fill="#4285F4"/>
-                <path d="M10 20c2.7 0 4.96-.89 6.62-2.42l-3.24-2.47c-.9.6-2.06.96-3.38.96-2.6 0-4.8-1.76-5.59-4.12H1.23v2.53C2.88 17.06 6.19 20 10 20z" fill="#34A853"/>
-                <path d="M4.41 11.95c-.2-.6-.31-1.24-.31-1.95s.11-1.35.31-1.95V5.52H1.23C.45 7.11 0 8.89 0 10.79s.45 3.68 1.23 5.27l3.18-2.53z" fill="#FBBC05"/>
-                <path d="M10 3.94c1.47 0 2.79.5 3.82 1.49l2.87-2.87C14.95.89 12.7 0 10 0 6.19 0 2.88 2.94 1.23 6.02l3.18 2.53c.79-2.36 2.99-4.12 5.59-4.12z" fill="#EA4335"/>
-              </svg>
-              <span>Entrar com o Google</span>
-            </button>
+              <div className="absolute -inset-4 bg-gradient-to-r from-pepper-red/30 to-pepper-orange/30 rounded-2xl blur-2xl opacity-40 group-hover:opacity-70 transition-opacity duration-500" />
+              <Image
+                src="https://res.cloudinary.com/do8gdtozt/image/upload/v1766242394/logo_V2_branca_sem_fundo_ujkf0t.png"
+                alt="Estúdio Sabor"
+                width={320}
+                height={120}
+                priority
+                className="relative object-contain drop-shadow-[0_0_30px_rgba(255,255,255,0.4)]"
+              />
+            </motion.div>
 
-            <div className="relative mb-8 text-center">
-               <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-black/[0.05]"></div></div>
-               <span className="relative px-4 bg-white/0 text-[10px] font-black text-pepper-black/40 uppercase tracking-widest">Ou crie com seu e-mail</span>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white tracking-tight leading-tight font-plus-jakarta mb-6">
+              Crie Sua <br className="hidden lg:block" /> 
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-pepper-red to-pepper-orange">Conta Gratuita</span>
+            </h1>
+            
+            <div className="inline-flex items-center gap-3 bg-white/5 border border-white/10 px-6 py-3 rounded-2xl mb-8 backdrop-blur-sm">
+              <Zap className="text-pepper-orange fill-pepper-orange" size={20} />
+              <span className="text-white font-black font-plus-jakarta uppercase tracking-wider text-sm">
+                Ganhe 30 créditos para testar agora
+              </span>
             </div>
 
-            <form action={handleSubmit} className="space-y-6">
-              {error && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="bg-pepper-red/5 border border-pepper-red/10 rounded-xl px-4 py-3 text-center"
+            <p className="text-stone-100 text-lg md:text-xl max-w-md leading-relaxed font-medium">
+              Transforme fotos comuns em pratos irresistíveis em segundos. Comece a vender mais hoje mesmo.
+            </p>
+          </motion.div>
+
+          {/* Right Side: Signup Card */}
+          <div className="w-full max-w-md mx-auto lg:mr-0">
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="bg-[#0d0b09]/60 backdrop-blur-[24px] border border-white/10 p-8 md:p-10 rounded-[3rem] shadow-[0_40px_100px_rgba(0,0,0,0.7)] relative overflow-hidden hover:border-white/20 transition-all group w-full"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="relative z-10">
+                {/* Social Login: Google */}
+                <button 
+                  type="button"
+                  onClick={() => signInWithGoogle()}
+                  className="w-full flex items-center justify-center gap-3 bg-white text-stone-950 font-black py-4 rounded-2xl hover:bg-stone-100 transition-all active:scale-[0.98] mb-8 shadow-[0_10px_30px_rgba(255,255,255,0.15)] uppercase tracking-widest text-xs font-plus-jakarta"
                 >
-                  <p className="text-pepper-red text-[10px] font-bold uppercase tracking-wide">
-                    {error}
-                  </p>
-                </motion.div>
-              )}
+                  <svg width="20" height="20" viewBox="0 0 20 20">
+                    <path d="M19.6 10.23c0-.66-.06-1.29-.16-1.91H10v3.61h5.38c-.23 1.25-.94 2.31-2 2.97v2.47h3.24c1.89-1.74 2.98-4.3 2.98-7.14z" fill="#4285F4"/>
+                    <path d="M10 20c2.7 0 4.96-.89 6.62-2.42l-3.24-2.47c-.9.6-2.06.96-3.38.96-2.6 0-4.8-1.76-5.59-4.12H1.23v2.53C2.88 17.06 6.19 20 10 20z" fill="#34A853"/>
+                    <path d="M4.41 11.95c-.2-.6-.31-1.24-.31-1.95s.11-1.35.31-1.95V5.52H1.23C.45 7.11 0 8.89 0 10.79s.45 3.68 1.23 5.27l3.18-2.53z" fill="#FBBC05"/>
+                    <path d="M10 3.94c1.47 0 2.79.5 3.82 1.49l2.87-2.87C14.95.89 12.7 0 10 0 6.19 0 2.88 2.94 1.23 6.02l3.18 2.53c.79-2.36 2.99-4.12 5.59-4.12z" fill="#EA4335"/>
+                  </svg>
+                  <span>Criar conta com Google</span>
+                </button>
 
-              <div>
-                <label className="block text-[10px] font-black text-pepper-black/60 uppercase tracking-[0.2em] mb-2 px-1">Seu Nome</label>
-                <div className="relative">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 text-pepper-black/20" size={18} />
-                  <input
-                    name="name"
-                    type="text"
-                    required
-                    placeholder="Como devemos te chamar?"
-                    className="w-full bg-white border border-black/[0.05] text-pepper-black text-sm rounded-2xl p-4 pl-12 outline-none focus:ring-2 focus:ring-pepper-orange/20 focus:border-pepper-orange transition-all placeholder:text-pepper-black/10 shadow-sm"
-                  />
+                <div className="relative mb-8 text-center">
+                   <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/10"></div></div>
+                   <span className="relative px-6 bg-[#0d0b09] text-[10px] font-black text-white/60 uppercase tracking-[0.2em] font-plus-jakarta">ou use seu e-mail</span>
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-[10px] font-black text-pepper-black/60 uppercase tracking-[0.2em] mb-2 px-1">E-mail</label>
-                <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-pepper-black/20" size={18} />
-                  <input
-                    name="email"
-                    type="email"
-                    required
-                    placeholder="seu@email.com"
-                    className="w-full bg-white border border-black/[0.05] text-pepper-black text-sm rounded-2xl p-4 pl-12 outline-none focus:ring-2 focus:ring-pepper-orange/20 focus:border-pepper-orange transition-all placeholder:text-pepper-black/10 shadow-sm"
-                  />
-                </div>
-              </div>
+                <form action={handleSubmit} className="space-y-5">
+                  <div>
+                    <label className="block text-xs font-black text-white/70 uppercase tracking-[0.2em] font-plus-jakarta mb-3 px-1">Seu nome</label>
+                    <div className="relative group/input">
+                      <User className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 group-focus-within/input:text-white transition-colors" size={20} />
+                      <input
+                        type="text"
+                        name="name"
+                        placeholder="Ex: João Silva"
+                        className="w-full bg-white/5 border border-white/10 text-white rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all font-plus-jakarta font-semibold placeholder:text-white/20"
+                        required
+                      />
+                    </div>
+                  </div>
 
-              <div>
-                <label className="block text-[10px] font-black text-pepper-black/60 uppercase tracking-[0.2em] mb-2 px-1">Senha</label>
-                <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-pepper-black/20" size={18} />
-                  <input
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    required
-                    placeholder="••••••••"
-                    className="w-full bg-white border border-black/[0.05] text-pepper-black text-sm rounded-2xl p-4 pl-12 pr-12 outline-none focus:ring-2 focus:ring-pepper-orange/20 focus:border-pepper-orange transition-all placeholder:text-pepper-black/10 shadow-sm"
-                  />
+                  <div>
+                    <label className="block text-xs font-black text-white/70 uppercase tracking-[0.2em] font-plus-jakarta mb-3 px-1">E-mail</label>
+                    <div className="relative group/input">
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 group-focus-within/input:text-white transition-colors" size={20} />
+                      <input
+                        type="email"
+                        name="email"
+                        placeholder="seu@email.com"
+                        className="w-full bg-white/5 border border-white/10 text-white rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all font-plus-jakarta font-semibold placeholder:text-white/20"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-black text-white/70 uppercase tracking-[0.2em] font-plus-jakarta mb-3 px-1">Senha</label>
+                    <div className="relative group/input">
+                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 group-focus-within/input:text-white transition-colors" size={20} />
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        placeholder="••••••••"
+                        className="w-full bg-white/5 border border-white/10 text-white rounded-2xl py-4 pl-12 pr-12 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all font-plus-jakarta font-semibold placeholder:text-white/20"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
+                      >
+                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {error && (
+                    <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-pepper-red text-sm font-black text-center font-plus-jakarta uppercase tracking-wide">
+                      {error}
+                    </motion.p>
+                  )}
+
                   <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-pepper-black/20 hover:text-pepper-orange transition-colors"
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-gradient-to-r from-pepper-red to-pepper-orange text-white font-black py-5 rounded-2xl shadow-xl shadow-pepper-red/30 hover:shadow-pepper-red/50 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 mt-6 uppercase tracking-[0.2em] text-sm font-plus-jakarta border-none"
+                    style={{ background: 'linear-gradient(to right, #FF3131, #FF5E3A)' }}
                   >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    {loading ? "Processando..." : "Criar minha conta grátis"}
                   </button>
-                </div>
+                </form>
               </div>
+            </motion.div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-gradient-to-r from-pepper-red to-pepper-orange text-white font-black py-4 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-30 disabled:scale-100 shadow-[0_10px_20px_rgba(230,57,70,0.2)] flex items-center justify-center gap-2 uppercase tracking-widest text-sm"
+            <p className="mt-10 text-center text-[11px] font-black text-white/40 uppercase tracking-[0.2em] font-plus-jakarta">
+              Já tem uma conta?{" "}
+              <Link
+                href="/login"
+                className="text-white hover:text-pepper-orange transition-colors underline underline-offset-4 decoration-white/20"
               >
-                {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : "Criar Minha Conta"}
-              </button>
-            </form>
+                Fazer Login
+              </Link>
+            </p>
           </div>
-        </motion.div>
-
-        <p className="mt-8 text-center text-xs font-bold text-pepper-black/40 uppercase tracking-widest">
-          Já tem uma conta?{" "}
-          <Link
-            href="/login"
-            className="text-pepper-orange hover:text-pepper-red transition-colors"
-          >
-            Fazer Login
-          </Link>
-        </p>
-      </motion.div>
+        </div>
+      </div>
     </div>
   );
 }

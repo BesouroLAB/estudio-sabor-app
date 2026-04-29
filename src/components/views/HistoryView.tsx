@@ -3,12 +3,13 @@
 import { motion } from "framer-motion";
 import { 
   Download, 
-  Share2, 
   Trash2, 
   Eye, 
   Calendar,
   Image as ImageIcon,
-  Plus
+  Plus,
+  Clock,
+  ExternalLink
 } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
@@ -30,34 +31,34 @@ export function HistoryView({ creations }: HistoryViewProps) {
   const hasCreations = creations.length > 0;
 
   return (
-    <div className="flex-1 px-[var(--space-page)] py-8 overflow-y-auto">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <div className="flex-1 bg-[#F7F7F7] min-h-screen select-none overflow-y-auto">
+      <div className="max-w-6xl mx-auto px-6 py-8 pb-24 md:pb-8 space-y-8">
         
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <h1 className="font-display font-bold text-3xl text-text-primary tracking-tight">
-              Meus <span className="text-pepper-orange">Projetos</span>
+            <h1 className="text-2xl font-bold text-[#3E3E3E] tracking-tight">
+              Meus <span className="text-[#EA1D2C]">Projetos</span>
             </h1>
-            <p className="text-text-muted mt-1">
-              Sua galeria de fotos e artes profissionais geradas com IA.
+            <p className="text-sm text-[#717171] mt-1">
+              Visualize e baixe suas criações profissionais.
             </p>
           </div>
           
           <Link 
             href="/dashboard/create"
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-pepper-red to-pepper-orange text-white font-bold rounded-xl shadow-lg shadow-pepper-red/20 hover:scale-[1.02] transition-all"
+            className="flex items-center justify-center gap-2 px-5 py-2.5 bg-[#EA1D2C] text-white text-sm font-bold rounded-lg hover:bg-[#d1192a] transition-all shadow-sm active:scale-95"
           >
             <Plus size={18} />
             Nova Criação
           </Link>
         </div>
 
-        {/* Content */}
+        {/* Content Section */}
         {!hasCreations ? (
           <EmptyHistory />
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {creations.map((creation, idx) => (
               <CreationCard key={creation.id} creation={creation} index={idx} />
             ))}
@@ -70,51 +71,53 @@ export function HistoryView({ creations }: HistoryViewProps) {
 }
 
 function CreationCard({ creation, index }: { creation: Creation, index: number }) {
-  const dateFormatted = format(new Date(creation.created_at), "dd 'de' MMMM", {
+  const dateFormatted = format(new Date(creation.created_at), "dd 'de' MMM", {
     locale: ptBR,
   });
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: index * 0.05 }}
-      className="group relative flex flex-col bg-bg-surface border border-border-default rounded-2xl overflow-hidden hover:border-pepper-orange/30 transition-all shadow-lg hover:shadow-[0_20px_50px_rgba(227,27,19,0.06)]"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.03 }}
+      className="group bg-white border border-[#EAEAEC] rounded-xl overflow-hidden hover:shadow-md transition-all flex flex-col"
     >
-      {/* Image Preview */}
-      <div className="aspect-square relative overflow-hidden bg-bg-elevated">
+      {/* Image Preview Area */}
+      <div className="aspect-square relative overflow-hidden bg-[#F7F7F7]">
         <img 
           src={creation.image_url} 
           alt="Criação"
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
         
-        {/* Formatting Badge */}
-        <div className="absolute top-3 left-3 px-2 py-0.5 rounded-md bg-white/90 backdrop-blur-md border border-white text-[9px] font-black uppercase tracking-widest text-pepper-red shadow-sm">
+        {/* Format Badge (iFood style) */}
+        <div className="absolute top-3 left-3 px-2 py-1 rounded bg-white/95 border border-[#EAEAEC] text-[10px] font-bold text-[#3E3E3E] shadow-sm">
            {creation.format_selected}
         </div>
 
-        {/* Hover Actions */}
-        <div className="absolute inset-0 bg-pepper-red/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-           <button className="w-10 h-10 rounded-full bg-white text-pepper-red flex items-center justify-center hover:scale-110 transition-transform shadow-xl">
-              <Eye size={18} />
-           </button>
-           <button className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/20 flex items-center justify-center hover:scale-110 transition-transform shadow-xl">
-              <Download size={18} />
-           </button>
-        </div>
+        {/* Action Overlays (Subtle on hover) */}
+        <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
       </div>
 
-      {/* Footer Details */}
-      <div className="p-4 space-y-2">
+      {/* Footer / Meta Section */}
+      <div className="p-4 flex flex-col gap-3">
          <div className="flex items-center justify-between">
-           <div className="flex items-center gap-1.5 text-text-muted">
+           <div className="flex items-center gap-1.5 text-[#A6A6A6]">
               <Calendar size={12} />
-              <span className="text-[10px] font-medium uppercase tracking-wider">{dateFormatted}</span>
+              <span className="text-[11px] font-medium uppercase tracking-wider">{dateFormatted}</span>
            </div>
-           <button className="text-text-muted hover:text-red-500 transition-colors">
-              <Trash2 size={14} />
-           </button>
+           
+           <div className="flex items-center gap-2">
+             <button className="p-1.5 text-[#717171] hover:text-[#EA1D2C] hover:bg-red-50 rounded-md transition-all" title="Ver Detalhes">
+                <Eye size={16} />
+             </button>
+             <button className="p-1.5 text-[#717171] hover:text-[#EA1D2C] hover:bg-red-50 rounded-md transition-all" title="Download">
+                <Download size={16} />
+             </button>
+             <button className="p-1.5 text-[#717171] hover:text-[#EA1D2C] hover:bg-red-50 rounded-md transition-all" title="Excluir">
+                <Trash2 size={16} />
+             </button>
+           </div>
          </div>
       </div>
     </motion.div>
@@ -123,52 +126,22 @@ function CreationCard({ creation, index }: { creation: Creation, index: number }
 
 function EmptyHistory() {
   return (
-    <div className="space-y-12 py-12">
-      <div className="flex flex-col items-center justify-center text-center space-y-6">
-        <div className="w-20 h-20 rounded-full bg-bg-elevated border border-border-default flex items-center justify-center text-text-muted/40">
-          <ImageIcon size={32} />
-        </div>
-        <div className="space-y-2">
-          <h3 className="font-display font-bold text-2xl text-text-primary">Sua galeria está vazia</h3>
-          <p className="text-text-muted max-w-sm mx-auto">
-            Você ainda não gerou nenhum Kit. Veja o que você pode criar em segundos:
-          </p>
-        </div>
+    <div className="flex flex-col items-center justify-center py-20 text-center bg-white border border-[#EAEAEC] border-dashed rounded-2xl">
+      <div className="w-16 h-16 rounded-full bg-[#F7F7F7] flex items-center justify-center mb-4">
+        <Clock size={28} className="text-[#A6A6A6]" />
       </div>
-
-      {/* Inspirational Examples */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 opacity-60 grayscale hover:grayscale-0 transition-all duration-500 hover:opacity-100 cursor-default">
-         <div className="aspect-[3/4] rounded-2xl overflow-hidden border border-border-default shadow-lg overflow-hidden relative group">
-            <img src="https://images.unsplash.com/photo-1571091718767-18b5b1457add?q=80&w=400&h=600&auto=format&fit=crop" className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-4">
-              <span className="text-[10px] text-white/70 font-bold uppercase">Exemplo Stories</span>
-              <p className="text-white font-bold">Hambúrguer Gourmet</p>
-            </div>
-         </div>
-         <div className="aspect-[3/4] rounded-2xl overflow-hidden border border-border-default shadow-lg overflow-hidden relative">
-            <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=400&h=600&auto=format&fit=crop" className="w-full h-full object-cover" />
-             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-4">
-              <span className="text-[10px] text-white/70 font-bold uppercase">Exemplo iFood</span>
-              <p className="text-white font-bold">Salada Tropical</p>
-            </div>
-         </div>
-         <div className="aspect-[3/4] rounded-2xl overflow-hidden border border-border-default shadow-lg overflow-hidden relative">
-            <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=400&h=600&auto=format&fit=crop" className="w-full h-full object-cover" />
-             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-4">
-              <span className="text-[10px] text-white/70 font-bold uppercase">Exemplo WhatsApp</span>
-              <p className="text-white font-bold">Churrasco Prime</p>
-            </div>
-         </div>
-      </div>
-
-      <div className="flex justify-center pt-8">
-        <Link 
-          href="/dashboard/create"
-          className="px-8 py-4 bg-gradient-to-r from-pepper-red to-pepper-orange text-white font-black rounded-xl shadow-xl shadow-pepper-red/20 hover:scale-105 transition-all active:scale-95"
-        >
-          COMEÇAR PRIMEIRA CRIAÇÃO
-        </Link>
-      </div>
+      <h3 className="text-lg font-bold text-[#3E3E3E]">Sua galeria está vazia</h3>
+      <p className="text-sm text-[#717171] max-w-xs mx-auto mt-2 mb-8">
+        Você ainda não gerou nenhum projeto. Comece criando uma foto profissional agora mesmo.
+      </p>
+      
+      <Link 
+        href="/dashboard/create"
+        className="flex items-center gap-2 px-8 py-3 bg-[#EA1D2C] text-white font-bold rounded-xl hover:bg-[#d1192a] transition-all shadow-md active:scale-95"
+      >
+        <Plus size={20} />
+        Começar Minha Primeira Foto
+      </Link>
     </div>
   );
 }

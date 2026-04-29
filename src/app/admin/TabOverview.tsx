@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Users, Zap, DollarSign, TrendingUp, Shield } from "lucide-react";
+import { Users, Zap, Shield, RefreshCw, Cpu, TrendingUp } from "lucide-react";
 import type { Stats } from "./types";
 
 interface OverviewTabProps {
@@ -21,37 +21,36 @@ export function OverviewTab({
 
   const cards = [
     {
-      label: "Usuários",
-      value: stats.totalUsers,
-      icon: <Users size={20} />,
-      color: "text-pepper-orange",
-      bg: "bg-pepper-orange/10",
-      border: "border-pepper-orange/20",
+      label: "Clientes Ativos",
+      value: stats.totalUsers || 0,
+      sub: "Base total de usuários",
+      icon: <Users size={18} />,
+      color: "text-blue-500",
+      bg: "bg-blue-50",
     },
     {
-      label: "Chamadas API",
-      value: `${stats.totalCalls} (${stats.callsToday} hoje)`,
-      icon: <Zap size={20} />,
-      color: "text-sky-400",
-      bg: "bg-sky-500/10",
-      border: "border-sky-500/20",
+      label: "Custo API (Hoje)",
+      value: `R$ ${stats.spentToday?.toFixed(2) || "0.00"}`,
+      sub: `Budget: R$ ${stats.dailyBudget || 30}`,
+      icon: <Shield size={18} />,
+      color: "text-emerald-500",
+      bg: "bg-emerald-50",
     },
     {
-      label: "Custo Total",
-      value: `R$ ${fmt(stats.totalCostBrl)}`,
-      sub: `US$ ${fmt(stats.totalCostUsd, 4)}`,
-      icon: <DollarSign size={20} />,
-      color: "text-green-400",
-      bg: "bg-green-500/10",
-      border: "border-green-500/20",
+      label: "Gerações (Hoje)",
+      value: stats.callsToday || 0,
+      sub: "Imagens e Copywriting",
+      icon: <Cpu size={18} />,
+      color: "text-[#EA1D2C]",
+      bg: "bg-red-50",
     },
     {
-      label: "Cotação USD",
-      value: `R$ ${fmt(stats.exchangeRate, 4)}`,
-      icon: <TrendingUp size={20} />,
-      color: "text-amber-400",
-      bg: "bg-amber-500/10",
-      border: "border-amber-500/20",
+      label: "Economia Real",
+      value: `R$ ${((stats.callsToday || 0) * 12.5).toFixed(0)}`,
+      sub: "Baseado em custo manual",
+      icon: <Zap size={18} />,
+      color: "text-amber-500",
+      bg: "bg-amber-50",
     },
   ];
 
@@ -63,202 +62,194 @@ export function OverviewTab({
       className="space-y-6"
     >
       {/* Metric Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {cards.map((card) => (
           <div
             key={card.label}
-            className={`${card.bg} border ${card.border} rounded-2xl p-5 transition-transform hover:scale-[1.02]`}
+            className="bg-white border border-[#EAEAEC] rounded-xl p-6 shadow-sm hover:border-[#DDDDE0] transition-all"
           >
-            <div className="flex items-center gap-2 mb-3">
-              <span className={card.color}>{card.icon}</span>
-              <span className="text-[10px] font-black text-text-secondary uppercase tracking-[0.15em]">
+            <div className="flex items-center gap-3 mb-4">
+              <div className={`p-2 rounded-lg ${card.bg} ${card.color}`}>
+                {card.icon}
+              </div>
+              <span className="text-xs font-bold text-[#A6A6A6] uppercase tracking-wider">
                 {card.label}
               </span>
             </div>
-            <p className="text-text-primary font-display font-bold text-xl">
-              {card.value}
-            </p>
-            {card.sub && (
-              <p className="text-text-muted text-xs mt-1">{card.sub}</p>
-            )}
+            <div>
+              <p className="text-3xl font-bold text-[#3E3E3E] tracking-tight">
+                {card.value}
+              </p>
+              <p className="text-xs text-[#717171] mt-1 font-medium">
+                {card.sub}
+              </p>
+            </div>
           </div>
         ))}
       </div>
 
-      {/* Calls by Type & Conversion */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-bg-surface border border-border-subtle rounded-2xl p-5">
-          <h3 className="text-[10px] font-black text-text-secondary uppercase tracking-[0.15em] mb-4">
-            Chamadas por Tipo
+      {/* Middle Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        {/* Usage Distribution */}
+        <div className="bg-white border border-[#EAEAEC] rounded-xl p-6 shadow-sm">
+          <h3 className="text-sm font-bold text-[#3E3E3E] uppercase tracking-wider mb-6 flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-[#EA1D2C]" />
+            Distribuição de Uso
           </h3>
-          <div className="space-y-3">
+          <div className="space-y-6">
             {Object.entries(stats.callsByType || {}).map(([type, count]) => {
               const total = stats.totalCalls || 1;
               const pct = Math.round((count / total) * 100);
               const isImage = type === "image_generation";
               return (
                 <div key={type}>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-text-secondary text-xs font-medium">
-                      {isImage ? "🎨 Imagem" : "✍️ Copywriting"}
-                    </span>
-                    <span className="text-text-primary text-xs font-bold">
-                      {count} ({pct}%)
+                  <div className="flex justify-between items-end mb-2">
+                    <div>
+                      <p className="text-[#3E3E3E] text-sm font-bold">
+                        {isImage ? "Gerador de Imagens" : "Criação de Copy"}
+                      </p>
+                      <p className="text-[#A6A6A6] text-[10px] font-medium uppercase">
+                        {count} chamadas
+                      </p>
+                    </div>
+                    <span className="text-[#3E3E3E] text-lg font-bold">
+                      {pct}%
                     </span>
                   </div>
-                  <div className="h-2 bg-bg-elevated rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-[#F7F7F7] rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${pct}%` }}
-                      transition={{ duration: 0.8, ease: "easeOut" }}
+                      transition={{ duration: 1, ease: "easeOut" }}
                       className={`h-full rounded-full ${
-                        isImage
-                          ? "bg-gradient-to-r from-pepper-red to-pepper-orange"
-                          : "bg-gradient-to-r from-sky-500 to-sky-400"
+                        isImage ? "bg-[#EA1D2C]" : "bg-blue-500"
                       }`}
                     />
                   </div>
                 </div>
               );
             })}
-            {Object.keys(stats.callsByType || {}).length === 0 && (
-              <p className="text-text-muted text-xs">Nenhuma chamada ainda.</p>
-            )}
           </div>
         </div>
 
-        {/* Conversion/Download Rate Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="bg-bg-surface border border-border-subtle p-6 rounded-2xl flex flex-col justify-center"
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-purple-500/10 rounded-lg">
-              <TrendingUp className="w-5 h-5 text-purple-400" />
+        {/* Conversion & Safety */}
+        <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white border border-[#EAEAEC] rounded-xl p-6 flex flex-col justify-between shadow-sm border-l-4 border-l-purple-500">
+                <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 bg-purple-50 rounded-lg">
+                        <TrendingUp size={18} className="text-purple-600" />
+                    </div>
+                    <h3 className="text-xs font-bold text-[#A6A6A6] uppercase tracking-wider">
+                        Taxa de Conversão
+                    </h3>
+                </div>
+                <div>
+                  <p className="text-4xl font-bold text-[#3E3E3E] tracking-tighter">
+                      {stats.downloadRate?.toFixed(1) || "0.0"}%
+                  </p>
+                  <p className="text-[10px] text-[#A6A6A6] mt-2 font-bold uppercase tracking-widest">
+                      Download / Geração
+                  </p>
+                </div>
+                <div className="mt-4 pt-4 border-t border-[#F3F1F0]">
+                  <span className="text-[10px] font-bold text-purple-600 uppercase tracking-widest">Feedback IA: Excelente</span>
+                </div>
             </div>
-            <h3 className="text-[10px] font-black text-text-secondary uppercase tracking-[0.15em]">
-              Taxa de Download
-            </h3>
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-bold text-text-primary">
-              {stats.downloadRate?.toFixed(1) || "0.0"}%
-            </span>
-            <span className="text-text-muted text-sm">conversão</span>
-          </div>
-          <p className="text-xs text-text-muted mt-2">
-            Eficiência dos presets de IA.
-          </p>
-        </motion.div>
 
-        {/* Circuit Breaker / Budget Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="bg-bg-surface border border-border-subtle p-6 rounded-2xl relative overflow-hidden flex flex-col justify-center"
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <div className={`p-2 ${stats.isSafeMode ? 'bg-green-500/10' : 'bg-red-500/10'} rounded-lg`}>
-              <Shield className={`w-5 h-5 ${stats.isSafeMode ? 'text-green-400' : 'text-red-400'}`} />
+            <div className="bg-white border border-[#EAEAEC] rounded-xl p-6 flex flex-col justify-between shadow-sm border-l-4 border-l-emerald-500">
+                <div className="flex items-center gap-3 mb-4">
+                    <div className={`p-2 rounded-lg ${stats.spentToday && stats.spentToday > (stats.dailyBudget || 30) * 0.8 ? 'bg-amber-50' : 'bg-emerald-50'}`}>
+                        <Shield size={18} className={`${stats.spentToday && stats.spentToday > (stats.dailyBudget || 30) * 0.8 ? 'text-amber-600' : 'text-emerald-600'}`} />
+                    </div>
+                    <h3 className="text-xs font-bold text-[#A6A6A6] uppercase tracking-wider">
+                        Circuit Breaker
+                    </h3>
+                </div>
+                <div>
+                  <div className="flex items-baseline gap-2">
+                      <p className="text-4xl font-bold text-[#3E3E3E] tracking-tighter">
+                          R$ {stats.spentToday?.toFixed(2) || "0.00"}
+                      </p>
+                      <p className="text-xs text-[#A6A6A6] font-bold">/ R$ {stats.dailyBudget?.toFixed(0) || "30"}</p>
+                  </div>
+                  <div className="w-full bg-[#F7F7F7] h-1.5 rounded-full mt-4 overflow-hidden">
+                      <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: `${Math.min(((stats.spentToday || 0) / (stats.dailyBudget || 30)) * 100, 100)}%` }}
+                          className={`h-full rounded-full ${stats.spentToday && stats.spentToday > ((stats.dailyBudget || 30) * 0.8) ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                      />
+                  </div>
+                </div>
+                <div className="mt-4 pt-4 border-t border-[#F3F1F0]">
+                  <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Status: Operacional</span>
+                </div>
             </div>
-            <h3 className="text-[10px] font-black text-text-secondary uppercase tracking-[0.15em]">
-              Circuit Breaker (Hoje)
-            </h3>
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-bold text-text-primary">
-              R$ {stats.spentToday?.toFixed(2) || "0.00"}
-            </span>
-            <span className="text-text-muted text-sm">/ R$ {stats.dailyBudget?.toFixed(2) || "30.00"}</span>
-          </div>
-          <div className="w-full bg-bg-elevated h-1.5 rounded-full mt-4">
-            <div 
-              className={`h-full rounded-full ${stats.spentToday && stats.spentToday > ((stats.dailyBudget || 30) * 0.8) ? 'bg-amber-500' : 'bg-green-500'}`}
-              style={{ width: `${Math.min(((stats.spentToday || 0) / (stats.dailyBudget || 30)) * 100, 100)}%` }}
-            />
-          </div>
-        </motion.div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Mini Chart - Daily Calls */}
-        <div className="bg-bg-surface border border-border-subtle rounded-2xl p-5">
-          <h3 className="text-[10px] font-black text-text-secondary uppercase tracking-[0.15em] mb-4">
-            Últimos 30 dias
-          </h3>
-          {stats.dailyCalls && stats.dailyCalls.length > 0 ? (
-            <div className="flex items-end gap-0.5 h-32">
-              {stats.dailyCalls.slice(-30).map((day) => {
-                const total = day.image_generation + day.copywriting;
-                const heightPct = maxDailyTotal > 0 ? (total / maxDailyTotal) * 100 : 0;
-                const imgPct = total > 0 ? (day.image_generation / total) * 100 : 0;
-                return (
-                  <div
-                    key={day.date}
-                    className="flex-1 flex flex-col justify-end group relative"
-                  >
-                    {/* Tooltip */}
-                    <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:block z-10">
-                      <div className="bg-bg-elevated border border-border-default rounded-lg px-2 py-1 text-[9px] text-text-secondary whitespace-nowrap shadow-lg">
-                        <p className="font-bold text-text-primary">
-                          {fmtShortDate(day.date)}
-                        </p>
-                        <p>🎨 {day.image_generation} · ✍️ {day.copywriting}</p>
-                      </div>
-                    </div>
-                    <div
-                      className="w-full rounded-t-sm overflow-hidden transition-all hover:opacity-80"
-                      style={{ height: `${Math.max(heightPct, 2)}%` }}
-                    >
-                      <div
-                        className="bg-gradient-to-t from-pepper-red to-pepper-orange"
-                        style={{ height: `${imgPct}%` }}
-                      />
-                      <div
-                        className="bg-sky-500"
-                        style={{ height: `${100 - imgPct}%` }}
-                      />
+      {/* Analytics Chart Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="lg:col-span-3 bg-white border border-[#EAEAEC] rounded-xl p-6 shadow-sm">
+          <div className="flex justify-between items-center mb-8">
+            <h3 className="text-sm font-bold text-[#3E3E3E] uppercase tracking-wider flex items-center gap-2">
+                <TrendingUp size={16} className="text-[#EA1D2C]" />
+                Volume de Operações (30 Dias)
+            </h3>
+            <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1.5">
+                    <div className="w-2 h-2 rounded-full bg-[#EA1D2C]" />
+                    <span className="text-[10px] font-bold text-[#717171] uppercase">Imagens</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                    <div className="w-2 h-2 rounded-full bg-blue-500" />
+                    <span className="text-[10px] font-bold text-[#717171] uppercase">Copy</span>
+                </div>
+            </div>
+          </div>
+          
+          <div className="flex items-end gap-1 h-40 px-2">
+            {stats.dailyCalls?.slice(-30).map((day) => {
+              const total = day.image_generation + day.copywriting;
+              const heightPct = maxDailyTotal > 0 ? (total / maxDailyTotal) * 100 : 0;
+              const imgPct = total > 0 ? (day.image_generation / total) * 100 : 0;
+              return (
+                <div key={day.date} className="flex-1 flex flex-col justify-end group relative h-full">
+                  <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-200 z-20 pointer-events-none">
+                    <div className="bg-white border border-[#EAEAEC] rounded-lg px-2 py-1.5 shadow-lg min-w-[100px] text-center">
+                        <p className="text-[10px] font-bold text-[#3E3E3E] border-b border-[#F3F1F0] pb-1 mb-1">{fmtShortDate(day.date)}</p>
+                        <p className="text-[10px] font-bold text-[#EA1D2C]">🎨 {day.image_generation}</p>
+                        <p className="text-[10px] font-bold text-blue-500">✍️ {day.copywriting}</p>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="flex items-center justify-center h-32 text-text-muted text-xs">
-              Sem dados ainda.
-            </div>
-          )}
-          <div className="flex items-center gap-4 mt-3">
-            <div className="flex items-center gap-1.5">
-              <div className="w-2.5 h-2.5 rounded-sm bg-gradient-to-r from-pepper-red to-pepper-orange" />
-              <span className="text-text-muted text-[10px]">Imagem</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-2.5 h-2.5 rounded-sm bg-sky-500" />
-              <span className="text-text-muted text-[10px]">Copy</span>
-            </div>
+                  <div
+                    className="w-full rounded-t-sm overflow-hidden transition-all duration-300 group-hover:opacity-80"
+                    style={{ height: `${Math.max(heightPct, 3)}%` }}
+                  >
+                    <div className="bg-[#EA1D2C]" style={{ height: `${imgPct}%` }} />
+                    <div className="bg-blue-500" style={{ height: `${100 - imgPct}%` }} />
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
-        {/* Sync Exchange Button */}
-        <div className="bg-bg-surface border border-border-subtle rounded-2xl p-5 flex flex-col items-center justify-center text-center">
-            <TrendingUp className="w-8 h-8 text-text-muted mb-4" />
-            <h3 className="text-text-primary font-bold mb-2">Sincronização Fiscal</h3>
-            <p className="text-text-muted text-xs mb-6 max-w-xs">
-                A cotação atual fixada no banco é de <strong>R$ {stats.exchangeRate?.toFixed(4) || "0.0000"}</strong>. 
-                Clique abaixo para buscar a cotação mais recente na AwesomeAPI.
+        <div className="lg:col-span-1 bg-white border border-[#EAEAEC] rounded-xl p-6 flex flex-col items-center justify-center text-center shadow-sm">
+            <div className="w-14 h-14 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center mb-6">
+                <RefreshCw size={24} className="text-[#EA1D2C]" />
+            </div>
+            <h3 className="text-[#3E3E3E] font-bold text-lg tracking-tight mb-1">Sync Fiscal</h3>
+            <p className="text-[#A6A6A6] text-[10px] font-bold uppercase tracking-widest mb-6">
+                Cotação: <span className="text-[#3E3E3E]">R$ {stats.exchangeRate?.toFixed(4) || "0.0000"}</span>
             </p>
             <button 
                 onClick={syncExchange}
-                className="px-6 py-2.5 rounded-xl bg-bg-elevated hover:bg-pepper-orange/10 text-pepper-orange border border-border-subtle hover:border-pepper-orange/30 transition-all font-semibold text-sm"
+                className="w-full py-3 rounded-lg bg-[#F7F7F7] border border-[#EAEAEC] text-[#3E3E3E] text-xs font-bold uppercase tracking-widest hover:bg-[#EA1D2C] hover:text-white hover:border-[#EA1D2C] transition-all shadow-sm active:scale-95"
             >
-                Sincronizar Câmbio Agora
+                Sincronizar
             </button>
         </div>
-
       </div>
     </motion.div>
   );

@@ -1,44 +1,75 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Flame, Users, Zap, TrendingUp, Image as ImageIcon, Type,
-  RefreshCw, LogOut, Shield
+import { 
+  Shield, 
+  Users, 
+  Activity, 
+  Settings as SettingsIcon,
+  LogOut,
+  Zap,
+  RefreshCw,
+  ChevronDown,
+  LayoutDashboard,
+  User,
+  TrendingUp
 } from "lucide-react";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
 
-import { Tab, Stats, UserProfile, UsageRecord, SystemSetting } from "./types";
+// Sub-components
 import { OverviewTab } from "./TabOverview";
-import { UsageTab } from "./TabUsage";
 import { CRMTab } from "./TabCRM";
+import { UsageTab } from "./TabUsage";
 import { SettingsTab } from "./TabSettings";
+import type { Tab, Stats, UserProfile, UsageRecord, SystemSetting } from "./types";
 
-// --- Component ---
-export default function AdminDashboard({
-  userEmail,
-}: {
+const LOGO_LIGHT_BG = "https://res.cloudinary.com/do8gdtozt/image/upload/v1761865865/logo_estudio_sabor_horizontal-upscale-scale-6_00x_nmbn9t.png";
+
+interface AdminDashboardProps {
   userEmail: string;
-}) {
+}
+
+export default function AdminDashboard({ userEmail }: AdminDashboardProps) {
+  const router = useRouter();
+  const supabase = createClient();
   const [activeTab, setActiveTab] = useState<Tab>("overview");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  
+  // States for data
   const [stats, setStats] = useState<Stats | null>(null);
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [usersTotal, setUsersTotal] = useState(0);
+  const [usersPage, setUsersPage] = useState(1);
+  const [userSearch, setUserSearch] = useState("");
+  
   const [usage, setUsage] = useState<UsageRecord[]>([]);
   const [usageTotal, setUsageTotal] = useState(0);
-  const [settings, setSettings] = useState<SystemSetting[]>([]);
-
-  // Filters
-  const [userSearch, setUserSearch] = useState("");
-  const [usageEmail, setUsageEmail] = useState("");
+  const [usagePage, setUsagePage] = useState(1);
   const [usageType, setUsageType] = useState("");
+  const [usageEmail, setUsageEmail] = useState("");
   const [usageDateFrom, setUsageDateFrom] = useState("");
   const [usageDateTo, setUsageDateTo] = useState("");
-  const [usersPage, setUsersPage] = useState(1);
-  const [usagePage, setUsagePage] = useState(1);
 
+  const [settings, setSettings] = useState<SystemSetting[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // --- Fetch Functions ---
+  // Close dropdown on click outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Fetch functions
   const fetchStats = useCallback(async () => {
     try {
       const res = await fetch("/api/admin/stats");
@@ -48,56 +79,44 @@ export default function AdminDashboard({
     }
   }, []);
 
-  const syncExchange = async () => {
-    try {
-      const res = await fetch("/api/admin/exchange/sync");
-      if (res.ok) {
-        alert("Câmbio sincronizado com sucesso!");
-        fetchStats();
-      }
-    } catch (e) {
-      alert("Falha ao sincronizar câmbio.");
-    }
-  };
-
   const fetchUsers = useCallback(async () => {
     const params = new URLSearchParams({
       page: String(usersPage),
       limit: "20",
+      search: userSearch,
     });
-  if (userSearch) params.set("search", userSearch);
-  try {
-    const res = await fetch(`/api/admin/users?${params}`);
-    if (res.ok) {
-      const data = await res.json();
-      setUsers(data.users);
-      setUsersTotal(data.total);
+    try {
+      const res = await fetch(`/api/admin/users?${params}`);
+      if (res.ok) {
+        const data = await res.json();
+        setUsers(data.users);
+        setUsersTotal(data.total);
+      }
+    } catch (e) {
+      console.error("Users fetch failed:", e);
     }
-  } catch (e) {
-    console.error("Users fetch failed:", e);
-  }
-}, [usersPage, userSearch]);
+  }, [usersPage, userSearch]);
 
-const fetchUsage = useCallback(async () => {
-  const params = new URLSearchParams({
-    page: String(usagePage),
-    limit: "50",
-  });
-  if (usageType) params.set("callType", usageType);
-  if (usageEmail) params.set("userEmail", usageEmail);
-  if (usageDateFrom) params.set("dateFrom", usageDateFrom);
-  if (usageDateTo) params.set("dateTo", usageDateTo);
-  try {
-    const res = await fetch(`/api/admin/usage?${params}`);
-    if (res.ok) {
-      const data = await res.json();
-      setUsage(data.usage);
-      setUsageTotal(data.total);
+  const fetchUsage = useCallback(async () => {
+    const params = new URLSearchParams({
+      page: String(usagePage),
+      limit: "50",
+      type: usageType,
+      email: usageEmail,
+      from: usageDateFrom,
+      to: usageDateTo,
+    });
+    try {
+      const res = await fetch(`/api/admin/usage?${params}`);
+      if (res.ok) {
+        const data = await res.json();
+        setUsage(data.usage);
+        setUsageTotal(data.total);
+      }
+    } catch (e) {
+      console.error("Usage fetch failed:", e);
     }
-  } catch (e) {
-    console.error("Usage fetch failed:", e);
-  }
-}, [usagePage, usageType, usageEmail, usageDateFrom, usageDateTo]);
+  }, [usagePage, usageType, usageEmail, usageDateFrom, usageDateTo]);
 
   const fetchSettings = useCallback(async () => {
     try {
@@ -108,204 +127,229 @@ const fetchUsage = useCallback(async () => {
     }
   }, []);
 
-  // --- Initial Load ---
   useEffect(() => {
     setLoading(true);
-    Promise.all([fetchStats(), fetchUsers(), fetchUsage(), fetchSettings()]).finally(() =>
-      setLoading(false)
-    );
-  }, [fetchStats, fetchUsers, fetchUsage, fetchSettings]);
+    Promise.all([fetchStats(), fetchSettings()]).finally(() => setLoading(false));
+  }, [fetchStats, fetchSettings]);
 
-// --- Tab Config ---
-const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
-  { id: "overview", label: "Painel", icon: <TrendingUp size={16} /> },
-  { id: "usage", label: "Histórico", icon: <Zap size={16} /> },
-  { id: "crm", label: "Clientes", icon: <Users size={16} /> },
-  { id: "settings", label: "Configurações", icon: <Shield size={16} /> },
-];
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
-// --- Helpers ---
-const fmt = (n: number, decimals = 2) =>
-  n.toLocaleString("pt-BR", {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  });
+  useEffect(() => {
+    fetchUsage();
+  }, [fetchUsage]);
 
-const fmtDate = (iso: string) =>
-  new Date(iso).toLocaleDateString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
 
-const fmtShortDate = (iso: string) =>
-  new Date(iso).toLocaleDateString("pt-BR", {
-    day: "2-digit",
-    month: "short",
-  });
+  const syncExchange = async () => {
+    const res = await fetch("/api/admin/exchange/sync", { method: "POST" });
+    if (res.ok) fetchStats();
+  };
 
-const callTypeBadge = (type: string) => {
-  const isImage = type === "image_generation";
+  const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
+    { id: "overview", label: "Visão Geral", icon: <TrendingUp size={16} /> },
+    { id: "crm", label: "Clientes", icon: <Users size={16} /> },
+    { id: "usage", label: "Telemetria", icon: <Zap size={16} /> },
+    { id: "settings", label: "Sistema", icon: <Shield size={16} /> },
+  ];
+
+  const fmt = (n: number, d = 2) => n.toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d });
+  const fmtDate = (s: string) => new Date(s).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+  const fmtShortDate = (s: string) => new Date(s).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+
+  const maxDailyTotal = stats?.dailyCalls ? Math.max(...stats.dailyCalls.map(d => d.image_generation + d.copywriting)) : 1;
+
   return (
-    <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${isImage
-          ? "bg-pepper-orange/10 text-pepper-orange border border-pepper-orange/20"
-          : "bg-sky-500/10 text-sky-400 border border-sky-500/20"
-        }`}
-    >
-      {isImage ? <ImageIcon size={10} /> : <Type size={10} />}
-      {isImage ? "Imagem" : "Copy"}
-    </span>
-  );
-};
+    <div className="min-h-screen bg-[#F7F7F7] font-sans text-[#3E3E3E]">
+      {/* Admin Top Header */}
+      <header className="h-20 bg-white border-b border-[#EAEAEC] sticky top-0 z-50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
+          <div className="flex items-center gap-10">
+            {/* Official Logo */}
+            <Link href="/dashboard" className="flex items-center shrink-0">
+              <img 
+                src={LOGO_LIGHT_BG} 
+                alt="Estúdio & Sabor" 
+                className="h-14 w-auto object-contain"
+              />
+            </Link>
 
-const statusBadge = (status: string) => (
-  <span
-    className={`inline-block w-2 h-2 rounded-full ${status === "success" ? "bg-green-500" : "bg-pepper-red"
-      }`}
-  />
-);
-
-// --- Chart ---
-const maxDailyTotal = stats?.dailyCalls
-  ? Math.max(
-    ...stats.dailyCalls.map(
-      (d) => d.image_generation + d.copywriting
-    ),
-    1
-  )
-  : 1;
-
-return (
-  <div className="min-h-dvh bg-bg-base">
-    {/* Header */}
-    <header className="sticky top-0 z-50 glass border-b border-border-subtle">
-      <div className="max-w-7xl mx-auto px-[var(--space-page)] h-14 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-pepper-red to-pepper-orange flex items-center justify-center">
-            <Flame size={18} className="text-white" />
+            {/* Tab Navigation (Horizontal) */}
+            <nav className="hidden lg:flex items-center gap-1 p-1 bg-[#F7F7F7] rounded-xl border border-[#EAEAEC]">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={cn(
+                    "flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-bold transition-all whitespace-nowrap",
+                    activeTab === tab.id
+                      ? "bg-white text-[#EA1D2C] shadow-sm border border-[#EAEAEC]"
+                      : "text-[#717171] hover:text-[#3E3E3E] hover:bg-[#EAEAEC]/30"
+                  )}
+                >
+                  {tab.icon}
+                  {tab.label}
+                </button>
+              ))}
+            </nav>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="font-display font-bold text-sm text-text-primary">
-              Admin
-            </span>
-            <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-pepper-red/10 border border-pepper-red/20">
-              <Shield size={10} className="text-pepper-red" />
-              <span className="text-pepper-red text-[10px] font-bold uppercase tracking-wider">
-                Owner
-              </span>
-            </span>
-          </div>
-        </div>
 
-        <div className="flex items-center gap-3">
-          <span className="text-text-muted text-xs hidden sm:block">
-            {userEmail}
-          </span>
-          <button
-            onClick={() => fetchStats()}
-            className="w-7 h-7 rounded-lg bg-bg-elevated border border-border-default flex items-center justify-center text-text-muted hover:text-pepper-orange transition-all"
-            title="Atualizar dados"
-          >
-            <RefreshCw size={14} />
-          </button>
-          <form action="/auth/signout" method="post">
+          <div className="flex items-center gap-4">
             <button
-              type="submit"
-              className="w-7 h-7 rounded-lg bg-bg-elevated border border-border-default flex items-center justify-center text-text-muted hover:text-pepper-red transition-all"
-              title="Sair"
+              onClick={() => fetchStats()}
+              className="w-10 h-10 rounded-xl bg-white border border-[#EAEAEC] flex items-center justify-center text-[#717171] hover:text-[#EA1D2C] hover:border-[#EA1D2C]/30 transition-all shadow-sm"
             >
-              <LogOut size={14} />
+              <RefreshCw size={18} />
             </button>
-          </form>
-        </div>
-      </div>
-    </header>
 
-    {/* Tabs */}
-    <div className="max-w-7xl mx-auto px-[var(--space-page)] pt-6">
-      <div className="flex gap-1 bg-bg-surface rounded-xl p-1 w-fit">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${activeTab === tab.id
-                ? "bg-gradient-to-r from-pepper-red to-pepper-orange text-white shadow-lg"
-                : "text-text-muted hover:text-text-primary"
-              }`}
+            {/* Profile Dropdown */}
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="flex items-center gap-3 pl-4 pr-3 py-2 rounded-xl bg-white border border-[#EAEAEC] hover:border-[#EA1D2C]/30 transition-all shadow-sm group"
+              >
+                <div className="hidden md:flex flex-col items-end">
+                  <span className="text-[#3E3E3E] text-sm font-bold leading-none">Administrator</span>
+                  <span className="text-[#A6A6A6] text-[10px] mt-1 font-bold uppercase tracking-widest">{userEmail.split('@')[0]}</span>
+                </div>
+                <div className="w-9 h-9 rounded-lg bg-[#F7F7F7] flex items-center justify-center border border-[#EAEAEC]">
+                  <User size={18} className="text-[#717171]" />
+                </div>
+                <ChevronDown size={14} className={cn("text-[#A6A6A6] transition-transform", dropdownOpen && "rotate-180")} />
+              </button>
+
+              <AnimatePresence>
+                {dropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    className="absolute right-0 mt-2 w-56 bg-white border border-[#EAEAEC] rounded-xl shadow-xl overflow-hidden z-[100] p-1.5"
+                  >
+                    <button
+                      onClick={() => router.push("/dashboard")}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm font-bold text-[#717171] hover:text-[#EA1D2C] hover:bg-red-50 rounded-lg transition-all"
+                    >
+                      <LayoutDashboard size={16} />
+                      Dashboard Cliente
+                    </button>
+                    <div className="h-px bg-[#F3F1F0] my-1" />
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm font-bold text-[#EA1D2C] hover:bg-red-50 rounded-lg transition-all"
+                    >
+                      <LogOut size={16} />
+                      Sair do Sistema
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content Area */}
+      <main className="max-w-7xl mx-auto px-6 py-10">
+        
+        {/* Mobile Header Title */}
+        <div className="lg:hidden mb-8 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#EA1D2C] flex items-center justify-center text-white shadow-lg shadow-[#EA1D2C]/20">
+                <Shield size={20} />
+            </div>
+            <div>
+                <h1 className="text-lg font-bold text-[#3E3E3E] tracking-tight">Admin Console</h1>
+                <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest block">Operacional</span>
+            </div>
+          </div>
+          
+          <select 
+            value={activeTab}
+            onChange={(e) => setActiveTab(e.target.value as any)}
+            className="bg-white border border-[#EAEAEC] rounded-lg px-3 py-2 text-sm font-bold text-[#3E3E3E] outline-none shadow-sm"
           >
-            {tab.icon}
-            {tab.label}
-          </button>
-        ))}
-      </div>
-    </div>
-
-    {/* Content */}
-    <main className="max-w-7xl mx-auto px-[var(--space-page)] py-6">
-      {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="w-8 h-8 border-2 border-pepper-red/30 border-t-pepper-red rounded-full animate-spin" />
+            {tabs.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
+          </select>
         </div>
-      ) : (
-        <AnimatePresence mode="wait">
-          {activeTab === "overview" && (
-            <OverviewTab
-              key="overview"
-              stats={stats}
-              fmt={fmt}
-              fmtShortDate={fmtShortDate}
-              maxDailyTotal={maxDailyTotal}
-              syncExchange={syncExchange}
-            />
-          )}
-          {activeTab === "usage" && (
-            <UsageTab
-              key="usage"
-              usage={usage}
-              usageTotal={usageTotal}
-              usagePage={usagePage}
-              setUsagePage={setUsagePage}
-              usageType={usageType}
-              setUsageType={setUsageType}
-              usageEmail={usageEmail}
-              setUsageEmail={setUsageEmail}
-              usageDateFrom={usageDateFrom}
-              setUsageDateFrom={setUsageDateFrom}
-              usageDateTo={usageDateTo}
-              setUsageDateTo={setUsageDateTo}
-              fetchUsage={fetchUsage}
-              fmt={fmt}
-              fmtDate={fmtDate}
-              callTypeBadge={callTypeBadge}
-              statusBadge={statusBadge}
-            />
-          )}
-          {activeTab === "crm" && (
-            <CRMTab
-              key="crm"
-              users={users}
-              usersTotal={usersTotal}
-              usersPage={usersPage}
-              setUsersPage={setUsersPage}
-              userSearch={userSearch}
-              setUserSearch={setUserSearch}
-              fetchUsers={fetchUsers}
-              fmtDate={fmtDate}
-            />
-          )}
-          {activeTab === "settings" && (
-            <SettingsTab
-              key="settings"
-              settings={settings}
-              fetchSettings={fetchSettings}
-            />
-          )}
-        </AnimatePresence>
-      )}
-    </main>
-  </div>
-);
+
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <RefreshCw size={32} className="text-[#EA1D2C] animate-spin opacity-20" />
+          </div>
+        ) : (
+          <AnimatePresence mode="wait">
+            {activeTab === "overview" && (
+              <OverviewTab 
+                key="overview"
+                stats={stats}
+                fmt={fmt}
+                fmtShortDate={fmtShortDate}
+                maxDailyTotal={maxDailyTotal}
+                syncExchange={syncExchange}
+              />
+            )}
+            {activeTab === "crm" && (
+              <CRMTab 
+                key="crm"
+                users={users}
+                usersTotal={usersTotal}
+                usersPage={usersPage}
+                setUsersPage={setUsersPage}
+                userSearch={userSearch}
+                setUserSearch={setUserSearch}
+                fetchUsers={fetchUsers}
+                fmtDate={fmtDate}
+              />
+            )}
+            {activeTab === "usage" && (
+              <UsageTab 
+                key="usage"
+                usage={usage}
+                usageTotal={usageTotal}
+                usagePage={usagePage}
+                setUsagePage={setUsagePage}
+                usageType={usageType}
+                setUsageType={setUsageType}
+                usageEmail={usageEmail}
+                setUsageEmail={setUsageEmail}
+                usageDateFrom={usageDateFrom}
+                setUsageDateFrom={setUsageDateFrom}
+                usageDateTo={usageDateTo}
+                setUsageDateTo={setUsageDateTo}
+                fetchUsage={fetchUsage}
+                fmt={fmt}
+                fmtDate={fmtDate}
+                callTypeBadge={(t) => (
+                  <span className={cn(
+                    "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border",
+                    t === "image_generation" ? "bg-red-50 text-[#EA1D2C] border-red-100" : "bg-blue-50 text-blue-600 border-blue-100"
+                  )}>
+                    {t === "image_generation" ? "Imagem" : "Copy"}
+                  </span>
+                )}
+                statusBadge={(s) => (
+                  <div className={cn(
+                    "w-2 h-2 rounded-full",
+                    s === "success" ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-[#EA1D2C] shadow-[0_0_8px_rgba(234,29,44,0.5)]"
+                  )} />
+                )}
+              />
+            )}
+            {activeTab === "settings" && (
+              <SettingsTab 
+                key="settings"
+                settings={settings}
+                fetchSettings={fetchSettings}
+              />
+            )}
+          </AnimatePresence>
+        )}
+      </main>
+    </div>
+  );
 }
