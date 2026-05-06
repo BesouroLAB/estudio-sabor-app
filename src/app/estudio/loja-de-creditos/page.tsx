@@ -126,68 +126,80 @@ function StorePageContent() {
 
 
         {/* Comparison Section (Neuromarketing) */}
-        <div className="bg-slate-900 rounded-[32px] p-8 md:p-12 text-white overflow-hidden relative">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-[#EA1D2C]/10 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2" />
+        <div className="bg-[#0A0A0A] border border-white/5 rounded-[32px] p-8 md:p-12 text-white overflow-hidden relative shadow-2xl">
+          {/* Brand Aura Glow */}
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#EA1D2C]/20 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2 animate-pulse" />
+          <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-[#FF5C00]/10 blur-[100px] rounded-full translate-y-1/2 -translate-x-1/2" />
           
           <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/10 text-white/60 text-[10px] font-bold uppercase tracking-widest">
-                <Zap size={10} className="text-[#EA1D2C]" />
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/80 text-[10px] font-bold uppercase tracking-widest">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#EA1D2C] animate-ping" />
                 Por que escolher o Estúdio & Sabor?
               </div>
-              <h2 className="text-3xl font-bold tracking-tight leading-tight">
-                O fim da dependência de <span className="text-[#EA1D2C]">agências caras</span> e fotógrafos lentos.
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight leading-tight">
+                O fim da dependência de <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#EA1D2C] to-[#FF5C00]">
+                  agências e fotógrafos.
+                </span>
               </h2>
-              <p className="text-slate-400 text-sm leading-relaxed">
-                No modelo tradicional, você pagaria até R$ 500 por um kit de 10 fotos e esperaria dias pela entrega. 
-                Aqui, você renova seu cardápio em segundos por menos de R$ 2,00 por foto.
+              <p className="text-slate-400 text-base leading-relaxed max-w-md">
+                No modelo tradicional, você pagaria até R$ 500 por um kit e esperaria dias. 
+                Aqui, você <span className="text-white font-medium">multiplica seu lucro no iFood</span> em segundos por menos de R$ 2,00 por foto.
               </p>
               
               <div className="flex flex-col gap-4 pt-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                    <Check size={12} className="text-emerald-500" />
+                {[
+                  "Resultados instantâneos (30 segundos)",
+                  "100% de aceitação no iFood garantida",
+                  "Direitos autorais totais das imagens"
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#EA1D2C] to-[#FF5C00] flex items-center justify-center p-0.5 shadow-lg shadow-[#EA1D2C]/20">
+                      <div className="w-full h-full rounded-full bg-[#0A0A0A] flex items-center justify-center">
+                        <Check size={12} className="text-white" />
+                      </div>
+                    </div>
+                    <span className="text-sm font-medium text-slate-200">{item}</span>
                   </div>
-                  <span className="text-sm font-medium">Resultados instantâneos (30 segundos)</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                    <Check size={12} className="text-emerald-500" />
-                  </div>
-                  <span className="text-sm font-medium">100% de aceitação no iFood garantida</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                    <Check size={12} className="text-emerald-500" />
-                  </div>
-                  <span className="text-sm font-medium">Direitos autorais totais das imagens</span>
-                </div>
+                ))}
               </div>
             </div>
 
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-6 backdrop-blur-sm">
-              <div className="space-y-4">
-                <div className="flex justify-between items-center text-xs font-bold uppercase tracking-widest text-white/40 pb-2 border-b border-white/5">
-                  <span>Comparativo</span>
-                  <span>Custo Estimado</span>
-                </div>
-                
-                <div className="flex justify-between items-center py-2">
-                  <span className="text-slate-300 text-sm">Fotógrafo Profissional (Kit 10)</span>
-                  <span className="font-bold text-slate-400 line-through">R$ 450+</span>
-                </div>
-                
-                <div className="flex justify-between items-center py-2">
-                  <span className="text-slate-300 text-sm">Agência Social Media</span>
-                  <span className="font-bold text-slate-400 line-through">R$ 800+</span>
-                </div>
-                
-                <div className="flex justify-between items-center py-4 px-4 bg-[#EA1D2C] rounded-xl shadow-lg shadow-[#EA1D2C]/20 -mx-2">
-                  <div className="flex flex-col">
-                    <span className="font-bold text-sm">Estúdio & Sabor</span>
-                    <span className="text-[10px] opacity-80 uppercase tracking-wider">Acesso Instantâneo</span>
+            <div className="relative">
+              {/* Outer Glow for the box */}
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-[#EA1D2C] to-[#FF5C00] rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+              
+              <div className="relative bg-[#111111] border border-white/10 rounded-2xl p-8 space-y-6 backdrop-blur-xl">
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-[0.2em] text-white/30 pb-4 border-b border-white/5">
+                    <span>Comparativo</span>
+                    <span>Custo Estimado</span>
                   </div>
-                  <span className="text-2xl font-black">R$ 29,90</span>
+                  
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-slate-400 text-sm">Fotógrafo Profissional (Kit 10)</span>
+                    <span className="font-bold text-slate-500 line-through">R$ 450+</span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-slate-400 text-sm">Agência Social Media</span>
+                    <span className="font-bold text-slate-500 line-through">R$ 800+</span>
+                  </div>
+                  
+                  <div className="mt-6 p-6 rounded-xl bg-gradient-to-r from-[#EA1D2C] to-[#FF5C00] relative overflow-hidden group shadow-2xl shadow-[#EA1D2C]/20">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 blur-2xl rounded-full translate-x-10 -translate-y-10" />
+                    <div className="flex justify-between items-center relative z-10">
+                      <div className="flex flex-col">
+                        <span className="font-black text-lg text-white">Estúdio & Sabor</span>
+                        <span className="text-[10px] text-white/80 font-bold uppercase tracking-widest">IA Especializada</span>
+                      </div>
+                      <div className="flex flex-col items-end">
+                        <span className="text-3xl font-black text-white">R$ 29,90</span>
+                        <span className="text-[9px] text-white/70 font-bold uppercase tracking-wider">Acesso Imediato</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

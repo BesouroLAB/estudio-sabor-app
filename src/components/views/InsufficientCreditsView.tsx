@@ -14,23 +14,29 @@ export function InsufficientCreditsView({ onBack, onGoToStore }: InsufficientCre
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      className="flex-1 flex flex-col items-center justify-center p-[var(--space-page)] bg-white"
+      className="flex-1 flex flex-col items-center justify-center p-[var(--space-page)] bg-[#0A0A0A] text-white relative overflow-hidden"
     >
-      <div className="max-w-3xl w-full text-center">
+      {/* Background Orbs */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#EA1D2C]/10 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2" />
+      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#FF5C00]/10 blur-[100px] rounded-full translate-y-1/2 -translate-x-1/2" />
+
+      <div className="max-w-4xl w-full text-center relative z-10">
         <div className="relative inline-block mb-8">
-          <div className="absolute inset-0 bg-red-500/20 blur-3xl rounded-full" />
-          <div className="relative w-24 h-24 rounded-[32px] bg-gradient-to-br from-[#EA1D2C] to-[#FC6803] flex items-center justify-center text-white shadow-2xl shadow-red-500/30">
-            <Sparkles size={48} />
+          <div className="absolute inset-0 bg-[#EA1D2C]/40 blur-3xl rounded-full animate-pulse" />
+          <div className="relative w-20 h-20 rounded-[28px] bg-gradient-to-br from-[#EA1D2C] to-[#FF5C00] flex items-center justify-center text-white shadow-2xl shadow-[#EA1D2C]/30">
+            <Sparkles size={40} />
           </div>
         </div>
 
-        <h1 className="text-4xl md:text-5xl font-bold text-[#1A1A1A] mb-4 tracking-tight">
+        <h1 className="text-4xl md:text-5xl font-black mb-6 tracking-tight leading-tight">
           Sua criatividade não tem limites, <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#EA1D2C] to-[#FC6803]">mas seus créditos acabaram.</span>
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#EA1D2C] to-[#FF5C00]">
+            mas seus créditos acabaram.
+          </span>
         </h1>
         
-        <p className="text-[#717171] text-lg mb-12 max-w-xl mx-auto leading-relaxed">
-          Para continuar gerando fotos de capa premium e kits completos de marketing, 
+        <p className="text-slate-400 text-lg mb-12 max-w-xl mx-auto leading-relaxed">
+          Para continuar gerando fotos de capa premium e kits de marketing que vendem mais, 
           você precisa de saldo em sua conta.
         </p>
 
@@ -38,26 +44,26 @@ export function InsufficientCreditsView({ onBack, onGoToStore }: InsufficientCre
           {/* Kit Essencial */}
           <motion.div
             whileHover={{ y: -8 }}
-            className="p-6 rounded-[32px] bg-white border border-[#EAEAEC] hover:border-[#EA1D2C]/30 transition-all shadow-sm hover:shadow-xl group"
+            className="p-8 rounded-[32px] bg-white/5 border border-white/10 hover:border-[#EA1D2C]/50 transition-all backdrop-blur-sm group relative overflow-hidden"
           >
-            <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all">
+            <div className="w-12 h-12 rounded-2xl bg-white/5 text-white flex items-center justify-center mb-6 group-hover:bg-[#EA1D2C] transition-all">
               <Rocket size={24} />
             </div>
-            <h3 className="font-bold text-lg text-[#3E3E3E] mb-1 text-left">Kit Essencial</h3>
-            <p className="text-2xl font-bold text-[#1A1A1A] mb-4 text-left">R$ 29,90</p>
-            <ul className="space-y-2 mb-6 text-left">
-              <li className="text-xs text-[#717171] flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+            <h3 className="font-bold text-lg text-white mb-1 text-left">Kit Essencial</h3>
+            <p className="text-2xl font-black text-white mb-4 text-left">R$ 29,90</p>
+            <ul className="space-y-3 mb-8 text-left">
+              <li className="text-xs text-slate-400 flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#EA1D2C]" />
                 10 Créditos Iniciais
               </li>
-              <li className="text-xs text-[#717171] flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+              <li className="text-xs text-slate-400 flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#EA1D2C]" />
                 R$ 2,99 por foto
               </li>
             </ul>
             <button 
               onClick={onGoToStore}
-              className="w-full py-3 rounded-2xl bg-[#F7F7F7] text-[#3E3E3E] font-bold text-sm hover:bg-[#EA1D2C] hover:text-white transition-all"
+              className="w-full py-4 rounded-2xl bg-white/10 text-white font-bold text-sm hover:bg-white hover:text-black transition-all"
             >
               Selecionar
             </button>
@@ -66,29 +72,31 @@ export function InsufficientCreditsView({ onBack, onGoToStore }: InsufficientCre
           {/* Combo Cardápio */}
           <motion.div
             whileHover={{ y: -8 }}
-            className="p-6 rounded-[32px] bg-white border-2 border-[#EA1D2C] relative shadow-2xl group"
+            className="p-8 rounded-[32px] bg-[#111111] border-2 border-[#EA1D2C] relative shadow-2xl group overflow-hidden"
           >
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-[#EA1D2C] to-[#FC6803] text-white text-[10px] font-bold rounded-full uppercase tracking-widest shadow-lg">
-              Favorito
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-gradient-to-r from-[#EA1D2C] to-[#FF5C00] text-white text-[10px] font-black rounded-full uppercase tracking-widest shadow-lg z-20">
+              Mais Popular
             </div>
-            <div className="w-12 h-12 rounded-2xl bg-red-50 text-[#EA1D2C] flex items-center justify-center mb-6 group-hover:bg-[#EA1D2C] group-hover:text-white transition-all">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#EA1D2C]/10 blur-2xl rounded-full" />
+            
+            <div className="w-12 h-12 rounded-2xl bg-[#EA1D2C] text-white flex items-center justify-center mb-6 shadow-lg shadow-[#EA1D2C]/20">
               <Star size={24} />
             </div>
-            <h3 className="font-bold text-lg text-[#3E3E3E] mb-1 text-left">Combo Cardápio</h3>
-            <p className="text-2xl font-bold text-[#1A1A1A] mb-4 text-left">R$ 59,90</p>
-            <ul className="space-y-2 mb-6 text-left">
-              <li className="text-xs text-[#717171] flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+            <h3 className="font-bold text-lg text-white mb-1 text-left">Combo Cardápio</h3>
+            <p className="text-2xl font-black text-white mb-4 text-left">R$ 59,90</p>
+            <ul className="space-y-3 mb-8 text-left">
+              <li className="text-xs text-slate-300 flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#FF5C00]" />
                 30 Créditos Premium
               </li>
-              <li className="text-xs text-[#717171] flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+              <li className="text-xs text-slate-300 flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#FF5C00]" />
                 R$ 1,99 por foto
               </li>
             </ul>
             <button 
               onClick={onGoToStore}
-              className="w-full py-3 rounded-2xl bg-gradient-to-r from-[#EA1D2C] to-[#FC6803] text-white font-bold text-sm shadow-lg shadow-red-500/20 hover:brightness-110 transition-all"
+              className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#EA1D2C] to-[#FF5C00] text-white font-bold text-sm shadow-xl shadow-[#EA1D2C]/20 hover:brightness-110 transition-all"
             >
               Selecionar
             </button>
@@ -97,45 +105,45 @@ export function InsufficientCreditsView({ onBack, onGoToStore }: InsufficientCre
           {/* Kit Dominação */}
           <motion.div
             whileHover={{ y: -8 }}
-            className="p-6 rounded-[32px] bg-white border border-[#EAEAEC] hover:border-[#EA1D2C]/30 transition-all shadow-sm hover:shadow-xl group"
+            className="p-8 rounded-[32px] bg-white/5 border border-white/10 hover:border-[#EA1D2C]/50 transition-all backdrop-blur-sm group relative overflow-hidden"
           >
-            <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-6 group-hover:bg-purple-600 group-hover:text-white transition-all">
+            <div className="w-12 h-12 rounded-2xl bg-white/5 text-white flex items-center justify-center mb-6 group-hover:bg-[#EA1D2C] transition-all">
               <Diamond size={24} />
             </div>
-            <h3 className="font-bold text-lg text-[#3E3E3E] mb-1 text-left">Kit Dominação</h3>
-            <p className="text-2xl font-bold text-[#1A1A1A] mb-4 text-left">R$ 149,90</p>
-            <ul className="space-y-2 mb-6 text-left">
-              <li className="text-xs text-[#717171] flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+            <h3 className="font-bold text-lg text-white mb-1 text-left">Kit Dominação</h3>
+            <p className="text-2xl font-black text-white mb-4 text-left">R$ 149,90</p>
+            <ul className="space-y-3 mb-8 text-left">
+              <li className="text-xs text-slate-400 flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#EA1D2C]" />
                 100 Créditos Ilimitados
               </li>
-              <li className="text-xs text-[#717171] flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+              <li className="text-xs text-slate-400 flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#EA1D2C]" />
                 R$ 1,49 por foto
               </li>
             </ul>
             <button 
               onClick={onGoToStore}
-              className="w-full py-3 rounded-2xl bg-[#F7F7F7] text-[#3E3E3E] font-bold text-sm hover:bg-[#EA1D2C] hover:text-white transition-all"
+              className="w-full py-4 rounded-2xl bg-white/10 text-white font-bold text-sm hover:bg-white hover:text-black transition-all"
             >
               Selecionar
             </button>
           </motion.div>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
           <button
             onClick={onBack}
-            className="flex items-center gap-2 px-8 py-4 text-[#717171] hover:text-[#1A1A1A] font-bold text-sm transition-all"
+            className="flex items-center gap-2 px-8 py-4 text-slate-400 hover:text-white font-bold text-sm transition-all"
           >
             <ArrowLeft size={18} />
             Voltar ao Dashboard
           </button>
           
-          <div className="h-px w-12 bg-[#EAEAEC] hidden sm:block" />
+          <div className="h-px w-12 bg-white/10 hidden sm:block" />
 
-          <p className="text-[10px] text-[#A6A6A6] font-bold uppercase tracking-widest flex items-center gap-2">
-            <ShoppingBag size={14} />
+          <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest flex items-center gap-2">
+            <ShoppingBag size={14} className="text-[#EA1D2C]" />
             Pagamento Seguro via Mercado Pago
           </p>
         </div>
