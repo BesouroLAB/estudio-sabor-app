@@ -67,144 +67,152 @@ export function UploadView({ onImageUpload, onBack }: UploadViewProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.4 }}
-      className="flex-1 flex flex-col px-[var(--space-page)] py-8 overflow-y-auto"
+      className="flex-1 flex flex-col px-6 py-12 overflow-y-auto bg-brand-dark relative select-none"
     >
-      <div className="max-w-7xl mx-auto w-full flex-1 flex flex-col">
+      {/* Brand Glows */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-brand-red/5 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-64 h-64 bg-brand-orange/5 blur-[100px] rounded-full pointer-events-none" />
+
+      <div className="max-w-4xl mx-auto w-full flex-1 flex flex-col relative z-10">
         {/* Header Actions */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-12">
           <button
             onClick={onBack}
-            className="flex items-center gap-1.5 text-text-muted hover:text-text-primary text-sm font-medium transition-colors"
+            className="group flex items-center gap-3 text-white/40 hover:text-white transition-all"
           >
-            <ArrowLeft size={16} />
-            Voltar
+            <div className="w-10 h-10 rounded-full border border-white/5 flex items-center justify-center group-hover:border-white/20 group-hover:bg-white/5 transition-all">
+              <ArrowLeft size={18} />
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em]">Voltar ao estúdio</span>
           </button>
         </div>
 
-        <div className="flex-1 flex flex-col items-center justify-center py-4">
-      {/* Hero Copy */}
-      <div className="text-center mb-10 max-w-xl">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.1 }}
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-50 text-[#EA1D2C] text-xs font-bold tracking-wider uppercase mb-6"
-        >
-          <Sparkles size={14} />
-          Inteligência Artificial para Delivery
-        </motion.div>
+        <div className="flex-1 flex flex-col items-center justify-center">
+          {/* Hero Copy */}
+          <div className="text-center mb-16 max-w-2xl">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1 }}
+              className="inline-flex items-center gap-3 px-5 py-2 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md text-white/60 text-[10px] font-black tracking-[0.2em] uppercase mb-8"
+            >
+              <Sparkles size={16} className="text-brand-yellow animate-pulse" />
+              Inteligência Artificial para Performance Food
+            </motion.div>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-[1.1] mb-4 text-[#3E3E3E]"
-        >
-          Transforme fotos comuns em{" "}
-          <span className="text-[#EA1D2C]">imagens profissionais</span>
-        </motion.h1>
+            <motion.h1
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.05] mb-6 text-white font-display"
+            >
+              Transforme fotos comuns em{" "}
+              <span className="text-transparent bg-clip-text bg-brand-gradient">Cenários de Estúdio</span>
+            </motion.h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="text-[#717171] text-base sm:text-lg leading-relaxed"
-        >
-          Nossa IA remove fundos feios, ajusta reflexos e cria cenários premium. 
-          Basta enviar a foto do prato e nós fazemos o resto.
-        </motion.p>
-      </div>
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="text-white/40 text-lg font-medium leading-relaxed"
+            >
+              Nossa IA analisa seu prato, remove o fundo original e reconstrói reflexos e iluminação em um ambiente premium de alta conversão.
+            </motion.p>
+          </div>
 
-      {/* Dropzone */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="w-full max-w-lg"
-      >
-        <div
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onClick={() => fileInputRef.current?.click()}
-          className={`
-            relative cursor-pointer group
-            rounded-2xl border-2 border-dashed
-            transition-all duration-300
-            flex flex-col items-center justify-center
-            py-16 px-8
-            ${
-              isDragging
-                ? "border-[#EA1D2C] bg-red-50 scale-[1.02]"
-                : "border-[#EAEAEC] hover:border-[#EA1D2C] bg-white"
-            }
-          `}
-          role="button"
-          tabIndex={0}
-          aria-label="Enviar foto do prato"
-          id="upload-dropzone"
-        >
-          {/* Animated icon */}
-          <div
-            className={`
-              w-20 h-20 rounded-2xl flex items-center justify-center mb-6
-              transition-all duration-500
-              ${
-                isDragging
-                  ? "bg-red-100 text-[#EA1D2C] scale-110"
-                  : "bg-[#F7F7F7] text-[#717171] group-hover:bg-red-50 group-hover:text-[#EA1D2C]"
-              }
-            `}
+          {/* Dropzone */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="w-full max-w-2xl group/drop"
           >
-            {isDragging ? (
-              <Upload size={36} className="animate-bounce-subtle" />
-            ) : (
-              <ImagePlus size={36} />
-            )}
-          </div>
+            <div
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onClick={() => fileInputRef.current?.click()}
+              className={`
+                relative cursor-pointer 
+                rounded-[48px] border-2 border-dashed
+                transition-all duration-500
+                flex flex-col items-center justify-center
+                py-20 px-10 overflow-hidden
+                ${
+                  isDragging
+                    ? "border-brand-orange bg-brand-orange/5 scale-[1.02]"
+                    : "border-white/10 hover:border-brand-orange/30 bg-brand-surface shadow-2xl"
+                }
+              `}
+              role="button"
+              tabIndex={0}
+              aria-label="Enviar foto do prato"
+              id="upload-dropzone"
+            >
+              {/* Inner Glow */}
+              <div className="absolute inset-0 bg-brand-gradient opacity-0 group-hover/drop:opacity-[0.03] transition-opacity duration-700" />
 
-          <p className="text-[#3E3E3E] font-bold text-lg mb-2">
-            {isDragging ? "Solte a foto aqui!" : "Arraste a foto do prato"}
-          </p>
-          <p className="text-[#717171] text-sm mb-6">
-            ou clique para selecionar do celular
-          </p>
+              {/* Animated icon */}
+              <div
+                className={`
+                  w-24 h-24 rounded-3xl flex items-center justify-center mb-8
+                  transition-all duration-700 relative z-10
+                  ${
+                    isDragging
+                      ? "bg-brand-gradient text-white scale-110 shadow-2xl"
+                      : "bg-brand-dark border border-white/5 text-white/20 group-hover/drop:scale-110 group-hover/drop:text-brand-orange group-hover/drop:border-brand-orange/20 shadow-inner"
+                  }
+                `}
+              >
+                {isDragging ? (
+                  <Upload size={40} className="animate-bounce" />
+                ) : (
+                  <ImagePlus size={40} />
+                )}
+              </div>
 
-          {/* CTA Button */}
-          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#EA1D2C] hover:bg-[#D01925] text-white font-bold text-sm shadow-md transition-transform group-hover:scale-105 active:scale-95">
-            <Camera size={16} />
-            Escolher Foto
-          </div>
+              <div className="relative z-10 text-center">
+                <p className="text-white font-black text-2xl mb-3 tracking-tight font-display">
+                  {isDragging ? "Solte a foto agora!" : "Arraste a foto do seu prato"}
+                </p>
+                <p className="text-white/30 text-sm font-bold uppercase tracking-widest mb-10">
+                  ou clique para selecionar
+                </p>
 
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileSelect}
-            className="hidden"
-            id="file-upload-input"
-            aria-label="Selecionar arquivo de imagem"
-          />
+                {/* CTA Button */}
+                <div className="inline-flex items-center gap-4 px-10 py-5 rounded-2xl bg-brand-gradient text-white font-black text-sm shadow-[0_20px_40px_rgba(234,29,44,0.2)] transition-all hover:scale-105 hover:shadow-[0_25px_50px_rgba(234,29,44,0.3)] active:scale-95 uppercase tracking-widest">
+                  <Camera size={20} />
+                  Selecionar Foto
+                </div>
+              </div>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                className="hidden"
+                id="file-upload-input"
+                aria-label="Selecionar arquivo de imagem"
+              />
+            </div>
+
+            {/* Trust indicators */}
+            <div className="flex flex-wrap items-center justify-center gap-8 mt-10">
+              {[
+                "JPG, PNG, WEBP",
+                "Até 10MB",
+                "Processamento Seguro"
+              ].map((text, i) => (
+                <div key={i} className="flex items-center gap-2.5">
+                  <div className="w-1.5 h-1.5 rounded-full bg-brand-orange shadow-[0_0_8px_rgba(255,164,0,0.5)]" />
+                  <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">{text}</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
         </div>
-
-        {/* Trust indicators */}
-        <div className="flex items-center justify-center gap-6 mt-6 text-[#717171] text-xs">
-          <span className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-            JPG, PNG, WEBP
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-            Até 10MB
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-            100% privado
-          </span>
-        </div>
-        </motion.div>
       </div>
-    </div>
-  </motion.div>
+    </motion.div>
   );
 }

@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
-export default function FerramentasRedirect() {
+export default function FerramentasPage() {
   redirect("/estudio");
 }

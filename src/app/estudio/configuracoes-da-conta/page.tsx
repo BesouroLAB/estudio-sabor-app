@@ -75,38 +75,38 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="flex-1 bg-[#F7F7F7] min-h-screen select-none overflow-y-auto">
-      <form key={`${userData?.id || 'loading'}_${lastUpdate}`} onSubmit={handleSave} className="max-w-3xl mx-auto px-6 py-8 pb-24 md:pb-8 space-y-8">
+    <div className="flex-1 bg-brand-dark min-h-screen select-none overflow-y-auto">
+      <form key={`${userData?.id || 'loading'}_${lastUpdate}`} onSubmit={handleSave} className="max-w-3xl mx-auto px-6 py-12 pb-24 md:pb-12 space-y-10">
 
         {/* Page Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <h1 className="text-2xl font-bold text-[#3E3E3E] tracking-tight">Configurações</h1>
-            <p className="text-sm text-[#717171] mt-1">Gerencie seu perfil e os dados do seu delivery.</p>
+            <h1 className="text-4xl font-bold text-white tracking-tight font-display bg-clip-text text-transparent bg-brand-gradient">Configurações</h1>
+            <p className="text-white/40 font-medium mt-2">Gerencie seu perfil e os dados do seu delivery.</p>
           </div>
           <button
             type="submit"
             disabled={loading}
-            className="flex items-center gap-2 px-5 py-2.5 bg-[#EA1D2C] text-white text-sm font-bold rounded-lg hover:bg-[#d1192a] transition-all shadow-sm active:scale-95 disabled:opacity-60"
+            className="flex items-center gap-3 px-8 py-4 bg-brand-gradient text-white text-sm font-bold rounded-2xl hover:opacity-90 transition-all shadow-xl active:scale-95 disabled:opacity-60"
           >
             {loading
-              ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              : <Save size={16} />
+              ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              : <Save size={18} />
             }
             Salvar Alterações
           </button>
         </div>
 
         {/* Profile Section */}
-        <Section icon={<User size={16} className="text-[#EA1D2C]" />} title="Perfil Pessoal">
-          <div className="flex flex-col md:flex-row gap-8 items-start">
+        <Section icon={<User size={18} className="text-brand-orange" />} title="Perfil Pessoal">
+          <div className="flex flex-col md:flex-row gap-10 items-start">
             {/* Avatar */}
             <div className="relative group shrink-0">
-              <div className="w-20 h-20 rounded-full bg-[#F7F7F7] border-2 border-dashed border-[#DDDDE0] flex items-center justify-center overflow-hidden">
+              <div className="w-24 h-24 rounded-3xl bg-brand-dark border-2 border-dashed border-white/10 flex items-center justify-center overflow-hidden group-hover:border-brand-orange/40 transition-colors">
                 {userData?.logo_url ? (
                   <img src={userData.logo_url} alt="Logo" className="w-full h-full object-cover" />
                 ) : (
-                  <User size={28} className="text-[#A6A6A6]" />
+                  <User size={32} className="text-white/20" />
                 )}
               </div>
               <button 
@@ -117,15 +117,15 @@ export default function SettingsPage() {
                     setUserData((prev: any) => ({ ...prev, logo_url: url }));
                   }
                 }}
-                className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-[#EA1D2C] text-white flex items-center justify-center shadow-md border-2 border-white hover:scale-110 transition-transform"
+                className="absolute -bottom-2 -right-2 w-10 h-10 rounded-2xl bg-brand-orange text-white flex items-center justify-center shadow-2xl border-2 border-brand-surface hover:scale-110 transition-transform active:scale-90"
               >
-                <Camera size={13} />
+                <Camera size={18} />
               </button>
               <input type="hidden" name="logo_url" value={userData?.logo_url || ""} />
             </div>
 
             {/* Fields */}
-            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
               <InputField name="full_name" label="Nome Completo" placeholder="Seu nome" defaultValue={userData?.full_name || ""} />
               <InputField name="email" label="E-mail de Acesso" placeholder="seu@email.com" defaultValue={userData?.email || ""} disabled />
               <InputField name="phone" label="WhatsApp" placeholder="(11) 99999-9999" defaultValue={userData?.phone || ""} />
@@ -134,60 +134,70 @@ export default function SettingsPage() {
         </Section>
 
         {/* Restaurant Section */}
-        <Section icon={<Store size={16} className="text-[#EA1D2C]" />} title="Dados do Restaurante">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <Section icon={<Store size={18} className="text-brand-orange" />} title="Dados do Restaurante">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <InputField name="restaurant_name" label="Nome do Estabelecimento" placeholder="Ex: Pizzaria do Sabor" defaultValue={userData?.establishment_name || ""} />
-            <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-[#717171] uppercase tracking-wider">Tipo de Culinária</label>
-              <select 
-                name="cuisine_type" 
-                defaultValue={userData?.cuisine_type || ""}
-                className="w-full bg-white border border-[#DDDDE0] rounded-lg px-4 py-2.5 text-sm text-[#3E3E3E] outline-none focus:border-[#EA1D2C]/50 transition-all appearance-none cursor-pointer"
-              >
-                <option value="" disabled>Selecione...</option>
-                <option value="pizzaria">Pizzaria</option>
-                <option value="hamburgueria">Hamburgueria</option>
-                <option value="sushi">Sushi / Japonesa</option>
-                <option value="brasileira">Comida Brasileira</option>
-                <option value="doceria">Doceria / Cafeteria</option>
-              </select>
+            <div className="space-y-2">
+              <label className="text-[11px] font-bold text-white/40 uppercase tracking-widest ml-1">Tipo de Culinária</label>
+              <div className="relative">
+                <select 
+                  name="cuisine_type" 
+                  defaultValue={userData?.cuisine_type || ""}
+                  className="w-full bg-brand-dark/50 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white outline-none focus:border-brand-orange/50 transition-all appearance-none cursor-pointer font-medium"
+                >
+                  <option value="" disabled className="bg-brand-surface">Selecione...</option>
+                  <option value="pizzaria" className="bg-brand-surface">Pizzaria</option>
+                  <option value="hamburgueria" className="bg-brand-surface">Hamburgueria</option>
+                  <option value="sushi" className="bg-brand-surface">Sushi / Japonesa</option>
+                  <option value="brasileira" className="bg-brand-surface">Comida Brasileira</option>
+                  <option value="doceria" className="bg-brand-surface">Doceria / Cafeteria</option>
+                </select>
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-white/20">
+                  <ArrowRight size={16} className="rotate-90" />
+                </div>
+              </div>
             </div>
             <div className="md:col-span-2">
-              <InputField name="menu_link" label="Link do Cardápio (iFood / Próprio)" placeholder="https://www.ifood.com.br/delivery/..." defaultValue={userData?.menu_link || ""} icon={<LinkIcon size={14} />} />
+              <InputField name="menu_link" label="Link do Cardápio (iFood / Próprio)" placeholder="https://www.ifood.com.br/delivery/..." defaultValue={userData?.menu_link || ""} icon={<LinkIcon size={16} />} />
             </div>
           </div>
         </Section>
 
         {/* Preferences Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <Section icon={<Bell size={16} className="text-[#EA1D2C]" />} title="Notificações">
-            <div className="space-y-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Section icon={<Bell size={18} className="text-brand-orange" />} title="Notificações">
+            <div className="space-y-5 py-2">
               <ToggleItem label="Alertas de novas promoções" defaultActive />
               <ToggleItem label="Lembretes de missões" defaultActive />
               <ToggleItem label="Novidades e releases" />
             </div>
           </Section>
 
-          <Section icon={<Shield size={16} className="text-[#EA1D2C]" />} title="Segurança">
-            <div className="space-y-3">
-              <Link href="#" className="block text-sm text-[#EA1D2C] font-semibold hover:underline">
-                Alterar senha de acesso
+          <Section icon={<Shield size={18} className="text-brand-orange" />} title="Segurança">
+            <div className="space-y-5 py-2">
+              <Link href="#" className="flex items-center justify-between group">
+                <span className="text-sm text-white/80 font-medium group-hover:text-white transition-colors">Alterar senha de acesso</span>
+                <ArrowRight size={14} className="text-white/20 group-hover:text-brand-orange transition-all group-hover:translate-x-1" />
               </Link>
-              <Link href="#" className="block text-sm text-[#EA1D2C] font-semibold hover:underline">
-                Gerenciar sessões ativas
+              <Link href="#" className="flex items-center justify-between group">
+                <span className="text-sm text-white/80 font-medium group-hover:text-white transition-colors">Gerenciar sessões ativas</span>
+                <ArrowRight size={14} className="text-white/20 group-hover:text-brand-orange transition-all group-hover:translate-x-1" />
               </Link>
-              <p className="text-xs text-[#A6A6A6]">Última sessão: hoje às {new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>
+              <div className="pt-2 border-t border-white/5">
+                <p className="text-[10px] text-white/20 uppercase font-bold tracking-widest">Última sessão</p>
+                <p className="text-xs text-white/40 mt-1 font-medium">Hoje às {new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>
+              </div>
             </div>
           </Section>
         </div>
 
         {/* Danger Zone */}
-        <div className="bg-white border border-red-100 rounded-xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="bg-red-500/5 border border-red-500/10 rounded-[32px] p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <h4 className="font-bold text-[#3E3E3E] text-sm">Zona de Perigo</h4>
-            <p className="text-xs text-[#717171] mt-0.5">Ao excluir sua conta, todos os dados e créditos são removidos permanentemente.</p>
+            <h4 className="font-bold text-red-500 text-lg font-display">Zona de Perigo</h4>
+            <p className="text-sm text-white/40 mt-1 font-medium">Ao excluir sua conta, todos os dados e créditos são removidos permanentemente.</p>
           </div>
-          <button type="button" className="text-red-500 text-sm font-bold border border-red-200 px-4 py-2 rounded-lg hover:bg-red-50 transition-all shrink-0">
+          <button type="button" className="text-red-500 text-xs font-bold uppercase tracking-widest border border-red-500/20 px-6 py-4 rounded-2xl hover:bg-red-500 hover:text-white transition-all shrink-0 active:scale-95">
             Excluir Conta
           </button>
         </div>
@@ -201,12 +211,17 @@ export default function SettingsPage() {
 
 function Section({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
   return (
-    <section className="bg-white border border-[#EAEAEC] rounded-xl p-6 space-y-5">
-      <div className="flex items-center gap-2 border-b border-[#F3F1F0] pb-4">
-        {icon}
-        <h2 className="font-bold text-sm text-[#3E3E3E] uppercase tracking-wider">{title}</h2>
+    <section className="bg-brand-surface border border-white/5 rounded-[32px] p-8 space-y-8 shadow-2xl relative overflow-hidden group">
+      <div className="absolute top-0 right-0 w-32 h-32 bg-brand-orange/5 blur-[60px] -mr-16 -mt-16 group-hover:bg-brand-orange/10 transition-colors" />
+      <div className="flex items-center gap-3 border-b border-white/5 pb-6 relative z-10">
+        <div className="w-10 h-10 rounded-xl bg-brand-orange/10 flex items-center justify-center text-brand-orange border border-brand-orange/20">
+          {icon}
+        </div>
+        <h2 className="font-bold text-sm text-white uppercase tracking-widest font-display">{title}</h2>
       </div>
-      {children}
+      <div className="relative z-10">
+        {children}
+      </div>
     </section>
   );
 }
@@ -220,10 +235,10 @@ function InputField({ label, placeholder, defaultValue, disabled, icon, name }: 
   name?: string;
 }) {
   return (
-    <div className="space-y-1.5">
-      <label className="text-[11px] font-bold text-[#717171] uppercase tracking-wider">{label}</label>
-      <div className="relative flex items-center">
-        {icon && <div className="absolute left-3.5 text-[#A6A6A6]">{icon}</div>}
+    <div className="space-y-2">
+      <label className="text-[11px] font-bold text-white/40 uppercase tracking-widest ml-1">{label}</label>
+      <div className="relative flex items-center group/input">
+        {icon && <div className="absolute left-5 text-white/20 group-focus-within/input:text-brand-orange transition-colors">{icon}</div>}
         <input
           type="text"
           name={name}
@@ -231,9 +246,9 @@ function InputField({ label, placeholder, defaultValue, disabled, icon, name }: 
           placeholder={placeholder}
           disabled={disabled}
           className={cn(
-            "w-full bg-white border border-[#DDDDE0] rounded-lg py-2.5 text-sm text-[#3E3E3E] outline-none focus:border-[#EA1D2C]/50 transition-all",
-            icon ? "pl-10 pr-4" : "px-4",
-            disabled && "bg-[#F7F7F7] text-[#A6A6A6] cursor-not-allowed"
+            "w-full bg-brand-dark/50 border border-white/10 rounded-2xl py-4 text-sm text-white outline-none focus:border-brand-orange/50 transition-all font-medium placeholder:text-white/10",
+            icon ? "pl-14 pr-6" : "px-6",
+            disabled && "opacity-50 grayscale cursor-not-allowed bg-brand-dark/20"
           )}
         />
       </div>
@@ -244,20 +259,21 @@ function InputField({ label, placeholder, defaultValue, disabled, icon, name }: 
 function ToggleItem({ label, defaultActive }: { label: string; defaultActive?: boolean }) {
   const [active, setActive] = useState(defaultActive ?? false);
   return (
-    <div className="flex items-center justify-between py-0.5">
-      <span className="text-sm text-[#3E3E3E]">{label}</span>
+    <div className="flex items-center justify-between group">
+      <span className="text-sm text-white/70 font-medium group-hover:text-white transition-colors">{label}</span>
       <button
+        type="button"
         onClick={() => setActive(!active)}
         className={cn(
-          "w-10 h-5 rounded-full relative transition-colors",
-          active ? "bg-[#EA1D2C]" : "bg-[#DDDDE0]"
+          "w-12 h-6 rounded-full relative transition-all duration-300",
+          active ? "bg-brand-gradient" : "bg-white/5 border border-white/10"
         )}
         role="switch"
         aria-checked={active}
       >
         <div className={cn(
-          "absolute top-[2px] w-4 h-4 rounded-full bg-white shadow-sm transition-all",
-          active ? "right-[2px]" : "left-[2px]"
+          "absolute top-1 w-4 h-4 rounded-full bg-white shadow-xl transition-all duration-300",
+          active ? "right-1" : "left-1"
         )} />
       </button>
     </div>

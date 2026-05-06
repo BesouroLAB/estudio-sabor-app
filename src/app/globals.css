@@ -6,12 +6,15 @@
    ============================================ */
 
 @theme inline {
-  /* --- Core Palette (Pepper) --- */
-  --color-pepper-red: #EA1D2C;
-  --color-pepper-orange: #FC6803;
-  --color-pepper-green-light: #2A9D8F;
-  --color-pepper-green-dark: #2A645D;
-  --color-pepper-black: #3E3E3E;
+  /* --- Brand Palette (Premium iFood) --- */
+  --color-brand-red: #FF002E;
+  --color-brand-orange: #FF5C00;
+  --color-brand-yellow: #FFB800;
+  --color-brand-dark: #0A0A0A;
+  --color-brand-surface: #111111;
+  --color-pepper-red: #FF002E;
+  --color-pepper-orange: #FF5C00;
+  --color-pepper-black: #1A1A1A;
 
   /* --- Light Palette (Default - Clean Pepper) --- */
   --color-bg-main: #F7F7F7;
@@ -221,10 +224,19 @@ body {
 
 /* Text Gradient */
 .text-gradient-pepper {
-  background: linear-gradient(135deg, #E63946, #FC6803);
+  background: linear-gradient(135deg, var(--color-brand-red), var(--color-brand-orange), var(--color-brand-yellow));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+.bg-brand-gradient {
+  background: linear-gradient(135deg, var(--color-brand-red), var(--color-brand-orange), var(--color-brand-yellow));
+}
+
+.border-brand-glow {
+  border: 1px solid rgba(234, 29, 44, 0.2);
+  box-shadow: 0 0 20px rgba(234, 29, 44, 0.1);
 }
 
 /* Card Hover Effect */

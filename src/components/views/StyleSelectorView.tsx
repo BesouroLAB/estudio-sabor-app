@@ -176,147 +176,161 @@ export function StyleSelectorView({
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="flex-1 flex flex-col overflow-hidden bg-white"
+      className="flex-1 flex flex-col overflow-hidden bg-brand-dark select-none"
     >
-      <div className="flex-1 flex flex-col px-[var(--space-page)] py-8 overflow-y-auto">
+      {/* Brand Glows */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-red/5 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-brand-orange/5 blur-[100px] rounded-full pointer-events-none" />
+
+      <div className="flex-1 flex flex-col px-6 py-8 overflow-y-auto relative z-10">
         <div className="max-w-7xl mx-auto w-full flex-1 flex flex-col">
           {/* Header Actions */}
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-12 gap-6 flex-wrap md:flex-nowrap">
             <button
               onClick={currentStep === 0 ? onBack : handlePrev}
-              className="flex items-center gap-1.5 text-[#717171] hover:text-[#3E3E3E] text-sm font-medium transition-colors"
+              className="group flex items-center gap-3 text-white/40 hover:text-white transition-all"
             >
-              <ArrowLeft size={16} />
-              {currentStep === 0 ? "Voltar" : "Passo anterior"}
+              <div className="w-10 h-10 rounded-full border border-white/5 flex items-center justify-center group-hover:border-white/20 group-hover:bg-white/5 transition-all">
+                <ArrowLeft size={18} />
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em]">{currentStep === 0 ? "Voltar" : "Passo anterior"}</span>
             </button>
             
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 md:gap-4 flex-1 justify-center max-w-xl">
               {steps.map((s, idx) => (
-                <div key={s.id} className="flex items-center">
-                  <div className="flex items-center gap-2">
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold transition-colors ${
-                      idx === currentStep ? "bg-[#EA1D2C] text-white shadow-md shadow-red-100" : 
-                      idx < currentStep ? "bg-green-500 text-white" : "bg-[#F7F7F7] text-[#717171]"
+                <div key={s.id} className="flex items-center flex-1 last:flex-none">
+                  <div className="flex flex-col items-center gap-2">
+                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-[10px] font-black transition-all duration-500 ${
+                      idx === currentStep ? "bg-brand-gradient text-white shadow-[0_0_20px_rgba(234,29,44,0.3)] scale-110" : 
+                      idx < currentStep ? "bg-emerald-500/20 text-emerald-500 border border-emerald-500/30" : "bg-white/5 text-white/20 border border-white/5"
                     }`}>
                       {idx < currentStep ? "✓" : idx + 1}
                     </div>
-                    <span className={`hidden sm:inline text-[10px] font-bold uppercase tracking-wider ${idx === currentStep ? "text-[#3E3E3E]" : "text-[#717171]"}`}>
+                    <span className={`hidden md:inline text-[9px] font-black uppercase tracking-widest ${idx === currentStep ? "text-white" : "text-white/20"}`}>
                       {s.label}
                     </span>
                   </div>
                   {idx < steps.length - 1 && (
-                    <div className="w-4 md:w-8 h-px bg-[#EAEAEC] mx-2" />
+                    <div className={`flex-1 h-[2px] mx-4 rounded-full transition-colors duration-700 ${idx < currentStep ? "bg-brand-orange/40" : "bg-white/5"}`} />
                   )}
                 </div>
               ))}
             </div>
 
-            <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 border border-red-100 text-[10px] font-bold text-[#EA1D2C] uppercase tracking-widest">
-              <Sparkles size={12} />
-              Motor AI Ativo
+            <div className="hidden xl:flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md text-[10px] font-black text-brand-orange uppercase tracking-[0.2em] shadow-xl">
+              <Sparkles size={14} className="animate-pulse" />
+              IA Engine v4.0
             </div>
           </div>
 
-          <div className="flex-1 grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-10">
+          <div className="flex-1 grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-12">
             {/* Left Column: Fixed Preview & Recipe Tags */}
-            <div className="flex flex-col gap-6">
-              <div className="relative aspect-square rounded-3xl overflow-hidden shadow-xl border border-[#EAEAEC]">
+            <div className="flex flex-col gap-8">
+              <div className="relative aspect-square rounded-[40px] overflow-hidden shadow-2xl border border-white/5 group">
+                <div className="absolute inset-0 bg-brand-gradient opacity-0 group-hover:opacity-10 transition-opacity duration-700 z-10" />
                 <Image
                   src={uploadedImage.preview}
                   alt="Original"
                   fill
-                  className="object-cover"
+                  className="object-cover transition-transform duration-1000 group-hover:scale-110"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                <div className="absolute bottom-4 left-4">
-                   <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-black/40 backdrop-blur-md text-[9px] font-bold text-white uppercase tracking-wider">
-                    Foto Original
-                  </span>
+                <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-transparent to-transparent opacity-60" />
+                <div className="absolute bottom-6 left-6 flex items-center gap-3">
+                   <div className="w-2 h-2 rounded-full bg-brand-orange animate-pulse" />
+                   <span className="text-[10px] font-black text-white uppercase tracking-widest">Foto Carregada</span>
                 </div>
               </div>
 
-              <div className="bg-[#F7F7F7] rounded-3xl p-6 border border-[#EAEAEC] shadow-sm">
-                <h3 className="text-[9px] font-bold text-[#A6A6A6] uppercase tracking-[0.2em] mb-5">
-                  Análise da Inteligência
+              <div className="bg-brand-surface rounded-[40px] p-8 border border-white/5 shadow-2xl relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-brand-orange/5 blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-brand-orange/10 transition-colors" />
+                
+                <h3 className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
+                  <Wand2 size={14} className="text-brand-orange" /> Parâmetros Detectados
                 </h3>
-                <div className="flex flex-col gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-white shadow-sm flex items-center justify-center text-[#EA1D2C]">
-                      <Camera size={16} />
+                
+                <div className="space-y-6">
+                  <div className="flex items-center gap-5 p-4 rounded-3xl bg-brand-dark/50 border border-white/5 shadow-inner">
+                    <div className="w-12 h-12 rounded-2xl bg-brand-gradient flex items-center justify-center text-white shadow-xl">
+                      <Camera size={20} />
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[10px] text-[#A6A6A6] font-bold uppercase">Setup Sugerido</span>
-                      <span className="text-xs font-bold text-[#3E3E3E]">{foodData.preset.cameraName}</span>
+                      <span className="text-[10px] text-white/20 font-black uppercase tracking-widest mb-1">Preset Sugerido</span>
+                      <span className="text-sm font-bold text-white tracking-tight">{foodData.preset.cameraName}</span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-white shadow-sm flex items-center justify-center text-[#EA1D2C]">
-                      <Sparkles size={16} />
+                  
+                  <div className="flex items-center gap-5 p-4 rounded-3xl bg-brand-dark/50 border border-white/5 shadow-inner">
+                    <div className="w-12 h-12 rounded-2xl bg-brand-gradient flex items-center justify-center text-white shadow-xl">
+                      <Sun size={20} />
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[10px] text-[#A6A6A6] font-bold uppercase">Iluminação</span>
-                      <span className="text-xs font-bold text-[#3E3E3E]">{foodData.preset.lightingName}</span>
+                      <span className="text-[10px] text-white/20 font-black uppercase tracking-widest mb-1">Luz Dinâmica</span>
+                      <span className="text-sm font-bold text-white tracking-tight">{foodData.preset.lightingName}</span>
                     </div>
                   </div>
                 </div>
-                <div className="mt-6 p-4 rounded-2xl bg-white/60 border border-white/40">
-                  <p className="text-[11px] text-[#717171] leading-relaxed font-medium">
-                    Prato detectado como <span className="text-[#EA1D2C] font-bold">{isDetecting ? "..." : foodData.name}</span>. 
-                    Nossos algoritmos selecionaram o melhor preset para realçar o brilho e textura desse item.
+
+                <div className="mt-10 p-6 rounded-3xl bg-brand-dark/40 border border-white/5 relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-brand-gradient" />
+                  <p className="text-xs text-white/50 leading-relaxed font-medium italic">
+                    "Identificamos <span className="text-brand-orange font-black uppercase tracking-widest ml-1">{isDetecting ? "processando..." : foodData.name}</span>. A rede neural aplicará calibração premium para texturas gastronômicas."
                   </p>
                 </div>
               </div>
             </div>
 
             {/* Right Column: Wizard Steps */}
-            <div className="flex flex-col bg-[#F7F7F7] rounded-[2.5rem] border border-[#EAEAEC] overflow-hidden shadow-inner">
-              <div className="flex-1 p-8 lg:p-12 overflow-y-auto">
+            <div className="flex flex-col bg-brand-surface rounded-[48px] border border-white/5 overflow-hidden shadow-2xl relative group/wizard">
+              <div className="absolute inset-0 bg-brand-gradient opacity-0 group-hover/wizard:opacity-[0.02] transition-opacity duration-1000 pointer-events-none" />
+              
+              <div className="flex-1 p-8 lg:p-16 overflow-y-auto relative z-10 custom-scrollbar">
                 <AnimatePresence mode="wait">
                   {currentStep === 0 && (
                     <motion.div
                       key="step0"
-                      initial={{ opacity: 0, x: 10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -10 }}
-                      className="space-y-8"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      className="space-y-12"
                     >
                       <div>
-                        <h2 className="text-3xl font-bold text-[#1A1A1A] mb-2 tracking-tight">Onde essa foto será usada?</h2>
-                        <p className="text-[#717171] text-sm">Escolha o destino para que a IA ajuste a composição e o formato ideal.</p>
+                        <div className="h-1.5 w-16 bg-brand-gradient rounded-full mb-8" />
+                        <h2 className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tighter font-display leading-[1.1]">Onde essa foto <br /><span className="text-transparent bg-clip-text bg-brand-gradient">será usada?</span></h2>
+                        <p className="text-white/40 text-lg font-medium">Escolha o destino para que a IA ajuste a composição e iluminação ideal.</p>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {visualStyles.map((style) => {
                           const Icon = style.icon;
                           const isSelected = selectedObjective === style.id;
                           return (
                             <motion.button
                               key={style.id}
-                              whileHover={{ y: -4, shadow: "0 10px 20px -5px rgba(0,0,0,0.05)" }}
+                              whileHover={{ scale: 1.02, y: -4 }}
                               whileTap={{ scale: 0.98 }}
                               onClick={() => handleObjectiveChange(style.id, style.format)}
                               className={`
-                                relative flex flex-col items-start gap-4 p-6 rounded-[28px] text-left transition-all duration-300
+                                relative flex flex-col items-start gap-6 p-8 rounded-[40px] text-left transition-all duration-500 group/card
                                 ${isSelected 
-                                  ? "bg-white ring-2 ring-[#EA1D2C] shadow-xl" 
-                                  : "bg-white/60 hover:bg-white border border-[#EAEAEC]"
+                                  ? "bg-brand-dark ring-2 ring-brand-red shadow-[0_20px_40px_rgba(234,29,44,0.15)]" 
+                                  : "bg-brand-dark/40 hover:bg-brand-dark/60 border border-white/5"
                                 }
                               `}
                             >
                               <div className={`
-                                w-11 h-11 rounded-2xl flex items-center justify-center
-                                ${isSelected ? "bg-[#EA1D2C] text-white" : "bg-[#F7F7F7] text-[#717171]"}
+                                w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500
+                                ${isSelected ? "bg-brand-gradient text-white shadow-xl" : "bg-brand-surface text-white/20 group-hover/card:text-brand-orange shadow-inner"}
                               `}>
-                                <Icon size={22} />
+                                <Icon size={24} />
                               </div>
                               <div>
-                                <h4 className="font-bold text-sm text-[#3E3E3E] mb-1">{style.label}</h4>
-                                <p className="text-[10px] leading-relaxed text-[#717171] line-clamp-2">{style.desc}</p>
+                                <h4 className={`font-black text-sm uppercase tracking-widest mb-2 ${isSelected ? "text-white" : "text-white/60"}`}>{style.label}</h4>
+                                <p className="text-[11px] leading-relaxed text-white/30 font-medium line-clamp-2">{style.desc}</p>
                               </div>
                               {isSelected && (
-                                <div className="absolute top-5 right-5">
-                                  <div className="w-6 h-6 rounded-full bg-[#EA1D2C] flex items-center justify-center">
-                                    <Sparkles size={12} className="text-white" />
+                                <div className="absolute top-6 right-6">
+                                  <div className="w-8 h-8 rounded-full bg-brand-gradient flex items-center justify-center shadow-lg">
+                                    <Sparkles size={14} className="text-white" />
                                   </div>
                                 </div>
                               )}
@@ -330,76 +344,73 @@ export function StyleSelectorView({
                   {currentStep === 1 && (
                     <motion.div
                       key="step1"
-                      initial={{ opacity: 0, x: 10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -10 }}
-                      className="space-y-10"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      className="space-y-12"
                     >
                       <div className="max-w-xl">
-                        <h2 className="text-3xl font-bold text-[#1A1A1A] mb-2 tracking-tight">Personalização</h2>
-                        <p className="text-[#717171] text-sm">Como você quer que a IA processe sua foto original?</p>
+                        <div className="h-1.5 w-16 bg-brand-gradient rounded-full mb-8" />
+                        <h2 className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tighter font-display leading-[1.1]">Personalize o <br /><span className="text-transparent bg-clip-text bg-brand-gradient">Comportamento</span></h2>
+                        <p className="text-white/40 text-lg font-medium">Como você quer que a IA processe sua foto original?</p>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                         {/* Ângulo */}
-                        <div className="space-y-4">
-                          <h3 className="text-[10px] font-bold text-[#A6A6A6] uppercase tracking-[0.2em]">Ângulo da Câmera</h3>
-                          <div className="flex flex-col gap-3">
-                            <button 
-                              onClick={() => setKeepAngle(true)}
-                              className={`group flex items-center gap-4 p-5 rounded-2xl border transition-all ${keepAngle ? "bg-white border-[#3E3E3E] shadow-md ring-1 ring-[#3E3E3E]" : "bg-white/60 border-[#EAEAEC] hover:bg-white"}`}
-                            >
-                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${keepAngle ? "bg-[#3E3E3E] text-white" : "bg-[#F7F7F7] text-[#717171]"}`}>
-                                <Camera size={18} />
-                              </div>
-                              <div className="text-left">
-                                <p className="text-sm font-bold text-[#3E3E3E]">Manter Original</p>
-                                <p className="text-[10px] text-[#717171]">Preserva o clique original</p>
-                              </div>
-                            </button>
-                            <button 
-                              onClick={() => setKeepAngle(false)}
-                              className={`group flex items-center gap-4 p-5 rounded-2xl border transition-all ${!keepAngle ? "bg-white border-[#EA1D2C] shadow-md ring-1 ring-[#EA1D2C]" : "bg-white/60 border-[#EAEAEC] hover:bg-white"}`}
-                            >
-                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${!keepAngle ? "bg-[#EA1D2C] text-white" : "bg-[#F7F7F7] text-[#717171]"}`}>
-                                <Sparkles size={18} />
-                              </div>
-                              <div className="text-left">
-                                <p className="text-sm font-bold text-[#3E3E3E]">Otimizar IA</p>
-                                <p className="text-[10px] text-[#717171]">Deixa a IA ajustar o ângulo</p>
-                              </div>
-                            </button>
+                        <div className="space-y-6">
+                          <h3 className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] ml-2">Ângulo da Câmera</h3>
+                          <div className="flex flex-col gap-4">
+                            {[
+                              { id: true, label: "Manter Original", desc: "Preserva o clique original", icon: Camera },
+                              { id: false, label: "Otimizar IA", desc: "IA calibra o melhor ângulo", icon: Sparkles }
+                            ].map((opt) => {
+                              const Icon = opt.icon;
+                              const isSelected = keepAngle === opt.id;
+                              return (
+                                <button 
+                                  key={String(opt.id)}
+                                  onClick={() => setKeepAngle(opt.id)}
+                                  className={`group flex items-center gap-6 p-6 rounded-[32px] border transition-all duration-500 ${isSelected ? "bg-brand-dark border-brand-red shadow-2xl ring-1 ring-brand-red/20" : "bg-brand-dark/30 border-white/5 hover:bg-brand-dark/50"}`}
+                                >
+                                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 ${isSelected ? "bg-brand-gradient text-white shadow-xl" : "bg-brand-surface text-white/20"}`}>
+                                    <Icon size={24} />
+                                  </div>
+                                  <div className="text-left">
+                                    <p className={`text-sm font-black uppercase tracking-widest mb-1 ${isSelected ? "text-white" : "text-white/40"}`}>{opt.label}</p>
+                                    <p className="text-[10px] text-white/20 font-bold uppercase tracking-tight">{opt.desc}</p>
+                                  </div>
+                                </button>
+                              );
+                            })}
                           </div>
                         </div>
 
                         {/* Fundo */}
-                        <div className="space-y-4">
-                          <h3 className="text-[10px] font-bold text-[#A6A6A6] uppercase tracking-[0.2em]">Cenário / Background</h3>
-                          <div className="flex flex-col gap-3">
-                            <button 
-                              onClick={() => setKeepBackground(true)}
-                              className={`group flex items-center gap-4 p-5 rounded-2xl border transition-all ${keepBackground ? "bg-white border-[#3E3E3E] shadow-md ring-1 ring-[#3E3E3E]" : "bg-white/60 border-[#EAEAEC] hover:bg-white"}`}
-                            >
-                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${keepBackground ? "bg-[#3E3E3E] text-white" : "bg-[#F7F7F7] text-[#717171]"}`}>
-                                <ImageIcon size={18} />
-                              </div>
-                              <div className="text-left">
-                                <p className="text-sm font-bold text-[#3E3E3E]">Manter Fundo</p>
-                                <p className="text-[10px] text-[#717171]">Apenas limpeza e cor</p>
-                              </div>
-                            </button>
-                            <button 
-                              onClick={() => setKeepBackground(false)}
-                              className={`group flex items-center gap-4 p-5 rounded-2xl border transition-all ${!keepBackground ? "bg-white border-[#EA1D2C] shadow-md ring-1 ring-[#EA1D2C]" : "bg-white/60 border-[#EAEAEC] hover:bg-white"}`}
-                            >
-                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${!keepBackground ? "bg-[#EA1D2C] text-white" : "bg-[#F7F7F7] text-[#717171]"}`}>
-                                <Layout size={18} />
-                              </div>
-                              <div className="text-left">
-                                <p className="text-sm font-bold text-[#3E3E3E]">Novo Cenário</p>
-                                <p className="text-[10px] text-[#717171]">IA cria um ambiente premium</p>
-                              </div>
-                            </button>
+                        <div className="space-y-6">
+                          <h3 className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] ml-2">Cenário / Background</h3>
+                          <div className="flex flex-col gap-4">
+                            {[
+                              { id: true, label: "Manter Fundo", desc: "Apenas limpeza e cor", icon: ImageIcon },
+                              { id: false, label: "Novo Cenário", desc: "IA cria ambiente premium", icon: Layout }
+                            ].map((opt) => {
+                              const Icon = opt.icon;
+                              const isSelected = keepBackground === opt.id;
+                              return (
+                                <button 
+                                  key={String(opt.id)}
+                                  onClick={() => setKeepBackground(opt.id)}
+                                  className={`group flex items-center gap-6 p-6 rounded-[32px] border transition-all duration-500 ${isSelected ? "bg-brand-dark border-brand-orange shadow-2xl ring-1 ring-brand-orange/20" : "bg-brand-dark/30 border-white/5 hover:bg-brand-dark/50"}`}
+                                >
+                                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 ${isSelected ? "bg-brand-gradient text-white shadow-xl" : "bg-brand-surface text-white/20"}`}>
+                                    <Icon size={24} />
+                                  </div>
+                                  <div className="text-left">
+                                    <p className={`text-sm font-black uppercase tracking-widest mb-1 ${isSelected ? "text-white" : "text-white/40"}`}>{opt.label}</p>
+                                    <p className="text-[10px] text-white/20 font-bold uppercase tracking-tight">{opt.desc}</p>
+                                  </div>
+                                </button>
+                              );
+                            })}
                           </div>
                         </div>
                       </div>
@@ -409,17 +420,18 @@ export function StyleSelectorView({
                   {currentStep === 2 && !keepBackground && (
                     <motion.div
                       key="step2"
-                      initial={{ opacity: 0, x: 10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -10 }}
-                      className="space-y-8"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      className="space-y-12"
                     >
                       <div className="max-w-xl">
-                        <h2 className="text-3xl font-bold text-[#1A1A1A] mb-2 tracking-tight">Novo Ambiente</h2>
-                        <p className="text-[#717171] text-sm">Qual clima você quer transmitir nesta nova foto?</p>
+                        <div className="h-1.5 w-16 bg-brand-gradient rounded-full mb-8" />
+                        <h2 className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tighter font-display leading-[1.1]">Atmosfera do <br /><span className="text-transparent bg-clip-text bg-brand-gradient">Ambiente</span></h2>
+                        <p className="text-white/40 text-lg font-medium">Qual clima você quer transmitir nesta nova foto?</p>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         {photographicStyles.map((env) => {
                           const isSelected = selectedEnvironment === env.id;
                           return (
@@ -427,22 +439,22 @@ export function StyleSelectorView({
                               key={env.id}
                               onClick={() => setSelectedEnvironment(env.id)}
                               className={`
-                                flex items-center gap-5 p-5 rounded-[28px] text-left transition-all duration-300
+                                flex items-center gap-6 p-8 rounded-[40px] text-left transition-all duration-500
                                 ${isSelected 
-                                  ? "bg-white ring-2 ring-[#EA1D2C] shadow-xl" 
-                                  : "bg-white/60 hover:bg-white border border-[#EAEAEC]"
+                                  ? "bg-brand-dark ring-2 ring-brand-red shadow-2xl" 
+                                  : "bg-brand-dark/40 hover:bg-brand-dark/60 border border-white/5"
                                 }
                               `}
                             >
                               <div className={`
-                                w-12 h-12 rounded-2xl flex items-center justify-center shrink-0
-                                ${isSelected ? "bg-[#EA1D2C] text-white" : "bg-[#F7F7F7] text-[#717171]"}
+                                w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-500 shadow-xl
+                                ${isSelected ? "bg-brand-gradient text-white" : "bg-brand-surface text-white/10"}
                               `}>
-                                <Sun size={24} />
+                                <Sun size={28} />
                               </div>
                               <div>
-                                <h4 className="font-bold text-sm text-[#3E3E3E] mb-1">{env.label}</h4>
-                                <p className="text-[10px] leading-relaxed text-[#717171]">{env.desc}</p>
+                                <h4 className={`font-black text-base uppercase tracking-widest mb-2 ${isSelected ? "text-white" : "text-white/40"}`}>{env.label}</h4>
+                                <p className="text-[11px] leading-relaxed text-white/20 font-medium">{env.desc}</p>
                               </div>
                             </button>
                           );
@@ -454,38 +466,38 @@ export function StyleSelectorView({
                   {currentStep === 3 && (
                     <motion.div
                       key="step3"
-                      initial={{ opacity: 0, x: 10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -10 }}
-                      className="space-y-10"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      className="space-y-12"
                     >
                       <div className="max-w-xl">
-                        <h2 className="text-3xl font-bold text-[#1A1A1A] mb-2 tracking-tight">Confirmar Formato</h2>
-                        <p className="text-[#717171] text-sm">Ajuste final da proporção da imagem gerada.</p>
+                        <div className="h-1.5 w-16 bg-brand-gradient rounded-full mb-8" />
+                        <h2 className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tighter font-display leading-[1.1]">Dimensões e <br /><span className="text-transparent bg-clip-text bg-brand-gradient">Proporção</span></h2>
+                        <p className="text-white/40 text-lg font-medium">Ajuste final da proporção da imagem gerada.</p>
                       </div>
 
-                      <div className="space-y-8">
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                      <div className="space-y-12">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
                           {aspectRatios.map((ratio) => {
                             const Icon = ratio.icon;
                             const isSelected = selectedFormat === ratio.id;
-                            const isRecommended = selectedFormat === ratio.id; // Usually the first selected
                             return (
                               <button
                                 key={ratio.id}
                                 onClick={() => setSelectedFormat(ratio.id)}
                                 className={`
-                                  relative flex flex-col items-center justify-center gap-4 p-6 rounded-3xl transition-all border
+                                  relative flex flex-col items-center justify-center gap-5 p-8 rounded-[32px] transition-all duration-500 border
                                   ${isSelected 
-                                    ? "bg-white border-[#EA1D2C] ring-2 ring-[#EA1D2C] shadow-lg scale-[1.02]" 
-                                    : "bg-white/60 text-[#717171] hover:bg-white border-[#EAEAEC]"
+                                    ? "bg-brand-dark border-brand-red ring-2 ring-brand-red shadow-2xl scale-105" 
+                                    : "bg-brand-dark/40 text-white/20 hover:bg-brand-dark/60 border-white/5"
                                   }
                                 `}
                               >
-                                <Icon size={24} className={isSelected ? "text-[#EA1D2C]" : "text-[#717171]"} />
+                                <Icon size={28} className={isSelected ? "text-brand-orange" : "text-white/10"} />
                                 <div className="text-center">
-                                  <span className={`block text-xs font-bold ${isSelected ? "text-[#3E3E3E]" : "text-[#717171]"}`}>{ratio.id}</span>
-                                  <span className="text-[9px] uppercase font-bold tracking-widest">{ratio.label}</span>
+                                  <span className={`block text-lg font-black tracking-tighter ${isSelected ? "text-white" : "text-white/20"}`}>{ratio.id}</span>
+                                  <span className="text-[9px] uppercase font-black tracking-[0.2em]">{ratio.label}</span>
                                 </div>
                               </button>
                             );
@@ -493,25 +505,23 @@ export function StyleSelectorView({
                         </div>
 
                         {/* Settings Summary */}
-                        <div className="p-6 rounded-3xl bg-white border border-[#EAEAEC] shadow-sm">
-                          <h3 className="text-[10px] font-bold text-[#A6A6A6] uppercase tracking-widest mb-4">Resumo da Geração</h3>
-                          <div className="grid grid-cols-2 gap-y-4 gap-x-8">
-                            <div className="flex flex-col">
-                              <span className="text-[9px] font-bold text-[#717171] uppercase">Objetivo</span>
-                              <span className="text-xs font-bold text-[#3E3E3E]">{visualStyles.find(s => s.id === selectedObjective)?.label}</span>
-                            </div>
-                            <div className="flex flex-col">
-                              <span className="text-[9px] font-bold text-[#717171] uppercase">Ambiente</span>
-                              <span className="text-xs font-bold text-[#3E3E3E]">{keepBackground ? "Original" : photographicStyles.find(s => s.id === selectedEnvironment)?.label}</span>
-                            </div>
-                            <div className="flex flex-col">
-                              <span className="text-[9px] font-bold text-[#717171] uppercase">Proporção</span>
-                              <span className="text-xs font-bold text-[#3E3E3E]">{selectedFormat}</span>
-                            </div>
-                            <div className="flex flex-col">
-                              <span className="text-[9px] font-bold text-[#717171] uppercase">Custo</span>
-                              <span className="text-xs font-bold text-[#EA1D2C]">1 Crédito</span>
-                            </div>
+                        <div className="p-8 rounded-[40px] bg-brand-dark/60 border border-white/5 shadow-inner relative overflow-hidden group/sum">
+                           <div className="absolute top-0 right-0 w-32 h-32 bg-brand-red/5 blur-3xl pointer-events-none" />
+                          <h3 className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
+                            <Sparkles size={14} className="text-brand-orange" /> Resumo da Configuração
+                          </h3>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                            {[
+                              { label: "Objetivo", value: visualStyles.find(s => s.id === selectedObjective)?.label },
+                              { label: "Ambiente", value: keepBackground ? "Original" : photographicStyles.find(s => s.id === selectedEnvironment)?.label },
+                              { label: "Formato", value: selectedFormat },
+                              { label: "Custo IA", value: "1 Crédito", accent: true }
+                            ].map((sum, i) => (
+                              <div key={i} className="flex flex-col">
+                                <span className="text-[9px] font-black text-white/10 uppercase tracking-widest mb-2">{sum.label}</span>
+                                <span className={`text-sm font-black uppercase tracking-tight ${sum.accent ? "text-brand-orange" : "text-white"}`}>{sum.value}</span>
+                              </div>
+                            ))}
                           </div>
                         </div>
                       </div>
@@ -521,47 +531,49 @@ export function StyleSelectorView({
               </div>
 
               {/* Sticky Action Footer */}
-              <div className="p-8 lg:px-12 bg-white border-t border-[#EAEAEC] flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[0_-15px_50px_rgba(0,0,0,0.04)]">
+              <div className="p-8 lg:p-12 bg-brand-surface border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-8 relative z-20">
                 <button
                   onClick={currentStep === 0 ? onBack : handlePrev}
-                  className="order-2 sm:order-1 px-8 py-3 text-sm font-bold text-[#717171] hover:text-[#3E3E3E] transition-all"
+                  className="order-2 sm:order-1 px-8 py-4 text-xs font-black text-white/30 hover:text-white uppercase tracking-widest transition-all"
                 >
-                  {currentStep === 0 ? "Cancelar" : "Voltar"}
+                  {currentStep === 0 ? "Cancelar" : "Voltar Etapa"}
                 </button>
 
-                <div className="order-1 sm:order-2 flex-1 flex justify-center">
+                <div className="order-1 sm:order-2 flex-1 flex justify-center w-full sm:w-auto">
                   {currentStep < 3 ? (
-                    <button
+                    <motion.button
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={handleNext}
-                      className="w-full sm:w-auto flex items-center justify-center gap-2 px-12 py-4 rounded-2xl bg-[#3E3E3E] text-white font-bold text-sm shadow-xl hover:bg-black transition-all active:scale-95"
+                      className="w-full sm:w-auto flex items-center justify-center gap-3 px-12 py-5 rounded-2xl bg-white text-brand-dark font-black text-xs uppercase tracking-widest shadow-2xl hover:bg-brand-orange hover:text-white transition-all group/next"
                     >
-                      Próximo Passo
-                      <ArrowRight size={18} />
-                    </button>
+                      Próxima Etapa
+                      <ArrowRight size={18} className="group-hover/next:translate-x-1 transition-transform" />
+                    </motion.button>
                   ) : (
                     <motion.button
-                      whileHover={{ scale: 1.02, shadow: "0 20px 40px -10px rgba(234,29,44,0.3)" }}
-                      whileTap={{ scale: 0.98 }}
+                      whileHover={{ scale: 1.05, y: -4 }}
+                      whileTap={{ scale: 0.95 }}
                       disabled={!canGenerate || isDetecting}
                       onClick={() => onConfirm(selectedFood || "food", selectedEnvironment, selectedFormat, { keepAngle, keepBackground })}
                       className={`
-                        w-full sm:w-auto flex items-center justify-center gap-3 px-16 py-5 rounded-2xl
-                        font-bold text-lg transition-all duration-300 shadow-2xl
+                        w-full sm:w-auto flex items-center justify-center gap-4 px-20 py-6 rounded-[24px]
+                        font-black text-sm uppercase tracking-[0.2em] transition-all duration-500 shadow-[0_20px_50px_rgba(234,29,44,0.3)]
                         ${canGenerate && !isDetecting
-                          ? "bg-[#EA1D2C] text-white hover:bg-[#D01925]"
-                          : "bg-[#F7F7F7] text-[#717171] cursor-not-allowed border border-[#EAEAEC]"
+                          ? "bg-brand-gradient text-white hover:shadow-[0_25px_60px_rgba(234,29,44,0.4)]"
+                          : "bg-white/5 text-white/10 cursor-not-allowed border border-white/5"
                         }
                       `}
                     >
                       {isDetecting ? (
                         <>
-                          <Loader2 size={20} className="animate-spin" />
-                          Calibrando IA...
+                          <Loader2 size={24} className="animate-spin" />
+                          Calibrando Motor IA...
                         </>
                       ) : (
                         <>
-                          <Wand2 size={22} />
-                          Gerar Foto Profissional
+                          <Wand2 size={24} />
+                          Iniciar Processamento
                         </>
                       )}
                     </motion.button>

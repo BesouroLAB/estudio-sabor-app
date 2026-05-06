@@ -64,7 +64,7 @@ export default async function DashboardLayout({
   
   return (
     <DashboardProvider initialCredits={credits} userId={user?.id}>
-      <div className="flex h-screen bg-[#F7F7F7] relative overflow-hidden" suppressHydrationWarning>
+      <div className="flex h-screen bg-brand-dark relative overflow-hidden" suppressHydrationWarning>
         <DashboardSidebar isAdmin={isAdmin} isVisitor={isMock} />
         
         <DashboardShellClient>

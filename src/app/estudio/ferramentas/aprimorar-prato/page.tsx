@@ -77,60 +77,69 @@ export default function EnhanceToolPage() {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto bg-[#FAFAFA] min-h-screen">
-      <div className="max-w-5xl mx-auto p-8">
-        <div className="flex items-center justify-between mb-8">
+    <div className="flex-1 overflow-y-auto bg-brand-dark min-h-screen text-white relative">
+      {/* Brand Aura Glows */}
+      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-brand-red/5 blur-[120px] rounded-full -translate-y-1/2 -translate-x-1/2" />
+      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-brand-orange/5 blur-[100px] rounded-full translate-y-1/2 translate-x-1/2" />
+
+      <div className="max-w-5xl mx-auto p-8 relative z-10">
+        <div className="flex items-center justify-between mb-12">
           <button
             onClick={() => router.push('/estudio')}
-            className="flex items-center gap-2 text-slate-500 hover:text-slate-800 transition-colors"
+            className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors font-bold text-sm"
           >
             <ArrowLeft size={16} />
             <span>Voltar ao painel</span>
           </button>
           
-          <div className="flex items-center gap-2 bg-amber-50 border border-amber-100 px-3 py-1.5 rounded-full">
-            <Zap size={14} className="text-amber-500 fill-amber-500" />
-            <span className="text-sm font-bold text-slate-700">Custo: {REQUIRED_CREDITS} Crédito</span>
+          <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
+            <Zap size={14} className="text-brand-orange fill-brand-orange animate-pulse" />
+            <span className="text-xs font-black uppercase tracking-wider text-slate-300">Custo: {REQUIRED_CREDITS} Crédito</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-4 mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-amber-500/30">
-            <Sparkles size={28} />
+        <div className="flex flex-col md:flex-row items-start md:items-center gap-6 mb-12">
+          <div className="relative group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-brand-red via-brand-orange to-brand-yellow rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+            <div className="relative w-16 h-16 rounded-2xl bg-brand-surface flex items-center justify-center text-white border border-white/10">
+              <Sparkles size={32} className="text-brand-orange" />
+            </div>
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 font-display">Aprimorar Prato</h1>
-            <p className="text-slate-500 font-medium">Melhore a iluminação, nitidez e aparência do seu prato com I.A.</p>
+            <h1 className="text-4xl font-black tracking-tight font-display mb-1">Aprimorar Prato</h1>
+            <p className="text-slate-400 font-medium text-lg">Melhore a iluminação e a suculência do seu prato com I.A.</p>
           </div>
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">
           {/* Lado Esquerdo: Upload */}
-          <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm flex flex-col gap-6">
+          <div className="bg-brand-surface rounded-[32px] p-8 border border-white/5 shadow-2xl flex flex-col gap-6 relative overflow-hidden">
             {!previewUrl ? (
-              <label className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50 hover:bg-slate-100 hover:border-amber-300 transition-colors cursor-pointer min-h-[300px]">
-                <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center text-amber-500 mb-4 shadow-sm">
-                  <Upload size={24} />
+              <label className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-white/10 rounded-2xl bg-white/5 hover:bg-white/10 hover:border-brand-red/50 transition-all cursor-pointer min-h-[350px] group">
+                <div className="w-20 h-20 rounded-full bg-brand-dark flex items-center justify-center text-brand-red mb-6 shadow-xl border border-white/5 group-hover:scale-110 transition-transform">
+                  <Upload size={28} />
                 </div>
-                <span className="font-bold text-slate-700 mb-1">Clique para enviar a foto</span>
-                <span className="text-sm text-slate-400">JPG ou PNG (Até 5MB)</span>
+                <span className="font-black text-white mb-2 uppercase tracking-widest text-xs">Enviar Foto do Prato</span>
+                <span className="text-sm text-slate-500">JPG ou PNG (Até 5MB)</span>
                 <input type="file" accept="image/jpeg, image/png" className="hidden" onChange={handleFileChange} />
               </label>
             ) : (
               <div className="flex-1 flex flex-col">
-                <div className="relative rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 mb-6 group aspect-square flex items-center justify-center">
+                <div className="relative rounded-2xl overflow-hidden bg-brand-dark border border-white/10 mb-8 group aspect-square flex items-center justify-center shadow-inner">
                   <img src={previewUrl} alt="Preview" className="max-w-full max-h-full object-contain" />
                   {!isEnhancing && !resultUrl && (
-                    <label className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                      <Upload size={24} className="mb-2" />
-                      <span className="font-medium text-sm">Trocar foto</span>
+                    <label className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all cursor-pointer backdrop-blur-sm">
+                      <div className="w-12 h-12 rounded-full bg-brand-red flex items-center justify-center mb-2">
+                        <Upload size={20} />
+                      </div>
+                      <span className="font-bold text-xs uppercase tracking-widest">Trocar foto</span>
                       <input type="file" accept="image/jpeg, image/png" className="hidden" onChange={handleFileChange} />
                     </label>
                   )}
                 </div>
                 
                 {error && (
-                  <div className="mb-4 p-4 bg-red-50 text-red-600 rounded-xl text-sm font-medium">
+                  <div className="mb-6 p-4 bg-brand-red/10 border border-brand-red/20 text-brand-red rounded-xl text-sm font-bold">
                     {error}
                   </div>
                 )}
@@ -139,16 +148,16 @@ export default function EnhanceToolPage() {
                   <button
                     onClick={handleEnhance}
                     disabled={isEnhancing}
-                    className={`w-full py-4 rounded-xl font-bold text-white shadow-lg flex items-center justify-center transition-all ${
+                    className={`w-full py-5 rounded-2xl font-black uppercase tracking-[0.1em] text-sm text-white shadow-2xl flex items-center justify-center transition-all ${
                       isEnhancing
-                        ? "bg-amber-400 shadow-none cursor-not-allowed"
-                        : "bg-gradient-to-r from-amber-500 to-amber-600 hover:brightness-110 hover:-translate-y-1 hover:shadow-amber-500/25"
+                        ? "bg-white/10 shadow-none cursor-not-allowed text-slate-500"
+                        : "bg-brand-gradient hover:brightness-110 hover:-translate-y-1 shadow-brand-red/20"
                     }`}
                   >
                     {isEnhancing ? (
-                      <span className="flex items-center gap-2"><Loader2 size={20} className="animate-spin" /> Mágica acontecendo...</span>
+                      <span className="flex items-center gap-3"><Loader2 size={20} className="animate-spin" /> Mágica acontecendo...</span>
                     ) : (
-                      <span className="flex items-center gap-2"><Sparkles size={20} /> Melhorar Foto Agora</span>
+                      <span className="flex items-center gap-3"><Sparkles size={20} /> Melhorar Foto Agora</span>
                     )}
                   </button>
                 )}
@@ -157,36 +166,36 @@ export default function EnhanceToolPage() {
           </div>
 
           {/* Lado Direito: Resultado */}
-          <div className="bg-white rounded-3xl p-8 shadow-sm border border-[#EAEAEC] flex flex-col">
-            <h3 className="text-[#1A1A1A] font-bold mb-6 flex items-center gap-2 text-xl font-display">
-              <ImageIcon className="text-[#EA1D2C]" size={24} /> 
+          <div className="bg-brand-surface rounded-[32px] p-8 border border-white/5 shadow-2xl flex flex-col relative overflow-hidden">
+            <h3 className="text-white font-black mb-8 flex items-center gap-3 text-sm uppercase tracking-widest">
+              <ImageIcon className="text-brand-red" size={20} /> 
               Resultado Premium
             </h3>
             
-            <div className="flex-1 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#EAEAEC] bg-[#F7F7F7] overflow-hidden relative min-h-[300px]">
+            <div className="flex-1 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-white/5 bg-brand-dark/50 overflow-hidden relative min-h-[350px] shadow-inner">
               {!resultUrl ? (
                 isEnhancing ? (
-                  <div className="flex flex-col items-center text-[#EA1D2C]">
-                    <Loader2 size={40} className="animate-spin mb-4" />
-                    <span className="font-medium animate-pulse text-[#3E3E3E]">Ajustando iluminação e texturas...</span>
+                  <div className="flex flex-col items-center text-brand-red">
+                    <Loader2 size={48} className="animate-spin mb-6" />
+                    <span className="font-bold uppercase tracking-widest text-[10px] animate-pulse text-slate-400">Aprimorando iluminação e texturas...</span>
                   </div>
                 ) : (
-                  <div className="text-[#717171] font-medium text-center p-8 max-w-xs">
-                    Faça o upload e clique em melhorar para ver a mágica da I.A. em sua foto.
+                  <div className="text-slate-600 font-bold text-center p-12 max-w-xs text-xs uppercase tracking-[0.2em] leading-relaxed">
+                    Faça o upload e clique em melhorar para ver o poder da I.A.
                   </div>
                 )
               ) : (
-                <div className="relative w-full h-full flex flex-col items-center justify-center bg-white">
+                <div className="relative w-full h-full flex flex-col items-center justify-center bg-brand-dark animate-fade-up">
                   <img src={resultUrl} alt="Resultado Aprimorado" className="w-full h-full object-contain" />
-                  <div className="absolute bottom-6 inset-x-0 flex justify-center">
+                  <div className="absolute bottom-8 inset-x-0 flex justify-center">
                     <a 
                       href={resultUrl} 
                       download="prato-aprimorado.png" 
                       target="_blank"
-                      className="bg-[#EA1D2C] text-white px-8 py-4 rounded-xl font-bold shadow-lg shadow-red-500/20 flex items-center gap-2 hover:-translate-y-1 transition-all"
+                      className="bg-white text-black px-10 py-5 rounded-2xl font-black uppercase tracking-[0.1em] text-xs shadow-2xl flex items-center gap-3 hover:-translate-y-1 transition-all"
                     >
                       <Download size={20} />
-                      Baixar Imagem em Alta
+                      Baixar em Alta
                     </a>
                   </div>
                 </div>
@@ -196,7 +205,7 @@ export default function EnhanceToolPage() {
             {resultUrl && (
               <button 
                 onClick={() => { setResultUrl(null); setPreviewUrl(null); setSelectedFile(null); }}
-                className="mt-6 w-full py-4 border-2 border-[#EAEAEC] text-[#3E3E3E] rounded-xl font-bold hover:bg-[#F7F7F7] hover:border-[#D1D1D6] transition-all"
+                className="mt-8 w-full py-5 border border-white/10 text-slate-400 rounded-2xl font-black uppercase tracking-[0.1em] text-xs hover:bg-white/5 hover:text-white transition-all"
               >
                 Aprimorar outra foto
               </button>

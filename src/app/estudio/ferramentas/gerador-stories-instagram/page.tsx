@@ -123,103 +123,114 @@ export default function StoriesGeneratorPage() {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto bg-[#FAFAFA] min-h-screen">
-      <div className="max-w-5xl mx-auto p-8">
+    <div className="flex-1 overflow-y-auto bg-brand-dark min-h-screen">
+      <div className="max-w-6xl mx-auto p-8">
         <button
           onClick={() => router.push('/estudio')}
-          className="flex items-center gap-2 text-slate-500 hover:text-slate-800 mb-8 transition-colors"
+          className="flex items-center gap-2 text-white/40 hover:text-white mb-8 transition-colors group"
         >
-          <ArrowLeft size={16} />
-          <span>Voltar ao painel</span>
+          <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+          <span className="font-medium">Voltar ao painel</span>
         </button>
 
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-rose-100 flex items-center justify-center text-rose-600 shadow-sm">
-              <Flame size={28} />
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6">
+          <div className="flex items-center gap-5">
+            <div className="w-16 h-16 rounded-2xl bg-brand-gradient p-[1px]">
+              <div className="w-full h-full rounded-2xl bg-brand-dark flex items-center justify-center text-white">
+                <Flame size={32} className="text-brand-orange" />
+              </div>
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 font-display">Stories para Instagram</h1>
-              <p className="text-slate-500 font-medium">Crie imagens verticais perfeitas (9:16) para engajar e vender mais nos stories.</p>
+              <h1 className="text-4xl font-bold text-white font-display mb-2">Stories que Vendem</h1>
+              <p className="text-white/60 font-medium max-w-md">Crie artes verticais (9:16) profissionais para engajar seguidores e converter em pedidos.</p>
             </div>
           </div>
           
-          <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-slate-200 shadow-sm">
-            <span className="text-sm font-bold text-slate-600">Seu Saldo:</span>
-            <span className="flex items-center gap-1 text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-md">
-              <Zap size={14} className="fill-emerald-500" /> {userCredits}
+          <div className="flex items-center gap-3 bg-brand-surface px-6 py-3 rounded-2xl border border-white/5 shadow-xl">
+            <span className="text-sm font-medium text-white/40">Seu Saldo:</span>
+            <span className="flex items-center gap-2 text-brand-yellow font-bold text-lg">
+              <Zap size={18} className="fill-brand-yellow" /> {userCredits}
             </span>
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-[1fr_1.2fr] gap-8">
+        <div className="grid lg:grid-cols-[450px_1fr] gap-8 items-start">
           {/* Formulário */}
-          <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm h-fit">
-            <form onSubmit={handleGenerate} className="flex flex-col gap-6">
+          <div className="bg-brand-surface rounded-[32px] p-8 border border-white/5 shadow-2xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-brand-gradient opacity-5 blur-3xl" />
+            
+            <form onSubmit={handleGenerate} className="flex flex-col gap-8 relative z-10">
               
-              {/* Upload */}
-              <div>
-                <label className="block text-sm font-bold text-slate-700 mb-2">Foto Original *</label>
+              {/* Upload Area */}
+              <div className="space-y-4">
+                <label className="block text-sm font-bold text-white/80 uppercase tracking-wider">Foto do seu Prato</label>
                 {!previewUrl ? (
                   <div 
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={handleDrop}
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-full border-2 border-dashed border-slate-200 rounded-2xl p-8 flex flex-col items-center justify-center text-slate-500 hover:bg-rose-50 hover:border-rose-300 transition-colors cursor-pointer group"
+                    className="w-full border-2 border-dashed border-white/10 rounded-2xl p-10 flex flex-col items-center justify-center text-white/40 hover:bg-white/[0.02] hover:border-brand-orange/50 transition-all cursor-pointer group/upload"
                   >
-                    <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-rose-100 group-hover:text-rose-600 transition-colors">
-                      <UploadCloud size={24} />
+                    <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4 group-hover/upload:scale-110 group-hover/upload:text-brand-orange transition-all">
+                      <UploadCloud size={32} />
                     </div>
-                    <span className="text-sm font-bold text-slate-700 mb-1">Clique ou arraste sua foto</span>
-                    <span className="text-xs text-slate-400 text-center">Tire a foto de cima (top-down) ou em 45º com boa iluminação.</span>
+                    <span className="text-base font-bold text-white/80 mb-1">Arraste sua foto aqui</span>
+                    <span className="text-sm text-white/40 text-center">Ângulo 45º ou Top-down</span>
                     <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
                   </div>
                 ) : (
-                  <div className="relative w-full aspect-square max-h-[300px] rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex justify-center bg-slate-900">
-                    <img src={previewUrl} className="h-full w-auto object-cover" alt="Preview" />
-                    <button 
-                      type="button"
-                      onClick={() => { setFile(null); setPreviewUrl(null); }}
-                      className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm text-white w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-500 transition-colors"
-                    >
-                      <X size={16} />
-                    </button>
+                  <div className="relative w-full aspect-square rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-brand-dark group/preview">
+                    <img src={previewUrl} className="w-full h-full object-cover" alt="Preview" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover/preview:opacity-100 transition-opacity flex items-end p-4">
+                      <button 
+                        type="button"
+                        onClick={() => { setFile(null); setPreviewUrl(null); }}
+                        className="w-full py-2 bg-red-500/20 backdrop-blur-md border border-red-500/50 text-red-500 rounded-xl font-bold hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-2"
+                      >
+                        <X size={16} /> Remover Foto
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
 
               {/* Nome do Prato */}
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-bold text-slate-700">O que é isso? (Opcional)</label>
-                  <span className="text-[10px] bg-rose-50 text-rose-600 px-2 py-1 rounded font-bold uppercase tracking-wider">A I.A. pode adivinhar</span>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="block text-sm font-bold text-white/80 uppercase tracking-wider">O que é este prato?</label>
+                  <span className="text-[10px] bg-brand-orange/10 text-brand-orange px-2 py-1 rounded-full font-bold border border-brand-orange/20">DETECÇÃO AUTOMÁTICA</span>
                 </div>
                 <input
                   type="text"
-                  placeholder="Ex: Fatia de Pizza Pepperoni"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-500/50 focus:border-rose-500 transition-all"
+                  placeholder="Ex: Hambúrguer Artesanal com Fritas"
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-brand-orange/50 focus:border-brand-orange transition-all font-medium"
                   value={foodType}
                   onChange={(e) => setFoodType(e.target.value)}
                 />
               </div>
 
               {/* Estilo Visual */}
-              <div>
-                <label className="block text-sm font-bold text-slate-700 mb-2">Estilo da Arte</label>
-                <select
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-500/50 focus:border-rose-500 transition-all appearance-none"
-                  value={style}
-                  onChange={(e) => setStyle(e.target.value)}
-                >
-                  <option value="Moderno e Apetitoso">Moderno e Apetitoso (Recomendado)</option>
-                  <option value="Focado em Oferta">Focado em Oferta / Promoção</option>
-                  <option value="Stories Engajamento">Stories Engajamento (Perguntas/Enquetes)</option>
-                  <option value="Dark Mode Premium">Dark Mode Premium</option>
-                </select>
+              <div className="space-y-3">
+                <label className="block text-sm font-bold text-white/80 uppercase tracking-wider">Vibe do Story</label>
+                <div className="relative">
+                  <select
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-orange/50 focus:border-brand-orange transition-all appearance-none font-medium"
+                    value={style}
+                    onChange={(e) => setStyle(e.target.value)}
+                  >
+                    <option value="Moderno e Apetitoso" className="bg-brand-surface text-white">Moderno e Apetitoso</option>
+                    <option value="Focado em Oferta" className="bg-brand-surface text-white">Oferta Irresistível</option>
+                    <option value="Stories Engajamento" className="bg-brand-surface text-white">Engajamento (Interação)</option>
+                    <option value="Dark Mode Premium" className="bg-brand-surface text-white">Dark Mode Premium</option>
+                  </select>
+                  <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-white/20">
+                    <Check size={16} />
+                  </div>
+                </div>
               </div>
 
               {error && (
-                <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm font-medium border border-red-100">
+                <div className="p-4 bg-red-500/10 text-red-400 rounded-2xl text-sm font-medium border border-red-500/20">
                   {error}
                 </div>
               )}
@@ -227,71 +238,102 @@ export default function StoriesGeneratorPage() {
               <button
                 type="submit"
                 disabled={isGenerating || !file}
-                className={`w-full py-4 rounded-xl font-bold text-white shadow-lg flex items-center justify-center transition-all ${
+                className={`w-full py-5 rounded-2xl font-bold text-white shadow-2xl flex items-center justify-center transition-all relative overflow-hidden group/btn ${
                   isGenerating || !file
-                    ? "bg-slate-300 shadow-none cursor-not-allowed"
-                    : "bg-rose-600 hover:bg-rose-700 hover:-translate-y-1 hover:shadow-rose-600/25"
+                    ? "bg-white/5 text-white/20 cursor-not-allowed border border-white/5"
+                    : "bg-brand-gradient hover:scale-[1.02] active:scale-[0.98]"
                 }`}
               >
                 {isGenerating ? (
-                  <span className="flex items-center gap-2"><Loader2 size={20} className="animate-spin" /> Criando Story Profissional...</span>
+                  <span className="flex items-center gap-3 relative z-10">
+                    <Loader2 size={24} className="animate-spin text-white" /> 
+                    Criando Story Mágico...
+                  </span>
                 ) : (
-                  <span className="flex items-center gap-2"><Sparkles size={18} /> Gerar Story (Custa 2 ⚡)</span>
+                  <span className="flex items-center gap-3 relative z-10 text-lg">
+                    <Sparkles size={22} /> 
+                    Gerar Story Profissional (2 ⚡)
+                  </span>
+                )}
+                {!isGenerating && file && (
+                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300" />
                 )}
               </button>
             </form>
           </div>
 
           {/* Resultado */}
-          <div className="flex flex-col h-full">
+          <div className="flex flex-col h-full min-h-[600px]">
             {!result ? (
-              <div className="bg-slate-100/50 border border-slate-200 border-dashed rounded-3xl h-full min-h-[400px] flex flex-col items-center justify-center text-slate-400 font-medium p-8 text-center">
-                <Flame size={48} className="mb-4 text-slate-300" />
-                <p>Faça o upload da foto e deixe nossa I.A.<br/>criar o Story perfeito para suas vendas hoje.</p>
+              <div className="bg-brand-surface/30 border-2 border-dashed border-white/5 rounded-[32px] flex-1 flex flex-col items-center justify-center text-white/20 p-12 text-center group">
+                <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                  <Flame size={48} className="text-white/10" />
+                </div>
+                <h3 className="text-xl font-bold text-white/40 mb-2">Aguardando sua obra-prima</h3>
+                <p className="max-w-xs mx-auto leading-relaxed font-medium">Suba uma foto e veja a mágica do Estúdio transformar seu prato em um story irresistível.</p>
               </div>
             ) : (
               <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col h-full"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-brand-surface rounded-[32px] p-8 border border-white/5 shadow-2xl flex flex-col h-full relative overflow-hidden"
               >
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2">
-                    <Check size={16} className="text-emerald-500" /> Seu Story Pronto
-                  </h3>
+                <div className="absolute top-0 right-0 w-64 h-64 bg-brand-gradient opacity-5 blur-[100px]" />
+                
+                <div className="flex items-center justify-between mb-10 relative z-10">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20">
+                      <Check size={20} />
+                    </div>
+                    <h3 className="text-xl font-bold text-white font-display uppercase tracking-wider">Story Gerado!</h3>
+                  </div>
                   <button
                     onClick={handleDownload}
-                    className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-slate-800 transition-colors"
+                    className="flex items-center gap-2 bg-white text-brand-dark px-6 py-3 rounded-2xl font-bold hover:bg-brand-yellow transition-all shadow-xl hover:scale-105 active:scale-95"
                   >
-                    <Download size={16} /> Baixar Arte
+                    <Download size={18} /> Baixar Arte
                   </button>
                 </div>
                 
-                <div className="grid sm:grid-cols-2 gap-6 mb-6 h-full min-h-[400px]">
-                  {/* Imagem (Story 9:16) */}
-                  <div className="rounded-2xl overflow-hidden border border-slate-100 bg-slate-900 flex items-center justify-center relative shadow-inner aspect-[9/16] mx-auto w-full max-w-[300px]">
-                    <img src={result.imageUrl} alt="Arte gerada" className="w-full h-full object-cover" />
+                <div className="grid md:grid-cols-[320px_1fr] gap-10 h-full relative z-10">
+                  {/* Preview da Arte */}
+                  <div className="flex flex-col gap-4 mx-auto w-full max-w-[320px]">
+                    <div className="rounded-3xl overflow-hidden border border-white/10 bg-brand-dark shadow-2xl aspect-[9/16] relative group/result">
+                      <img src={result.imageUrl} alt="Arte gerada" className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-brand-gradient opacity-0 group-hover/result:opacity-10 transition-opacity" />
+                    </div>
+                    <p className="text-[10px] text-center text-white/30 font-bold uppercase tracking-widest">Visualização Story Instagram</p>
                   </div>
                   
                   {/* Legenda(s) / Textos para inserir no app */}
-                  <div className="flex flex-col gap-4">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">Textos para Usar</h4>
-                    <p className="text-xs text-slate-400">Copie estes textos para colar como figurinhas no seu Instagram.</p>
-                    <div className="flex-1 overflow-y-auto space-y-3 pr-2 custom-scrollbar">
+                  <div className="flex flex-col gap-6">
+                    <div className="space-y-1">
+                      <h4 className="text-sm font-bold uppercase tracking-widest text-brand-orange">Copie para o seu Story</h4>
+                      <p className="text-sm text-white/40 font-medium leading-relaxed">Clique no texto para copiar e colar diretamente no Instagram como figurinha de texto.</p>
+                    </div>
+                    
+                    <div className="flex-1 overflow-y-auto space-y-4 pr-3 custom-scrollbar max-h-[500px]">
                       {result.copyTexts?.map((textObj: any, index: number) => (
-                        <div key={index} className="bg-slate-50 p-4 rounded-2xl border border-slate-100 relative group">
-                          <p className="text-sm text-slate-700 whitespace-pre-wrap">{textObj.text || textObj}</p>
-                          <button 
-                            onClick={() => {
-                              navigator.clipboard.writeText(textObj.text || textObj);
-                            }}
-                            className="absolute top-2 right-2 w-8 h-8 rounded-lg bg-white shadow-sm text-slate-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:text-rose-600"
-                            title="Copiar Texto"
-                          >
-                            <Copy size={14} />
-                          </button>
+                        <div 
+                          key={index} 
+                          onClick={() => {
+                            navigator.clipboard.writeText(textObj.text || textObj);
+                          }}
+                          className="bg-white/5 p-6 rounded-2xl border border-white/5 relative group cursor-pointer hover:bg-white/[0.08] hover:border-brand-orange/30 transition-all"
+                        >
+                          <p className="text-base text-white/90 leading-relaxed font-medium whitespace-pre-wrap">{textObj.text || textObj}</p>
+                          <div className="absolute top-4 right-4 text-white/20 group-hover:text-brand-orange transition-colors">
+                            <Copy size={16} />
+                          </div>
                         </div>
                       ))}
+                    </div>
+
+                    <div className="mt-auto p-5 bg-brand-orange/5 border border-brand-orange/10 rounded-2xl">
+                      <p className="text-xs text-brand-orange/80 font-bold leading-relaxed flex items-start gap-2">
+                        <Sparkles size={14} className="mt-0.5 shrink-0" />
+                        DICA: Use estes textos em fontes diferentes no Instagram para criar um Story dinâmico e atraente!
+                      </p>
                     </div>
                   </div>
                 </div>

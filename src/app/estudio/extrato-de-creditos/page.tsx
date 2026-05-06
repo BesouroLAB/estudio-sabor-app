@@ -51,129 +51,138 @@ export default function BalancePage() {
   }
 
   return (
-    <div className="flex-1 bg-[#F7F7F7] min-h-screen select-none overflow-y-auto">
-      <div className="max-w-4xl mx-auto px-6 py-8 pb-24 md:pb-8 space-y-8">
+    <div className="flex-1 bg-brand-dark min-h-screen select-none overflow-y-auto">
+      <div className="max-w-4xl mx-auto px-6 py-12 pb-24 md:pb-12 space-y-12">
 
         {/* Page Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <h1 className="text-2xl font-bold text-[#3E3E3E] tracking-tight">
-              Extrato de <span className="text-[#EA1D2C]">Créditos</span>
+            <h1 className="text-4xl font-bold text-white tracking-tight font-display">
+              Extrato de <span className="bg-clip-text text-transparent bg-brand-gradient">Créditos</span>
             </h1>
-            <p className="text-sm text-[#717171] mt-1">Controle total sobre seu investimento em marketing de cardápio.</p>
+            <p className="text-white/40 font-medium mt-2">Controle total sobre seu investimento em marketing de cardápio.</p>
           </div>
           <Link
             href="/estudio/loja-de-creditos"
-            className="flex items-center justify-center gap-2 px-5 py-2.5 bg-[#EA1D2C] text-white text-sm font-bold rounded-lg hover:bg-[#d1192a] transition-all shadow-sm active:scale-95"
+            className="flex items-center justify-center gap-3 px-8 py-4 bg-brand-gradient text-white text-sm font-bold rounded-2xl hover:opacity-90 transition-all shadow-xl active:scale-95"
           >
-            <ShoppingBag size={16} />
+            <ShoppingBag size={18} />
             Adquirir Créditos
           </Link>
         </div>
 
-        {/* Balance Summary — iFood-style card row */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white border border-[#EAEAEC] rounded-xl p-5 flex flex-col gap-3">
-            <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center">
-              <Sparkles size={20} className="text-emerald-600" />
+        {/* Balance Summary — Modern Dark Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-brand-surface border border-white/5 rounded-[32px] p-8 flex flex-col gap-5 shadow-2xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-brand-orange/5 blur-[60px] -mr-16 -mt-16 group-hover:bg-brand-orange/10 transition-colors" />
+            <div className="w-12 h-12 rounded-2xl bg-brand-orange/10 flex items-center justify-center border border-brand-orange/20">
+              <Sparkles size={24} className="text-brand-orange" />
             </div>
             <div>
-              <p className="text-3xl font-bold text-[#3E3E3E] tracking-tight">{userCredits}</p>
-              <p className="text-[11px] text-[#A6A6A6] font-medium uppercase tracking-wider mt-0.5">Saldo Atual</p>
+              <p className="text-4xl font-bold text-white tracking-tight font-display">{userCredits}</p>
+              <p className="text-[11px] text-white/40 font-bold uppercase tracking-widest mt-1">Saldo Atual</p>
             </div>
           </div>
 
-          <div className="bg-white border border-[#EAEAEC] rounded-xl p-5 flex flex-col gap-3">
-            <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
-              <ArrowDownLeft size={20} className="text-blue-500" />
+          <div className="bg-brand-surface border border-white/5 rounded-[32px] p-8 flex flex-col gap-5 shadow-2xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-[60px] -mr-16 -mt-16 group-hover:bg-blue-500/10 transition-colors" />
+            <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+              <ArrowDownLeft size={24} className="text-blue-400" />
             </div>
             <div>
-              <p className="text-3xl font-bold text-[#3E3E3E] tracking-tight">+{creditsBought}</p>
-              <p className="text-[11px] text-[#A6A6A6] font-medium uppercase tracking-wider mt-0.5">Créditos Comprados</p>
+              <p className="text-4xl font-bold text-white tracking-tight font-display">+{creditsBought}</p>
+              <p className="text-[11px] text-white/40 font-bold uppercase tracking-widest mt-1">Créditos Comprados</p>
             </div>
           </div>
 
-          <div className="bg-white border border-[#EAEAEC] rounded-xl p-5 flex flex-col gap-3">
-            <div className="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center">
-              <ArrowUpRight size={20} className="text-[#EA1D2C]" />
+          <div className="bg-brand-surface border border-white/5 rounded-[32px] p-8 flex flex-col gap-5 shadow-2xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/5 blur-[60px] -mr-16 -mt-16 group-hover:bg-red-500/10 transition-colors" />
+            <div className="w-12 h-12 rounded-2xl bg-red-500/10 flex items-center justify-center border border-red-500/20">
+              <ArrowUpRight size={24} className="text-red-400" />
             </div>
             <div>
-              <p className="text-3xl font-bold text-[#3E3E3E] tracking-tight">{creditsSpent}</p>
-              <p className="text-[11px] text-[#A6A6A6] font-medium uppercase tracking-wider mt-0.5">Kits Gerados</p>
+              <p className="text-4xl font-bold text-white tracking-tight font-display">{creditsSpent}</p>
+              <p className="text-[11px] text-white/40 font-bold uppercase tracking-widest mt-1">Criações Realizadas</p>
             </div>
           </div>
         </div>
 
         {/* Info Note */}
-        <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-start gap-3">
-          <Info size={16} className="text-blue-500 mt-0.5 shrink-0" />
-          <p className="text-xs text-[#3E3E3E] leading-relaxed">
-            <span className="font-bold">Como funciona:</span> Cada crédito garante 1 foto profissional + 1 legenda estratégica.
-            Seus créditos nunca expiram — use quando quiser.
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-6 flex items-start gap-4">
+          <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 border border-white/10">
+            <Info size={20} className="text-brand-yellow" />
+          </div>
+          <p className="text-sm text-white/60 leading-relaxed font-medium">
+            <span className="text-white font-bold block mb-0.5">Como funciona:</span> 
+            Cada crédito garante o uso de uma de nossas ferramentas premium de IA.
+            Seus créditos nunca expiram — use quando quiser para impulsionar suas vendas.
           </p>
         </div>
 
         {/* Transaction Table */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <History size={16} className="text-[#717171]" />
-            <h2 className="font-bold text-sm text-[#3E3E3E] uppercase tracking-wider">Atividade Recente</h2>
+        <div className="space-y-6">
+          <div className="flex items-center gap-3 ml-1">
+            <div className="w-1 h-4 bg-brand-gradient rounded-full" />
+            <h2 className="font-bold text-sm text-white uppercase tracking-widest font-display">Atividade Recente</h2>
           </div>
 
-          <div className="bg-white border border-[#EAEAEC] rounded-xl overflow-hidden">
+          <div className="bg-brand-surface border border-white/5 rounded-[32px] overflow-hidden shadow-2xl">
             {transactions.length > 0 ? (
               <>
-                <div className="divide-y divide-[#F3F1F0]">
+                <div className="divide-y divide-white/5">
                   {transactions.map((tx) => (
                     <div
                       key={tx.id}
-                      className="flex items-center justify-between px-5 py-4 hover:bg-[#FAFAFA] transition-colors"
+                      className="flex items-center justify-between px-8 py-6 hover:bg-white/[0.02] transition-colors"
                     >
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-5">
                         <div className={cn(
-                          "w-9 h-9 rounded-lg flex items-center justify-center shrink-0",
-                          (tx.type === "refill" || tx.type === "purchase") ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-[#EA1D2C]"
+                          "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border",
+                          (tx.type === "refill" || tx.type === "purchase") 
+                            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" 
+                            : "bg-white/5 text-white/40 border-white/10"
                         )}>
-                          {(tx.type === "refill" || tx.type === "purchase") ? <ArrowDownLeft size={18} /> : <ArrowUpRight size={18} />}
+                          {(tx.type === "refill" || tx.type === "purchase") ? <ArrowDownLeft size={22} /> : <ArrowUpRight size={22} />}
                         </div>
                         <div>
-                          <p className="text-sm font-semibold text-[#3E3E3E]">{tx.description || tx.title || "Transação"}</p>
-                          <p className="text-xs text-[#A6A6A6]">{tx.date || new Date(tx.created_at).toLocaleDateString('pt-BR')}</p>
+                          <p className="text-base font-bold text-white font-display tracking-wide">{tx.description || tx.title || "Transação"}</p>
+                          <p className="text-xs text-white/30 font-medium mt-0.5">{tx.date || new Date(tx.created_at).toLocaleDateString('pt-BR')}</p>
                         </div>
                       </div>
 
                       <div className="text-right shrink-0">
                         <span className={cn(
-                          "font-mono font-bold text-sm",
-                          (tx.type === "refill" || tx.type === "purchase") ? "text-emerald-600" : "text-[#3E3E3E]"
+                          "font-mono font-bold text-lg tracking-tight",
+                          (tx.type === "refill" || tx.type === "purchase") ? "text-emerald-400" : "text-white/60"
                         )}>
-                          {(tx.type === "refill" || tx.type === "purchase") ? "+" : "-"}{tx.amount} crédito{tx.amount > 1 ? "s" : ""}
+                          {(tx.type === "refill" || tx.type === "purchase") ? "+" : "-"}{tx.amount}
+                          <span className="text-[10px] uppercase ml-1 opacity-40 font-sans tracking-widest">crédito{tx.amount > 1 ? "s" : ""}</span>
                         </span>
                       </div>
                     </div>
                   ))}
                 </div>
-                <div className="px-5 py-3 bg-[#FAFAFA] border-t border-[#F3F1F0]">
-                  <p className="text-xs text-[#A6A6A6] text-center">Mostrando todo o histórico</p>
+                <div className="px-8 py-4 bg-white/[0.02] border-t border-white/5">
+                  <p className="text-[10px] text-white/20 text-center font-bold uppercase tracking-[0.2em]">Fim do Histórico</p>
                 </div>
               </>
             ) : (
-              <div className="flex flex-col items-center justify-center py-16 text-center px-4">
-                <div className="w-12 h-12 rounded-full bg-[#F7F7F7] flex items-center justify-center mb-3">
-                  <Clock size={24} className="text-[#A6A6A6]" />
+              <div className="flex flex-col items-center justify-center py-20 text-center px-6">
+                <div className="w-16 h-16 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center mb-6">
+                  <Clock size={32} className="text-white/20" />
                 </div>
-                <p className="text-sm font-bold text-[#3E3E3E]">Sem atividade no momento</p>
-                <p className="text-xs text-[#717171] mt-1 max-w-[240px]">
+                <p className="text-xl font-bold text-white font-display">Sem atividade no momento</p>
+                <p className="text-sm text-white/40 mt-2 max-w-[280px] font-medium leading-relaxed">
                   {isMock 
                     ? "Como você é um visitante, ainda não possui um histórico de créditos."
                     : "Você ainda não realizou nenhuma movimentação de créditos."
                   }
                 </p>
                 <Link 
-                   href="/estudio/criar" 
-                   className="mt-6 text-[#EA1D2C] text-xs font-bold hover:underline flex items-center gap-1"
+                   href="/estudio" 
+                   className="mt-10 px-8 py-4 bg-white/5 border border-white/10 rounded-2xl text-white text-xs font-bold uppercase tracking-widest hover:bg-brand-orange hover:border-brand-orange transition-all flex items-center gap-3"
                 >
-                  Gerar minha primeira foto profissional <ArrowRight size={12} />
+                  Começar a Criar <ArrowRight size={14} />
                 </Link>
               </div>
             )}

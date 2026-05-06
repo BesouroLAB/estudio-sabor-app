@@ -87,51 +87,61 @@ AÇÃO:
   };
 
   return (
-    <div className="flex-1 overflow-y-auto bg-[#FAFAFA] min-h-screen">
-      <div className="max-w-5xl mx-auto p-8">
+    <div className="flex-1 overflow-y-auto bg-brand-dark min-h-screen text-white relative">
+      {/* Brand Aura Glows */}
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-brand-red/5 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-brand-orange/5 blur-[100px] rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+
+      <div className="max-w-5xl mx-auto p-8 relative z-10">
         <button
           onClick={() => router.push('/estudio')}
-          className="flex items-center gap-2 text-slate-500 hover:text-slate-800 mb-8 transition-colors"
+          className="flex items-center gap-2 text-slate-500 hover:text-white mb-8 transition-colors group font-black text-[10px] uppercase tracking-widest"
         >
-          <ArrowLeft size={16} />
+          <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
           <span>Voltar ao painel</span>
         </button>
 
-        <div className="flex items-center gap-4 mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-600 shadow-sm">
-            <Type size={28} />
+        <div className="flex items-center gap-6 mb-12">
+          <div className="w-16 h-16 rounded-2xl bg-brand-gradient flex items-center justify-center text-white shadow-[0_10px_30px_rgba(234,29,44,0.3)] shrink-0">
+            <Type size={32} />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 font-display">Gerador de Descrição para iFood</h1>
-            <p className="text-slate-500 font-medium">Crie textos apetitosos que convertem visitantes em clientes no seu cardápio do iFood.</p>
+            <h1 className="text-4xl font-black text-white font-display tracking-tight leading-tight">
+              Copiadora <span className="text-transparent bg-clip-text bg-brand-gradient">iFood Profissional</span>
+            </h1>
+            <p className="text-slate-400 font-medium text-sm mt-1">Crie textos que dão água na boca e convertem visitantes em pedidos reais.</p>
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-2 gap-8 items-start">
           {/* Formulário */}
-          <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
-            <form onSubmit={handleGenerate} className="flex flex-col gap-6">
+          <div className="bg-brand-surface rounded-[32px] p-8 border border-white/5 shadow-2xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-brand-red/5 blur-3xl pointer-events-none" />
+            
+            <form onSubmit={handleGenerate} className="flex flex-col gap-8">
               
               {/* Foto (Opcional) */}
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-2">Foto do Prato (Opcional)</label>
+                <label className="block text-[10px] font-black text-slate-400 mb-3 uppercase tracking-widest">Visual do Prato (Opcional)</label>
                 <div className="flex items-center gap-4">
                   {!imageSrc ? (
-                    <label className="w-full border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center text-slate-500 hover:bg-slate-50 hover:border-emerald-300 transition-colors cursor-pointer">
-                      <ImageIcon size={24} className="mb-2" />
-                      <span className="text-xs font-medium">Clique para enviar uma foto para análise da I.A.</span>
+                    <label className="w-full border-2 border-dashed border-white/5 rounded-2xl p-6 flex flex-col items-center justify-center text-slate-500 hover:bg-white/5 hover:border-brand-red/30 transition-all cursor-pointer group/upload">
+                      <ImageIcon size={28} className="mb-3 group-hover/upload:text-brand-red transition-colors" />
+                      <span className="text-[10px] font-bold text-center uppercase tracking-tight">Anexar foto para análise da IA</span>
                       <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
                     </label>
                   ) : (
-                    <div className="relative w-full h-32 rounded-xl overflow-hidden border border-slate-200">
-                      <img src={imageSrc} className="w-full h-full object-cover" alt="Preview" />
-                      <button 
-                        type="button"
-                        onClick={() => setImageSrc(null)}
-                        className="absolute top-2 right-2 bg-black/50 text-white p-1.5 rounded-lg hover:bg-red-500 transition-colors"
-                      >
-                        <X size={14} />
-                      </button>
+                    <div className="relative w-full h-40 rounded-2xl overflow-hidden border border-white/10 group/preview">
+                      <img src={imageSrc} className="w-full h-full object-cover transition-transform group-hover/preview:scale-110 duration-700" alt="Preview" />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/preview:opacity-100 transition-opacity flex items-center justify-center">
+                        <button 
+                          type="button"
+                          onClick={() => setImageSrc(null)}
+                          className="bg-brand-red text-white p-3 rounded-xl hover:scale-110 transition-transform shadow-xl"
+                        >
+                          <X size={18} />
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -139,11 +149,11 @@ AÇÃO:
 
               {/* Ingredientes */}
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-2">O que vai no prato? (Ingredientes) *</label>
+                <label className="block text-[10px] font-black text-slate-400 mb-3 uppercase tracking-widest">O que compõe o prato? *</label>
                 <textarea
                   required
-                  placeholder="Ex: Pão brioche, 2 blends de 150g, queijo cheddar, bacon artesanal..."
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all min-h-[80px] resize-none"
+                  placeholder="Ex: Pão brioche amanteigado, blend 180g, queijo gouda, cebola caramelizada..."
+                  className="w-full bg-brand-dark border border-white/5 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-red/50 focus:border-brand-red transition-all min-h-[100px] resize-none font-medium placeholder:text-slate-700"
                   value={ingredients}
                   onChange={(e) => setIngredients(e.target.value)}
                 />
@@ -151,26 +161,26 @@ AÇÃO:
 
               {/* Contexto da Loja */}
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-2">Contexto da sua Loja (Opcional)</label>
+                <label className="block text-[10px] font-black text-slate-400 mb-3 uppercase tracking-widest">Personalidade da Loja (Opcional)</label>
                 <input
                   type="text"
-                  placeholder="Ex: Hamburgueria artesanal de garagem com pegada rock n roll"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
+                  placeholder="Ex: Hamburgueria artesanal com pegada rústica"
+                  className="w-full bg-brand-dark border border-white/5 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-red/50 focus:border-brand-red transition-all font-medium placeholder:text-slate-700"
                   value={storeContext}
                   onChange={(e) => setStoreContext(e.target.value)}
                 />
               </div>
 
               {/* Nome do Prato */}
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-bold text-slate-700">Nome do Prato (Opcional)</label>
-                  <span className="text-[10px] bg-emerald-50 text-emerald-600 px-2 py-1 rounded font-bold uppercase tracking-wider">Deixe em branco para a I.A. criar</span>
+              <div className="relative">
+                <div className="flex items-center justify-between mb-3">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Nome do Prato</label>
+                  <span className="text-[9px] bg-brand-red/10 text-brand-red px-2 py-1 rounded font-black uppercase tracking-wider border border-brand-red/20">A IA pode sugerir nomes</span>
                 </div>
                 <input
                   type="text"
-                  placeholder="Ex: Smash Burguer Duplo"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
+                  placeholder="Ex: Gran Burger Especial"
+                  className="w-full bg-brand-dark border border-white/5 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-red/50 focus:border-brand-red transition-all font-medium placeholder:text-slate-700"
                   value={dishName}
                   onChange={(e) => setDishName(e.target.value)}
                 />
@@ -179,74 +189,92 @@ AÇÃO:
               <button
                 type="submit"
                 disabled={isGenerating || !ingredients.trim()}
-                className={`w-full py-4 rounded-xl font-bold text-white shadow-lg flex items-center justify-center transition-all ${
+                className={`w-full py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl flex items-center justify-center transition-all group/btn ${
                   isGenerating || !ingredients.trim()
-                    ? "bg-slate-300 shadow-none cursor-not-allowed"
-                    : "bg-emerald-600 hover:bg-emerald-700 hover:-translate-y-1 hover:shadow-emerald-600/25"
+                    ? "bg-brand-surface text-slate-600 border border-white/5 cursor-not-allowed"
+                    : "bg-brand-gradient text-white hover:scale-[1.02] active:scale-[0.98] shadow-brand-red/20"
                 }`}
               >
                 {isGenerating ? (
-                  <span className="flex items-center gap-2"><Loader2 size={20} className="animate-spin" /> Processando Magia...</span>
+                  <span className="flex items-center gap-3"><Loader2 size={20} className="animate-spin" /> Cozinhando Textos...</span>
                 ) : (
-                  <span className="flex items-center gap-2"><Sparkles size={18} /> {dishName ? "Gerar Descrições" : "Gerar Nomes e Descrições"}</span>
+                  <span className="flex items-center gap-3">
+                    <Sparkles size={18} className="group-hover/btn:rotate-12 transition-transform" /> 
+                    {dishName ? "Gerar Descrições" : "Criar Nome e Descrições"}
+                  </span>
                 )}
               </button>
             </form>
           </div>
 
           {/* Resultado */}
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-8 h-full">
             {!result ? (
-              <div className="bg-slate-100/50 border border-slate-200 border-dashed rounded-3xl h-full min-h-[300px] flex items-center justify-center text-slate-400 font-medium p-8 text-center">
-                Preencha os ingredientes e deixe a I.A. fazer a mágica para o seu iFood.
+              <div className="bg-brand-surface/30 border-2 border-white/5 border-dashed rounded-[32px] flex-1 min-h-[400px] flex flex-col items-center justify-center text-slate-600 p-12 text-center group">
+                <div className="w-20 h-20 rounded-full bg-brand-surface border border-white/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                  <Sparkles size={32} className="text-slate-700" />
+                </div>
+                <p className="text-sm font-black uppercase tracking-[0.2em] mb-2">Aguardando sua entrada</p>
+                <p className="text-xs font-medium max-w-xs leading-relaxed">Preencha os dados do prato ao lado e deixe a IA criar uma vitrine irresistível para o seu delivery.</p>
               </div>
             ) : (
               <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="flex flex-col gap-6"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col gap-8"
               >
                 {/* Nomes Criados (se aplicável) */}
                 {result.names && (
-                  <div className="bg-amber-50 rounded-3xl p-6 border border-amber-200 shadow-sm relative group">
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-amber-600 mb-3 flex items-center gap-2"><Sparkles size={14}/> Sugestões de Nomes</h3>
-                    <ul className="space-y-2 mb-2">
+                  <div className="bg-brand-surface rounded-[32px] p-8 border border-brand-orange/30 shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-brand-orange/10 blur-3xl pointer-events-none" />
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-orange mb-6 flex items-center gap-2">
+                      <Sparkles size={14}/> Sugestões de Nomes de Impacto
+                    </h3>
+                    <div className="flex flex-wrap gap-3 mb-2">
                       {result.names.map((name, i) => (
-                        <li key={i} className="text-slate-800 font-bold text-lg">• {name}</li>
+                        <div key={i} className="bg-brand-dark border border-white/10 px-5 py-3 rounded-xl text-white font-black text-lg shadow-xl">
+                          {name}
+                        </div>
                       ))}
-                    </ul>
+                    </div>
                     <button 
                       onClick={() => handleCopy("names", result.names!.join('\n'))}
-                      className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center hover:bg-amber-200 transition-colors"
+                      className="absolute top-8 right-8 w-10 h-10 rounded-xl bg-brand-dark border border-white/10 text-slate-400 flex items-center justify-center hover:text-white transition-colors hover:border-brand-orange/50 shadow-xl"
                     >
-                      {copied === "names" ? <Check size={16} /> : <Copy size={16} />}
+                      {copied === "names" ? <Check size={18} className="text-emerald-500" /> : <Copy size={18} />}
                     </button>
                   </div>
                 )}
 
                 {/* Legenda Curta */}
-                <div className="bg-white rounded-3xl p-6 border border-emerald-100 shadow-[0_4px_20px_-5px_rgba(16,185,129,0.1)] relative group">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-600 mb-3">Descrição para iFood (Conversão Rápida)</h3>
-                  <p className="text-slate-700 text-lg whitespace-pre-wrap">{result.short}</p>
+                <div className="bg-brand-surface rounded-[32px] p-8 border border-white/5 shadow-2xl relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-brand-red/5 blur-3xl pointer-events-none" />
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-red mb-6">Foco iFood (Máxima Conversão)</h3>
+                  <div className="bg-brand-dark/50 border border-white/5 p-6 rounded-2xl">
+                    <p className="text-slate-200 text-lg font-medium leading-relaxed italic">"{result.short}"</p>
+                  </div>
                   
                   <button 
                     onClick={() => handleCopy("short", result.short)}
-                    className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-100 transition-colors"
+                    className="absolute top-8 right-8 w-10 h-10 rounded-xl bg-brand-dark border border-white/10 text-slate-400 flex items-center justify-center hover:text-white transition-colors hover:border-brand-red/50 shadow-xl"
                   >
-                    {copied === "short" ? <Check size={16} /> : <Copy size={16} />}
+                    {copied === "short" ? <Check size={18} className="text-emerald-500" /> : <Copy size={18} />}
                   </button>
                 </div>
 
                 {/* Legenda Longa */}
-                <div className="bg-white rounded-3xl p-6 border border-emerald-100 shadow-[0_4px_20px_-5px_rgba(16,185,129,0.1)] relative group">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-600 mb-3">Versão Longa (WhatsApp/Redes Sociais)</h3>
-                  <p className="text-slate-700 text-[15px] whitespace-pre-wrap leading-relaxed">{result.long}</p>
+                <div className="bg-brand-surface rounded-[32px] p-8 border border-white/5 shadow-2xl relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-brand-orange/5 blur-3xl pointer-events-none" />
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-orange mb-6">WhatsApp & Redes Sociais</h3>
+                  <div className="bg-brand-dark/50 border border-white/5 p-6 rounded-2xl">
+                    <p className="text-slate-300 text-sm font-medium leading-relaxed whitespace-pre-wrap">{result.long}</p>
+                  </div>
                   
                   <button 
                     onClick={() => handleCopy("long", result.long)}
-                    className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-100 transition-colors"
+                    className="absolute top-8 right-8 w-10 h-10 rounded-xl bg-brand-dark border border-white/10 text-slate-400 flex items-center justify-center hover:text-white transition-colors hover:border-brand-orange/50 shadow-xl"
                   >
-                    {copied === "long" ? <Check size={16} /> : <Copy size={16} />}
+                    {copied === "long" ? <Check size={18} className="text-emerald-500" /> : <Copy size={18} />}
                   </button>
                 </div>
               </motion.div>

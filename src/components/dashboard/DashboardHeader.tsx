@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, User as UserIcon, LogOut, LogIn, Settings, MessageCircle, ChevronRight } from "lucide-react";
+import { Sparkles, User as UserIcon, LogOut, LogIn, Settings, MessageCircle, ChevronRight, PlusSquare } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
@@ -57,65 +57,80 @@ export function DashboardHeader({
 
   // Credit badge color based on credit level
   const getCreditStyle = () => {
-    if (userCredits >= 20) return "bg-emerald-50 border-emerald-200 text-emerald-700";
-    if (userCredits >= 5) return "bg-amber-50 border-amber-200 text-amber-700";
-    return "bg-red-50 border-red-200 text-[#EA1D2C]";
+    if (userCredits >= 20) return "bg-emerald-500/10 border-emerald-500/20 text-emerald-500";
+    if (userCredits >= 5) return "bg-amber-500/10 border-amber-500/20 text-amber-500";
+    return "bg-brand-red/10 border-brand-red/20 text-brand-red";
   };
 
   return (
-    <header className="sticky top-0 z-30 bg-white border-b border-[#EAEAEC]" suppressHydrationWarning>
-      {/* Announcement Banner */}
+    <header className="sticky top-0 z-30 bg-brand-dark/80 border-b border-white/5 backdrop-blur-xl" suppressHydrationWarning>
+      {/* Announcement Banner - More subtle and premium */}
       {announcement?.active && (
-        <div className="bg-[#EA1D2C] text-white text-center text-xs font-medium py-1.5 px-4">
-          {announcement.message}
+        <div className="bg-brand-gradient relative overflow-hidden">
+          <div className="absolute inset-0 bg-black/10 backdrop-blur-[1px]" />
+          <div className="relative z-10 text-white text-center text-[10px] font-black uppercase tracking-[0.3em] py-2 px-4 animate-pulse">
+            {announcement.message}
+          </div>
         </div>
       )}
 
-      <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between relative">
         {/* Left: Breadcrumb */}
-        <nav className="flex items-center gap-1.5 text-sm">
-          <Link href="/estudio" className="text-[#A6A6A6] hover:text-[#3E3E3E] transition-colors font-medium">
+        <nav className="flex items-center gap-3 text-[11px]">
+          <Link href="/estudio" className="text-white/30 hover:text-white transition-all font-black uppercase tracking-[0.2em] flex items-center gap-2 group">
+            <div className="w-1.5 h-1.5 rounded-full bg-brand-red group-hover:scale-125 transition-transform" />
             Início
           </Link>
           {!isHome && (
             <>
-              <ChevronRight size={14} className="text-[#DDDDE0]" />
-              <span className="text-[#3E3E3E] font-semibold">{currentPage}</span>
+              <ChevronRight size={14} className="text-white/10" />
+              <span className="text-white font-black uppercase tracking-[0.2em]">{currentPage}</span>
             </>
           )}
         </nav>
 
         {/* Right: Credits + User */}
-        <div className="flex items-center gap-3">
-          {/* Credits Badge */}
+        <div className="flex items-center gap-6">
+          {/* Credits Badge - High End */}
           <Link
             href="/estudio/loja-de-creditos"
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-bold transition-colors hover:opacity-80 ${getCreditStyle()}`}
+            className="group relative flex items-center gap-3 pl-4 pr-1.5 py-1.5 rounded-full bg-white/5 border border-white/10 hover:border-brand-red/30 transition-all active:scale-95"
           >
-            <Sparkles size={13} />
-            <span>{userCredits}</span>
-            <span className="opacity-70 font-medium hidden sm:inline">créditos</span>
+            <div className="flex items-center gap-2">
+              <Sparkles size={14} className="text-brand-orange animate-pulse" />
+              <div className="flex flex-col">
+                <span className="text-white text-sm font-black leading-none">{userCredits}</span>
+                <span className="text-[9px] font-black text-white/30 tracking-widest leading-none">CRÉDITOS</span>
+              </div>
+            </div>
+            <div className="w-8 h-8 rounded-full bg-brand-gradient flex items-center justify-center text-white shadow-lg shadow-brand-red/20 group-hover:scale-110 transition-transform">
+              <PlusSquare size={14} strokeWidth={3} />
+            </div>
           </Link>
 
-          <div className="h-6 w-px bg-[#EAEAEC] hidden sm:block" />
+          <div className="h-8 w-px bg-white/10 hidden sm:block" />
 
           {/* User Profile Dropdown */}
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="flex items-center gap-2.5 transition-all cursor-pointer group text-left"
+              className="flex items-center gap-3 transition-all cursor-pointer group text-left"
             >
-              <span className="hidden sm:block text-xs font-semibold text-[#3E3E3E] group-hover:text-[#717171] transition-colors max-w-[120px] truncate">
-                {userName || user?.email?.split("@")[0] || "Visitante"}
-              </span>
-              <div className="w-8 h-8 rounded-full bg-[#F7F7F7] flex items-center justify-center transition-all group-hover:bg-[#EAEAEC]">
-                <UserIcon
-                  size={16}
-                  className={cn(
-                    "transition-colors",
-                    dropdownOpen ? "text-[#EA1D2C]" : "text-[#717171] group-hover:text-[#3E3E3E]"
+              <div className="relative">
+                <div className="w-11 h-11 rounded-full bg-brand-surface flex items-center justify-center transition-all border border-white/10 group-hover:border-brand-red/50 shadow-2xl overflow-hidden p-0.5">
+                  {user?.id === "mock-temporario" ? (
+                    <div className="w-full h-full rounded-full bg-white/5 flex items-center justify-center">
+                      <UserIcon size={20} className="text-white/30" />
+                    </div>
+                  ) : (
+                    <img 
+                      src={`https://api.dicebear.com/7.x/initials/svg?seed=${userName || user?.email}&backgroundColor=111111&fontFamily=Inter&fontWeight=700`} 
+                      alt="Avatar" 
+                      className="w-full h-full rounded-full object-cover" 
+                    />
                   )}
-                />
+                </div>
+                <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-emerald-500 border-2 border-brand-dark" />
               </div>
             </button>
 
@@ -123,68 +138,83 @@ export function DashboardHeader({
             <AnimatePresence>
               {dropdownOpen && (
                 <motion.div
-                  initial={{ opacity: 0, y: 6, scale: 0.97 }}
+                  initial={{ opacity: 0, y: 15, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 6, scale: 0.97 }}
-                  transition={{ duration: 0.12 }}
-                  className="absolute right-0 top-full mt-2 w-52 bg-white rounded-xl shadow-lg border border-[#EAEAEC] p-1.5 z-50"
+                  exit={{ opacity: 0, y: 15, scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  className="absolute right-0 top-full mt-4 w-72 bg-brand-surface/95 rounded-[32px] shadow-[0_25px_60px_rgba(0,0,0,0.8)] border border-white/10 p-3 z-50 backdrop-blur-2xl"
                 >
-                  {user?.id === "mock-temporario" ? (
-                    <div className="p-3 bg-red-50 rounded-lg mb-1.5 border border-red-100">
-                      <p className="text-[10px] font-bold text-[#EA1D2C] uppercase tracking-wider mb-1.5">Modo Visitante</p>
-                      <p className="text-[10px] text-[#717171] leading-snug mb-2.5">Crie uma conta para salvar suas criações.</p>
+                  <div className="px-5 py-4 mb-2">
+                    <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-1.5">Sua Conta</p>
+                    <p className="text-base font-black text-white truncate tracking-tight">{userName || user?.email}</p>
+                    <p className="text-[11px] font-bold text-brand-orange mt-0.5 uppercase tracking-wider">Membro Premium</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-1">
+                    {user?.id === "mock-temporario" ? (
+                      <div className="p-4 bg-brand-red/5 rounded-2xl mb-2 border border-brand-red/10 group">
+                        <p className="text-[10px] font-black text-brand-red uppercase tracking-wider mb-3">Modo Visitante</p>
+                        <button
+                          onClick={() => { router.push("/signup"); setDropdownOpen(false); }}
+                          className="w-full py-3 bg-brand-gradient text-white text-[11px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-brand-red/20 transition-all hover:scale-[1.02] active:scale-95"
+                        >
+                          Criar Conta Agora
+                        </button>
+                      </div>
+                    ) : (
                       <button
-                        onClick={() => { router.push("/signup"); setDropdownOpen(false); }}
-                        className="w-full py-2 bg-[#EA1D2C] text-white text-[10px] font-bold uppercase tracking-wider rounded-lg hover:bg-[#d1192a] transition-colors"
+                        onClick={() => { router.push("/estudio/configuracoes-da-conta"); setDropdownOpen(false); }}
+                        className="w-full text-left px-5 py-3.5 text-[13px] font-bold text-white/60 hover:text-white hover:bg-white/5 rounded-2xl transition-all flex items-center gap-3 group"
                       >
-                        Criar Conta Grátis
+                        <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <Settings size={18} />
+                        </div>
+                        Configurações
                       </button>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => { router.push("/estudio/configuracoes-da-conta"); setDropdownOpen(false); }}
-                      className="w-full text-left px-3 py-2 text-sm text-[#717171] hover:bg-[#F7F7F7] rounded-lg transition-colors flex items-center gap-2.5"
-                    >
-                      <Settings size={14} />
-                      Configurações
-                    </button>
-                  )}
+                    )}
 
-                  <a
-                    href={supportLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => setDropdownOpen(false)}
-                    className="w-full text-left px-3 py-2 text-sm text-[#717171] hover:bg-[#F7F7F7] rounded-lg transition-colors flex items-center gap-2.5"
-                  >
-                    <MessageCircle size={14} className="text-emerald-500" />
-                    Suporte WhatsApp
-                  </a>
-
-                  <div className="h-px bg-[#EAEAEC] my-1" />
-
-                  {user?.id === "mock-temporario" ? (
-                    <button
-                      onClick={() => { router.push("/login"); setDropdownOpen(false); }}
-                      className="w-full text-left px-3 py-2 text-sm text-[#3E3E3E] hover:bg-[#F7F7F7] rounded-lg transition-colors flex items-center gap-2.5"
+                    <a
+                      href={supportLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setDropdownOpen(false)}
+                      className="w-full text-left px-5 py-3.5 text-[13px] font-bold text-white/60 hover:text-white hover:bg-white/5 rounded-2xl transition-all flex items-center gap-3 group"
                     >
-                      <LogIn size={14} />
-                      Fazer Login
-                    </button>
-                  ) : (
-                    <button
-                      onClick={async () => {
-                        setDropdownOpen(false);
-                        const supabase = createClient();
-                        await supabase.auth.signOut();
-                        window.location.href = "/login";
-                      }}
-                      className="w-full text-left px-3 py-2 text-sm text-[#EA1D2C] hover:bg-red-50 rounded-lg transition-colors flex items-center gap-2.5"
-                    >
-                      <LogOut size={14} />
-                      Sair da conta
-                    </button>
-                  )}
+                      <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <MessageCircle size={18} className="text-emerald-500" />
+                      </div>
+                      Suporte VIP WhatsApp
+                    </a>
+
+                    <div className="h-px bg-white/5 mx-3 my-2" />
+
+                    {user?.id === "mock-temporario" ? (
+                      <button
+                        onClick={() => { router.push("/login"); setDropdownOpen(false); }}
+                        className="w-full text-left px-5 py-3.5 text-[13px] font-black text-white hover:bg-white/5 rounded-2xl transition-all flex items-center gap-3 group"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-brand-orange/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <LogIn size={18} className="text-brand-orange" />
+                        </div>
+                        Fazer Login
+                      </button>
+                    ) : (
+                      <button
+                        onClick={async () => {
+                          setDropdownOpen(false);
+                          const supabase = createClient();
+                          await supabase.auth.signOut();
+                          window.location.href = "/login";
+                        }}
+                        className="w-full text-left px-5 py-3.5 text-[13px] font-black text-brand-red hover:bg-brand-red/5 rounded-2xl transition-all flex items-center gap-3 group"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-brand-red/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <LogOut size={18} />
+                        </div>
+                        Sair da Conta
+                      </button>
+                    )}
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>

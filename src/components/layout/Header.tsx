@@ -17,6 +17,7 @@ const stepLabels: Record<AppStep, string> = {
   style: "Escolher Estilo",
   loading: "Gerando...",
   result: "Seu Pacote",
+  insufficient_credits: "Sem Créditos",
 };
 
 export function Header({ onReset, currentStep }: HeaderProps) {
