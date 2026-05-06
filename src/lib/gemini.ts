@@ -58,13 +58,14 @@ export async function generateContentUnified(modelName: string, prompt: string, 
         });
       }
 
+      const isImageModel = modelName.includes('image');
       const result = await model.generateContent({
         contents: [{ role: 'user', parts }],
-        generationConfig: {
+        generationConfig: isImageModel ? {
           // @ts-ignore
           aspectRatio: aspectRatio,
           responseModalities: ["image", "text"],
-        }
+        } : undefined
       });
       
       return {
@@ -94,14 +95,15 @@ export async function generateContentUnified(modelName: string, prompt: string, 
       });
     }
 
+    const isImageModel = modelName.includes('image');
     const result = await ai.models.generateContent({
       model: modelName,
       contents: [{ role: 'user', parts }],
-      config: {
+      config: isImageModel ? {
         // @ts-ignore
         aspectRatio: aspectRatio,
         responseModalities: ["image", "text"],
-      }
+      } : undefined
     });
 
     return {

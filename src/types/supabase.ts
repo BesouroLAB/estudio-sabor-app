@@ -14,55 +14,68 @@ export type Database = {
   }
   public: {
     Tables: {
-      ai_usage_logs: {
+      api_usage: {
         Row: {
-          action_type: string
+          campaign_id: string | null
           cost_brl: number | null
-          created_at: string | null
-          credits_used: number | null
-          estimated_profit_brl: number | null
-          estimated_value_brl: number | null
+          cost_usd: number | null
+          created_at: string
+          error_message: string | null
+          exchange_rate: number | null
           id: string
           input_tokens: number | null
           metadata: Json | null
-          model_name: string | null
+          model: string | null
           output_tokens: number | null
           status: string | null
+          storage_url: string | null
+          type: Database["public"]["Enums"]["call_type"]
           user_id: string
         }
         Insert: {
-          action_type: string
+          campaign_id?: string | null
           cost_brl?: number | null
-          created_at?: string | null
-          credits_used?: number | null
-          estimated_profit_brl?: number | null
-          estimated_value_brl?: number | null
+          cost_usd?: number | null
+          created_at?: string
+          error_message?: string | null
+          exchange_rate?: number | null
           id?: string
           input_tokens?: number | null
           metadata?: Json | null
-          model_name?: string | null
+          model?: string | null
           output_tokens?: number | null
           status?: string | null
+          storage_url?: string | null
+          type: Database["public"]["Enums"]["call_type"]
           user_id: string
         }
         Update: {
-          action_type?: string
+          campaign_id?: string | null
           cost_brl?: number | null
-          created_at?: string | null
-          credits_used?: number | null
-          estimated_profit_brl?: number | null
-          estimated_value_brl?: number | null
+          cost_usd?: number | null
+          created_at?: string
+          error_message?: string | null
+          exchange_rate?: number | null
           id?: string
           input_tokens?: number | null
           metadata?: Json | null
-          model_name?: string | null
+          model?: string | null
           output_tokens?: number | null
           status?: string | null
+          storage_url?: string | null
+          type?: Database["public"]["Enums"]["call_type"]
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "ai_usage_logs_profiles_fkey"
+            foreignKeyName: "generation_logs_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "generation_logs_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -70,324 +83,298 @@ export type Database = {
           },
         ]
       }
-      api_usage: {
+      campaigns: {
         Row: {
-          call_type: string
-          cost_brl: number | null
-          cost_usd: number | null
-          created_at: string | null
-          downloaded_at: string | null
-          error_message: string | null
+          created_at: string
+          dish_category: string | null
+          dish_name: string
+          functional_image_url: string | null
+          generated_copy: string | null
           id: string
-          metadata: Json | null
-          model: string
-          status: string | null
-          storage_url: string | null
-          tokens_input: number | null
-          tokens_output: number | null
-          user_email: string | null
-          user_id: string | null
-        }
-        Insert: {
-          call_type: string
-          cost_brl?: number | null
-          cost_usd?: number | null
-          created_at?: string | null
-          downloaded_at?: string | null
-          error_message?: string | null
-          id?: string
-          metadata?: Json | null
-          model: string
-          status?: string | null
-          storage_url?: string | null
-          tokens_input?: number | null
-          tokens_output?: number | null
-          user_email?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          call_type?: string
-          cost_brl?: number | null
-          cost_usd?: number | null
-          created_at?: string | null
-          downloaded_at?: string | null
-          error_message?: string | null
-          id?: string
-          metadata?: Json | null
-          model?: string
-          status?: string | null
-          storage_url?: string | null
-          tokens_input?: number | null
-          tokens_output?: number | null
-          user_email?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      checklists: {
-        Row: {
-          created_at: string | null
-          id: string
-          is_completed: boolean | null
-          notice_id: string | null
-          task_text: string
+          promotional_image_url: string | null
+          type: Database["public"]["Enums"]["call_type"]
           user_id: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
+          dish_category?: string | null
+          dish_name: string
+          functional_image_url?: string | null
+          generated_copy?: string | null
           id?: string
-          is_completed?: boolean | null
-          notice_id?: string | null
-          task_text: string
+          promotional_image_url?: string | null
+          type: Database["public"]["Enums"]["call_type"]
           user_id: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
+          dish_category?: string | null
+          dish_name?: string
+          functional_image_url?: string | null
+          generated_copy?: string | null
           id?: string
-          is_completed?: boolean | null
-          notice_id?: string | null
-          task_text?: string
+          promotional_image_url?: string | null
+          type?: Database["public"]["Enums"]["call_type"]
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "checklists_notice_id_fkey"
-            columns: ["notice_id"]
+            foreignKeyName: "campaigns_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "notices"
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creations: {
+        Row: {
+          copywriting_texts: Json | null
+          created_at: string | null
+          format_selected: string
+          id: string
+          image_url: string
+          prompt_metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          copywriting_texts?: Json | null
+          created_at?: string | null
+          format_selected: string
+          id?: string
+          image_url: string
+          prompt_metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          copywriting_texts?: Json | null
+          created_at?: string | null
+          format_selected?: string
+          id?: string
+          image_url?: string
+          prompt_metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      credit_transactions: {
+        Row: {
+          amount: number
+          amount_paid_brl: number | null
+          cost_brl: number | null
+          created_at: string
+          expires_at: string | null
+          full_name: string | null
+          id: string
+          package_name: string | null
+          reference_id: string | null
+          tokens_input: number | null
+          tokens_output: number | null
+          type: Database["public"]["Enums"]["transaction_type"]
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          amount_paid_brl?: number | null
+          cost_brl?: number | null
+          created_at?: string
+          expires_at?: string | null
+          full_name?: string | null
+          id?: string
+          package_name?: string | null
+          reference_id?: string | null
+          tokens_input?: number | null
+          tokens_output?: number | null
+          type: Database["public"]["Enums"]["transaction_type"]
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          amount_paid_brl?: number | null
+          cost_brl?: number | null
+          created_at?: string
+          expires_at?: string | null
+          full_name?: string | null
+          id?: string
+          package_name?: string | null
+          reference_id?: string | null
+          tokens_input?: number | null
+          tokens_output?: number | null
+          type?: Database["public"]["Enums"]["transaction_type"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
       }
       exchange_rates: {
         Row: {
-          currency_pair: string | null
+          currency_pair: string
           fetched_at: string | null
           id: string
           rate: number
+          source: string | null
         }
         Insert: {
-          currency_pair?: string | null
+          currency_pair: string
           fetched_at?: string | null
           id?: string
           rate: number
+          source?: string | null
         }
         Update: {
-          currency_pair?: string | null
+          currency_pair?: string
           fetched_at?: string | null
           id?: string
           rate?: number
-        }
-        Relationships: []
-      }
-      ideas: {
-        Row: {
-          concept: string | null
-          content: string | null
-          created_at: string | null
-          description: string | null
-          id: string
-          impact: string | null
-          innovation: string | null
-          notice_id: string | null
-          registration_deadline: string | null
-          title: string
-          user_id: string
-          why_high_scores: string | null
-        }
-        Insert: {
-          concept?: string | null
-          content?: string | null
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          impact?: string | null
-          innovation?: string | null
-          notice_id?: string | null
-          registration_deadline?: string | null
-          title: string
-          user_id: string
-          why_high_scores?: string | null
-        }
-        Update: {
-          concept?: string | null
-          content?: string | null
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          impact?: string | null
-          innovation?: string | null
-          notice_id?: string | null
-          registration_deadline?: string | null
-          title?: string
-          user_id?: string
-          why_high_scores?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "ideas_notice_id_fkey"
-            columns: ["notice_id"]
-            isOneToOne: false
-            referencedRelation: "notices"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      notices: {
-        Row: {
-          analysis_result: Json | null
-          created_at: string | null
-          description: string | null
-          file_url: string | null
-          id: string
-          registration_deadline: string | null
-          status: string | null
-          summary: string | null
-          tasks: Json | null
-          title: string
-          user_id: string
-        }
-        Insert: {
-          analysis_result?: Json | null
-          created_at?: string | null
-          description?: string | null
-          file_url?: string | null
-          id?: string
-          registration_deadline?: string | null
-          status?: string | null
-          summary?: string | null
-          tasks?: Json | null
-          title: string
-          user_id: string
-        }
-        Update: {
-          analysis_result?: Json | null
-          created_at?: string | null
-          description?: string | null
-          file_url?: string | null
-          id?: string
-          registration_deadline?: string | null
-          status?: string | null
-          summary?: string | null
-          tasks?: Json | null
-          title?: string
-          user_id?: string
+          source?: string | null
         }
         Relationships: []
       }
       profiles: {
         Row: {
-          avatar_url: string | null
-          bio: string | null
-          created_at: string | null
-          credits: number | null
-          document_id: string | null
-          email: string | null
+          city: string | null
+          created_at: string
+          credits: number
+          cuisine_type: string | null
+          current_tier: string
+          email: string
+          establishment_name: string | null
           full_name: string | null
           id: string
-          is_blocked: boolean | null
-          last_billing_date: string | null
-          organization_name: string | null
-          plan_type: string | null
-          plan_value: number | null
+          is_suspended: boolean
+          last_purchase_date: string | null
+          logo_url: string | null
+          menu_link: string | null
+          phone: string | null
           role: string | null
-          total_tokens_consumed: number | null
+          total_purchases: number
+          total_spent_brl: number
         }
         Insert: {
-          avatar_url?: string | null
-          bio?: string | null
-          created_at?: string | null
-          credits?: number | null
-          document_id?: string | null
-          email?: string | null
+          city?: string | null
+          created_at?: string
+          credits?: number
+          cuisine_type?: string | null
+          current_tier?: string
+          email: string
+          establishment_name?: string | null
           full_name?: string | null
           id: string
-          is_blocked?: boolean | null
-          last_billing_date?: string | null
-          organization_name?: string | null
-          plan_type?: string | null
-          plan_value?: number | null
+          is_suspended?: boolean
+          last_purchase_date?: string | null
+          logo_url?: string | null
+          menu_link?: string | null
+          phone?: string | null
           role?: string | null
-          total_tokens_consumed?: number | null
+          total_purchases?: number
+          total_spent_brl?: number
         }
         Update: {
-          avatar_url?: string | null
-          bio?: string | null
-          created_at?: string | null
-          credits?: number | null
-          document_id?: string | null
-          email?: string | null
+          city?: string | null
+          created_at?: string
+          credits?: number
+          cuisine_type?: string | null
+          current_tier?: string
+          email?: string
+          establishment_name?: string | null
           full_name?: string | null
           id?: string
-          is_blocked?: boolean | null
-          last_billing_date?: string | null
-          organization_name?: string | null
-          plan_type?: string | null
-          plan_value?: number | null
+          is_suspended?: boolean
+          last_purchase_date?: string | null
+          logo_url?: string | null
+          menu_link?: string | null
+          phone?: string | null
           role?: string | null
-          total_tokens_consumed?: number | null
+          total_purchases?: number
+          total_spent_brl?: number
         }
         Relationships: []
       }
-      projects: {
+      prompt_presets: {
         Row: {
+          camera_hardware: string
+          created_at: string
+          food_category: string
+          id: string
+          is_active: boolean
+          lighting_setup: string
+          negative_prompt: string
+          style_override: string | null
+          updated_at: string
+        }
+        Insert: {
+          camera_hardware: string
+          created_at?: string
+          food_category: string
+          id?: string
+          is_active?: boolean
+          lighting_setup: string
+          negative_prompt: string
+          style_override?: string | null
+          updated_at?: string
+        }
+        Update: {
+          camera_hardware?: string
+          created_at?: string
+          food_category?: string
+          id?: string
+          is_active?: boolean
+          lighting_setup?: string
+          negative_prompt?: string
+          style_override?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      service_costs: {
+        Row: {
+          cost_credits: number
           created_at: string | null
           description: string | null
-          feasibility_report: Json | null
           id: string
-          notice_id: string | null
-          registration_deadline: string | null
-          title: string
-          user_id: string
+          label: string
         }
         Insert: {
+          cost_credits: number
           created_at?: string | null
           description?: string | null
-          feasibility_report?: Json | null
-          id?: string
-          notice_id?: string | null
-          registration_deadline?: string | null
-          title: string
-          user_id: string
+          id: string
+          label: string
         }
         Update: {
+          cost_credits?: number
           created_at?: string | null
           description?: string | null
-          feasibility_report?: Json | null
           id?: string
-          notice_id?: string | null
-          registration_deadline?: string | null
-          title?: string
-          user_id?: string
+          label?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "projects_notice_id_fkey"
-            columns: ["notice_id"]
-            isOneToOne: false
-            referencedRelation: "notices"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
-      settings: {
+      system_settings: {
         Row: {
-          daily_budget_brl: number | null
-          id: string
-          is_safe_mode: boolean | null
-          updated_at: string | null
+          description: string | null
+          key: string
+          updated_at: string
+          value: Json
         }
         Insert: {
-          daily_budget_brl?: number | null
-          id?: string
-          is_safe_mode?: boolean | null
-          updated_at?: string | null
+          description?: string | null
+          key: string
+          updated_at?: string
+          value: Json
         }
         Update: {
-          daily_budget_brl?: number | null
-          id?: string
-          is_safe_mode?: boolean | null
-          updated_at?: string | null
+          description?: string | null
+          key?: string
+          updated_at?: string
+          value?: Json
         }
         Relationships: []
       }
@@ -396,11 +383,36 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      custom_is_admin: { Args: never; Returns: boolean }
-      decrement_credits: { Args: { user_id: string }; Returns: undefined }
+      add_credits: {
+        Args: {
+          credit_amount: number
+          mp_payment_id: string
+          paid_amount_brl: number
+          purchased_package: string
+          target_user_id: string
+        }
+        Returns: Json
+      }
+      consume_credits: {
+        Args: {
+          p_reference_id: string
+          p_service_id: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      decrement_credits: {
+        Args: { credit_cost?: number; target_user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      call_type: "kit_completo" | "imagem_unica" | "apenas_copy"
+      transaction_type:
+        | "purchase"
+        | "usage"
+        | "admin_adjustment"
+        | "onboarding_bonus"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -527,6 +539,14 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      call_type: ["kit_completo", "imagem_unica", "apenas_copy"],
+      transaction_type: [
+        "purchase",
+        "usage",
+        "admin_adjustment",
+        "onboarding_bonus",
+      ],
+    },
   },
 } as const

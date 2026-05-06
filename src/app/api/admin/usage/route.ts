@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { requireAdmin } from "@/lib/admin";
+import { requireAdmin, getAdminSupabase } from "@/lib/admin";
 
 export async function GET(req: NextRequest) {
   const admin = await requireAdmin();
@@ -17,7 +16,8 @@ export async function GET(req: NextRequest) {
   const limit = parseInt(searchParams.get("limit") || "50");
   const offset = (page - 1) * limit;
 
-  const supabase = await createClient();
+  // Usar service role para ver TODOS os registros de uso
+  const supabase = getAdminSupabase();
 
   let query = supabase
     .from("api_usage")

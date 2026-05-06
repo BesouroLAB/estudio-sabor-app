@@ -4,6 +4,10 @@ import { requireAdmin } from "@/lib/admin";
 
 export const dynamic = "force-dynamic";
 
+export async function POST() {
+  return GET();
+}
+
 export async function GET() {
   const admin = await requireAdmin();
   if (!admin) {
@@ -21,12 +25,20 @@ export async function GET() {
     const rate = parseFloat(data.USDBRL.bid);
 
     const supabase = await createClient();
-    const { error } = await supabase.from("exchange_rates").insert({
+    
+    // History
+    await supabase.from("exchange_rates").insert({
       currency_pair: "USD-BRL",
       rate: rate,
     });
 
-    if (error) throw error;
+    // Global Settings
+    await supabase.from("system_settings").upsert({
+      key: "usd_brl_rate",
+      value: rate,
+      description: "Taxa de câmbio USD para BRL para cálculo de custos de API (Sync Automático)",
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'key' });
 
     return NextResponse.json({
       success: true,

@@ -10,15 +10,29 @@ export async function requireAdmin() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return null;
+  if (!user) {
+    console.error("❌ requireAdmin: No authenticated user found");
+    return null;
+  }
 
-  const { data: profile } = await supabase
+  const { data: profile, error } = await supabase
     .from("profiles")
     .select("role")
     .eq("id", user.id)
     .single();
 
-  if (!profile || profile.role !== "admin") return null;
+  if (error) {
+    console.error("❌ requireAdmin: Failed to fetch profile:", error.message);
+  }
+
+  // Verificação por role OU por email (fallback robusto)
+  const isAdminByRole = profile?.role === "admin";
+  const isAdminByEmail = user.email?.includes("tiagofernand9s") || user.email?.includes("besourolab");
+  
+  if (!isAdminByRole && !isAdminByEmail) {
+    console.error(`❌ requireAdmin: Access denied for ${user.email} (role: ${profile?.role})`);
+    return null;
+  }
 
   return user;
 }

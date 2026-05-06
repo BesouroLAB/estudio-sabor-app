@@ -1,47 +1,80 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { requireAdmin } from "@/lib/admin";
+import { requireAdmin, getAdminSupabase } from "@/lib/admin";
 
 export async function GET(req: NextRequest) {
-  const admin = await requireAdmin();
-  if (!admin) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-  }
+  try {
+    const admin = await requireAdmin();
+    if (!admin) return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
 
-  const { searchParams } = new URL(req.url);
-  const search = searchParams.get("search") || "";
-  const accountType = searchParams.get("accountType") || "";
-  const page = parseInt(searchParams.get("page") || "1");
-  const limit = parseInt(searchParams.get("limit") || "20");
-  const offset = (page - 1) * limit;
+    // Usar service role para bypass RLS — admin precisa ver TODOS os profiles
+    const adminDb = getAdminSupabase();
 
-  const supabase = await createClient();
+    const { data: users, error } = await adminDb
+      .from("profiles")
+      .select("*")
+      .order("created_at", { ascending: false });
 
-  let query = supabase
-    .from("profiles")
-    .select("*", { count: "exact" })
-    .order("created_at", { ascending: false })
-    .range(offset, offset + limit - 1);
+    if (error) throw error;
 
-  if (search) {
-    query = query.or(`email.ilike.%${search}%,full_name.ilike.%${search}%`);
-  }
-
-  if (accountType) {
-    query = query.eq("account_type", accountType);
-  }
-
-  const { data, count, error } = await query;
-
-  if (error) {
-    console.error("❌ Admin users query failed:", error);
+    return NextResponse.json(users);
+  } catch (error: any) {
+    console.error("❌ Admin users GET error:", error.message);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+}
 
-  return NextResponse.json({
-    users: data || [],
-    total: count || 0,
-    page,
-    limit,
-  });
+export async function PATCH(req: NextRequest) {
+  try {
+    const admin = await requireAdmin();
+    if (!admin) return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
+
+    const body = await req.json();
+    const { userId, ...updates } = body;
+
+    if (!userId) return NextResponse.json({ error: "userId is required" }, { status: 400 });
+
+    const adminDb = getAdminSupabase();
+    
+    const { data, error } = await adminDb
+      .from("profiles")
+      .update(updates)
+      .eq("id", userId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return NextResponse.json(data);
+  } catch (error: any) {
+    console.error("❌ Admin users PATCH error:", error.message);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const admin = await requireAdmin();
+    if (!admin) return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
+
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get("userId");
+
+    if (!userId) return NextResponse.json({ error: "userId is required" }, { status: 400 });
+
+    const adminDb = getAdminSupabase();
+
+    // Nota: Deletar um profile pode exigir deletar o auth.user também se quiser limpeza total,
+    // mas por enquanto focamos no profile do CRM.
+    const { error } = await adminDb
+      .from("profiles")
+      .delete()
+      .eq("id", userId);
+
+    if (error) throw error;
+
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error("❌ Admin users DELETE error:", error.message);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 }

@@ -165,8 +165,8 @@ export function UsageTab({
                   </td>
                   <td className="px-6 py-4 text-[#717171] text-[11px] font-mono">
                     <div className="flex flex-col">
-                      <span>In: {row.tokens_input.toLocaleString()}</span>
-                      <span>Out: {row.tokens_output.toLocaleString()}</span>
+                      <span>In: {row.input_tokens.toLocaleString()}</span>
+                      <span>Out: {row.output_tokens.toLocaleString()}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4">

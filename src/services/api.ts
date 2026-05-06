@@ -1,3 +1,5 @@
+import { createClient } from "@/lib/supabase/client";
+
 export interface GenerateImageResult {
   base64Image: string;
   mimeType: string;
@@ -9,20 +11,38 @@ export interface CopyText {
   text: string;
 }
 
-export async function classifyImage(
-  imageBase64: string,
-  mimeType: string
-): Promise<string> {
-  const MOCK = process.env.NODE_ENV === "development";
-  if (MOCK) {
-    await new Promise(r => setTimeout(r, 1000));
-    return "hamburger";
+export interface FullKitResult {
+  imageUrl: string;
+  mimeType: string;
+  copyTexts: CopyText[];
+  remaining_credits: number;
+}
+
+export async function uploadImage(file: File): Promise<string> {
+  const supabase = createClient();
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+  const filePath = `temp/${fileName}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from('creations')
+    .upload(filePath, file);
+
+  if (uploadError) {
+    throw new Error(`Erro ao enviar imagem: ${uploadError.message}`);
   }
 
+  return filePath;
+}
+
+export async function classifyImage(
+  imagePath: string,
+  mimeType: string
+): Promise<string> {
   const response = await fetch("/api/classify", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ imageBase64, mimeType }),
+    body: JSON.stringify({ imagePath, mimeType }),
   });
 
   if (!response.ok) return "brasileira"; // Fallback on error
@@ -32,31 +52,21 @@ export async function classifyImage(
 }
 
 export async function generateImage(
-  imageBase64: string,
+  imagePath: string,
   mimeType: string,
   foodType: string,
   visualStyle: string,
   formatSelected: string = "1:1",
   options: { keepAngle: boolean; keepBackground: boolean } = { keepAngle: false, keepBackground: false }
 ): Promise<GenerateImageResult> {
-  const MOCK = process.env.NODE_ENV === "development";
-  if (MOCK) {
-    // Fake delay
-    await new Promise(r => setTimeout(r, 1500));
-    return {
-      base64Image: imageBase64,
-      mimeType: mimeType,
-    };
-  }
-
   const response = await fetch("/api/generate", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ 
-      imageBase64, 
-      mimeType, 
-      foodType, 
-      visualStyle, 
+    body: JSON.stringify({
+      imagePath,
+      mimeType,
+      foodType,
+      visualStyle,
       formatSelected,
       keepAngle: options.keepAngle,
       keepBackground: options.keepBackground
@@ -100,4 +110,37 @@ export async function generateCopywriting(
 
   const data = await response.json();
   return data.texts;
+}
+
+export async function generateFullKit(
+  imagePath: string,
+  mimeType: string,
+  foodType: string,
+  visualStyle: string,
+  formatSelected: string,
+  serviceId: string,
+  referenceId: string,
+  options?: { keepAngle: boolean; keepBackground: boolean }
+): Promise<FullKitResult> {
+  const response = await fetch("/api/studio/kit", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      imagePath,
+      mimeType,
+      foodType,
+      visualStyle,
+      formatSelected,
+      serviceId,
+      referenceId,
+      options
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || `Kit generation failed with status ${response.status}`);
+  }
+
+  return response.json();
 }

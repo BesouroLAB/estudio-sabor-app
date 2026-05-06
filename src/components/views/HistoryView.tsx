@@ -46,7 +46,7 @@ export function HistoryView({ creations }: HistoryViewProps) {
           </div>
           
           <Link 
-            href="/dashboard/create"
+            href="/estudio/criar"
             className="flex items-center justify-center gap-2 px-5 py-2.5 bg-[#EA1D2C] text-white text-sm font-bold rounded-lg hover:bg-[#d1192a] transition-all shadow-sm active:scale-95"
           >
             <Plus size={18} />
@@ -136,7 +136,7 @@ function EmptyHistory() {
       </p>
       
       <Link 
-        href="/dashboard/create"
+        href="/estudio/criar"
         className="flex items-center gap-2 px-8 py-3 bg-[#EA1D2C] text-white font-bold rounded-xl hover:bg-[#d1192a] transition-all shadow-md active:scale-95"
       >
         <Plus size={20} />

@@ -13,8 +13,8 @@ export function OverviewView({ userName, creditsRemaining }: OverviewProps) {
 
   return (
     <DashboardHub 
-      onStartKit={() => router.push("/dashboard/create")}
-      onOpenStore={() => router.push("/dashboard/store")}
+      onStartKit={() => router.push("/estudio/criar")}
+      onOpenStore={() => router.push("/estudio/loja-de-creditos")}
       creditsRemaining={creditsRemaining}
       userName={userName}
     />

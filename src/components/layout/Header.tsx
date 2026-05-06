@@ -32,9 +32,9 @@ export function Header({ onReset, currentStep }: HeaderProps) {
           className="flex items-center group focus-ring rounded-lg overflow-hidden"
           aria-label="Voltar ao início"
         >
-          <img 
-            src="https://res.cloudinary.com/do8gdtozt/image/upload/v1766242394/logo_V2_branca_sem_fundo_ujkf0t.png" 
-            alt="Estúdio & Sabor" 
+          <img
+            src="https://res.cloudinary.com/do8gdtozt/image/upload/v1766242394/logo_V2_branca_sem_fundo_ujkf0t.png"
+            alt="Estúdio & Sabor"
             className="h-10 w-auto object-contain transition-transform group-hover:scale-105"
           />
         </button>
@@ -45,21 +45,19 @@ export function Header({ onReset, currentStep }: HeaderProps) {
             <React.Fragment key={s}>
               <div className="flex items-center gap-1.5">
                 <motion.div
-                  className={`h-1.5 rounded-full transition-all duration-500 ${
-                    i <= currentIndex
+                  className={`h-1.5 rounded-full transition-all duration-500 ${i <= currentIndex
                       ? "bg-gradient-to-r from-pepper-red to-pepper-orange w-6 sm:w-8"
                       : "bg-white/10 w-4 sm:w-6"
-                  }`}
+                    }`}
                   layout
                 />
                 <span
-                  className={`text-[10px] font-medium tracking-wider uppercase hidden md:block transition-colors ${
-                    i === currentIndex
+                  className={`text-[10px] font-medium tracking-wider uppercase hidden md:block transition-colors ${i === currentIndex
                       ? "text-pepper-orange"
                       : i < currentIndex
-                      ? "text-text-secondary"
-                      : "text-text-muted"
-                  }`}
+                        ? "text-text-secondary"
+                        : "text-text-muted"
+                    }`}
                 >
                   {stepLabels[s]}
                 </span>

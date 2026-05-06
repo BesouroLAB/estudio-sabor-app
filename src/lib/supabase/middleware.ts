@@ -36,7 +36,7 @@ export async function updateSession(request: NextRequest) {
 
   // Protected routes: redirect to /login if not authenticated
   const isProtectedRoute =
-    request.nextUrl.pathname.startsWith("/dashboard") ||
+    request.nextUrl.pathname.startsWith("/estudio") ||
     request.nextUrl.pathname.startsWith("/admin");
   const isAuthRoute =
     request.nextUrl.pathname.startsWith("/login") ||
@@ -52,7 +52,7 @@ export async function updateSession(request: NextRequest) {
   // If user is already logged in, redirect away from auth pages to dashboard
   if (user && isAuthRoute) {
     const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
+    url.pathname = "/estudio";
     return NextResponse.redirect(url);
   }
 

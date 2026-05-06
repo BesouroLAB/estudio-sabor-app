@@ -52,12 +52,20 @@ export async function GET() {
     const data = await res.json();
     const rate = parseFloat(data.USDBRL.bid);
 
-    // Cache it
+    // Cache it in history
     await supabase.from("exchange_rates").insert({
       currency_pair: "USD-BRL",
       rate,
       source: "awesomeapi",
     });
+
+    // Update global system settings for other APIs
+    await supabase.from("system_settings").upsert({
+      key: "usd_brl_rate",
+      value: rate,
+      description: "Taxa de câmbio USD para BRL para cálculo de custos de API (Sync Automático)",
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'key' });
 
     console.log(`💱 Exchange rate fetched and cached: USD 1 = BRL ${rate}`);
 

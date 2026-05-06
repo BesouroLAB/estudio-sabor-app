@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, User as UserIcon, LogOut, Settings, MessageCircle, ChevronRight } from "lucide-react";
+import { Sparkles, User as UserIcon, LogOut, LogIn, Settings, MessageCircle, ChevronRight } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
@@ -18,13 +18,13 @@ interface DashboardHeaderProps {
 }
 
 const breadcrumbMap: Record<string, string> = {
-  "/dashboard": "Início",
-  "/dashboard/create": "Criar Foto",
-  "/dashboard/history": "Meus Projetos",
-  "/dashboard/templates": "Templates & Promos",
-  "/dashboard/balance": "Extrato de Créditos",
-  "/dashboard/store": "Loja de Créditos",
-  "/dashboard/settings": "Configurações",
+  "/estudio": "Início",
+  "/estudio/criar": "Criar Foto",
+  "/estudio/minhas-criacoes": "Meus Projetos",
+  "/estudio/templates-de-venda": "Templates & Promos",
+  "/estudio/extrato-de-creditos": "Extrato de Créditos",
+  "/estudio/loja-de-creditos": "Loja de Créditos",
+  "/estudio/configuracoes-da-conta": "Configurações",
 };
 
 export function DashboardHeader({
@@ -36,7 +36,7 @@ export function DashboardHeader({
 }: DashboardHeaderProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { sidebarCollapsed } = useDashboard();
+  const { sidebarCollapsed, userCredits } = useDashboard();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -53,17 +53,17 @@ export function DashboardHeader({
   }, [dropdownOpen]);
 
   const currentPage = breadcrumbMap[pathname] || "Início";
-  const isHome = pathname === "/dashboard";
+  const isHome = pathname === "/estudio";
 
   // Credit badge color based on credit level
   const getCreditStyle = () => {
-    if (credits >= 20) return "bg-emerald-50 border-emerald-200 text-emerald-700";
-    if (credits >= 5) return "bg-amber-50 border-amber-200 text-amber-700";
+    if (userCredits >= 20) return "bg-emerald-50 border-emerald-200 text-emerald-700";
+    if (userCredits >= 5) return "bg-amber-50 border-amber-200 text-amber-700";
     return "bg-red-50 border-red-200 text-[#EA1D2C]";
   };
 
   return (
-    <header className="sticky top-0 z-30 bg-white border-b border-[#EAEAEC]">
+    <header className="sticky top-0 z-30 bg-white border-b border-[#EAEAEC]" suppressHydrationWarning>
       {/* Announcement Banner */}
       {announcement?.active && (
         <div className="bg-[#EA1D2C] text-white text-center text-xs font-medium py-1.5 px-4">
@@ -74,7 +74,7 @@ export function DashboardHeader({
       <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
         {/* Left: Breadcrumb */}
         <nav className="flex items-center gap-1.5 text-sm">
-          <Link href="/dashboard" className="text-[#A6A6A6] hover:text-[#3E3E3E] transition-colors font-medium">
+          <Link href="/estudio" className="text-[#A6A6A6] hover:text-[#3E3E3E] transition-colors font-medium">
             Início
           </Link>
           {!isHome && (
@@ -89,11 +89,11 @@ export function DashboardHeader({
         <div className="flex items-center gap-3">
           {/* Credits Badge */}
           <Link
-            href="/dashboard/store"
+            href="/estudio/loja-de-creditos"
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-bold transition-colors hover:opacity-80 ${getCreditStyle()}`}
           >
             <Sparkles size={13} />
-            <span>{credits}</span>
+            <span>{userCredits}</span>
             <span className="opacity-70 font-medium hidden sm:inline">créditos</span>
           </Link>
 
@@ -142,7 +142,7 @@ export function DashboardHeader({
                     </div>
                   ) : (
                     <button
-                      onClick={() => { router.push("/dashboard/settings"); setDropdownOpen(false); }}
+                      onClick={() => { router.push("/estudio/configuracoes-da-conta"); setDropdownOpen(false); }}
                       className="w-full text-left px-3 py-2 text-sm text-[#717171] hover:bg-[#F7F7F7] rounded-lg transition-colors flex items-center gap-2.5"
                     >
                       <Settings size={14} />
@@ -168,7 +168,7 @@ export function DashboardHeader({
                       onClick={() => { router.push("/login"); setDropdownOpen(false); }}
                       className="w-full text-left px-3 py-2 text-sm text-[#3E3E3E] hover:bg-[#F7F7F7] rounded-lg transition-colors flex items-center gap-2.5"
                     >
-                      <LogOut size={14} />
+                      <LogIn size={14} />
                       Fazer Login
                     </button>
                   ) : (

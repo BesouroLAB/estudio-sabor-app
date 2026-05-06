@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
         // Find user by email
         const { data: profile } = await supabase
           .from("profiles")
-          .select("id, credits_remaining")
+          .select("id, credits")
           .eq("email", customerEmail)
           .single();
 
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
           const { error: updateError } = await supabase
             .from("profiles")
             .update({ 
-               credits_remaining: (profile.credits_remaining || 0) + creditsToAdd 
+               credits: (profile.credits || 0) + creditsToAdd 
             })
             .eq("id", profile.id);
 

@@ -1,30 +1,30 @@
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 
-// We use service role key for backend tracking to bypass RLS if needed, 
-// but sticking to anon for now as it's what's available in .env.
+// We use service role key for backend tracking to bypass RLS
 const supabase =
-  supabaseUrl && supabaseAnonKey
-    ? createClient(supabaseUrl, supabaseAnonKey)
+  supabaseUrl && supabaseServiceKey
+    ? createClient(supabaseUrl, supabaseServiceKey)
     : null;
 
-// Gemini pricing (USD per 1M tokens)
+// Gemini pricing (USD per 1M tokens) - Update as needed for 2025/2026 pricing
 const PRICING = {
   "gemini-2.5-flash-image": { input: 0.15, output: 0.60, imageOutput: 0.0315 },
   "gemini-1.5-flash": { input: 0.075, output: 0.30 },
+  "unified-kit-v1": { input: 0.10, output: 0.40 }, // Weighted average
 } as const;
 
 type ModelKey = keyof typeof PRICING;
 
 interface UsageParams {
-  callType: "image_generation" | "copywriting";
+  callType: "full_kit" | "image_generation" | "copywriting";
   model: string;
-  tokensInput: number;
-  tokensOutput: number;
+  tokensInput?: number;
+  tokensOutput?: number;
   isImageOutput?: boolean;
-  imageBase64?: string; // Add this for storage upload
+  imageBase64?: string;
   userId?: string;
   userEmail?: string;
   status?: "success" | "error";
@@ -40,46 +40,61 @@ function calculateCostUsd(params: UsageParams): number {
     return pricing.imageOutput;
   }
 
-  const inputCost = (params.tokensInput / 1_000_000) * pricing.input;
-  const outputCost = (params.tokensOutput / 1_000_000) * pricing.output;
+  const input = params.tokensInput || 0;
+  const output = params.tokensOutput || 0;
+
+  const inputCost = (input / 1_000_000) * pricing.input;
+  const outputCost = (output / 1_000_000) * pricing.output;
   return inputCost + outputCost;
 }
 
 /**
- * Fetches the cached USD→BRL rate, or returns a fallback.
+ * Fetches the USD→BRL rate from system_settings or updates it via AwesomeAPI if stale.
  */
 async function getExchangeRate(): Promise<number> {
   if (!supabase) return 5.50;
 
-  const { data } = await supabase
-    .from("exchange_rates")
-    .select("rate")
-    .eq("currency_pair", "USD-BRL")
-    .order("fetched_at", { ascending: false })
-    .limit(1)
-    .single();
+  try {
+    // Check current setting
+    const { data: setting } = await supabase
+      .from("system_settings")
+      .select("value, updated_at")
+      .eq("key", "usd_brl_rate")
+      .single();
 
-  return data?.rate ?? 5.50;
+    const now = new Date();
+    const lastUpdate = setting?.updated_at ? new Date(setting.updated_at) : new Date(0);
+    const hoursSinceUpdate = (now.getTime() - lastUpdate.getTime()) / (1000 * 60 * 60);
+
+    // If older than 24h, use the sync service
+    if (!setting || hoursSinceUpdate > 24) {
+      const { syncExchangeRate } = await import("@/lib/services/exchange-rate");
+      return await syncExchangeRate();
+    }
+
+    return parseFloat(setting?.value || "5.50");
+  } catch (err) {
+    console.error("❌ Failed to fetch/update exchange rate in tracker:", err);
+    return 5.50;
+  }
 }
 
 /**
  * Gap 4: Circuit Breaker Logic
- * Returns true if we are WITHIN budget, false if we should block the call.
  */
 export async function checkCircuitBreaker(): Promise<{ allowed: boolean; reason?: string }> {
   if (!supabase) return { allowed: true };
 
   try {
-    // 1. Get Settings
     const { data: settings } = await supabase
-      .from("settings")
-      .select("daily_budget_brl, is_safe_mode")
-      .eq("id", "global")
+      .from("system_settings")
+      .select("value")
+      .eq("key", "global_budget")
       .single();
 
-    if (!settings || !settings.is_safe_mode) return { allowed: true };
+    const budget = settings?.value as any;
+    if (!budget || !budget.is_safe_mode) return { allowed: true };
 
-    // 2. Calculate Today's Spending
     const today = new Date().toISOString().split("T")[0];
     const { data: usageData } = await supabase
       .from("api_usage")
@@ -88,47 +103,17 @@ export async function checkCircuitBreaker(): Promise<{ allowed: boolean; reason?
 
     const spentToday = (usageData || []).reduce((acc, curr) => acc + (Number(curr.cost_brl) || 0), 0);
 
-    if (spentToday >= settings.daily_budget_brl) {
+    if (spentToday >= budget.daily_budget_brl) {
       return { 
         allowed: false, 
-        reason: `Daily budget exceeded: R$ ${spentToday.toFixed(2)} / R$ ${settings.daily_budget_brl.toFixed(2)}` 
+        reason: `Daily budget exceeded: R$ ${spentToday.toFixed(2)} / R$ ${budget.daily_budget_brl.toFixed(2)}` 
       };
     }
 
     return { allowed: true };
   } catch (err) {
-    console.error("❌ Circuit breaker check failed, allowing by default:", err);
+    console.error("❌ Circuit breaker check failed:", err);
     return { allowed: true };
-  }
-}
-
-/**
- * Gap 2: Asset Management (Base64 -> Storage)
- */
-async function uploadImageToStorage(base64Data: string, userId?: string): Promise<string | null> {
-  if (!supabase) return null;
-
-  try {
-    const fileName = `${userId || "anon"}/${Date.now()}-${Math.random().toString(36).substring(7)}.png`;
-    const buffer = Buffer.from(base64Data, 'base64');
-
-    const { error } = await supabase.storage
-      .from('generations')
-      .upload(fileName, buffer, {
-        contentType: 'image/png',
-        upsert: true
-      });
-
-    if (error) throw error;
-
-    const { data: { publicUrl } } = supabase.storage
-      .from('generations')
-      .getPublicUrl(fileName);
-
-    return publicUrl;
-  } catch (err) {
-    console.error("❌ Failed to upload image to storage:", err);
-    return null;
   }
 }
 
@@ -136,39 +121,30 @@ async function uploadImageToStorage(base64Data: string, userId?: string): Promis
  * Track an API call in the database for admin analytics.
  */
 export async function trackUsage(params: UsageParams): Promise<void> {
-  if (!supabase) {
-    console.warn("⚠️ Supabase not configured — usage not tracked.");
-    return;
-  }
+  if (!supabase) return;
 
   try {
     const costUsd = calculateCostUsd(params);
     const exchangeRate = await getExchangeRate();
     const costBrl = costUsd * exchangeRate;
 
-    let storageUrl = null;
-    if (params.imageBase64 && params.status !== "error") {
-      storageUrl = await uploadImageToStorage(params.imageBase64, params.userId);
-    }
-
     const { error } = await supabase.from("api_usage").insert({
       user_id: params.userId || null,
-      user_email: params.userEmail || null,
       call_type: params.callType,
       model: params.model,
-      tokens_input: params.tokensInput,
-      tokens_output: params.tokensOutput,
+      input_tokens: params.tokensInput || 0,
+      output_tokens: params.tokensOutput || 0,
       cost_usd: costUsd,
+      exchange_rate: exchangeRate,
       cost_brl: costBrl,
       status: params.status || "success",
       error_message: params.errorMessage || null,
       metadata: params.metadata || {},
-      storage_url: storageUrl,
     });
 
     if (error) throw error;
     console.log(
-      `📊 Tracked: ${params.callType} (${params.model}) — URL: ${storageUrl ? 'Persisted' : 'None'} — R$${costBrl.toFixed(4)}`
+      `📊 [${params.callType}] Logged to api_usage — Cost: R$${costBrl.toFixed(4)}`
     );
   } catch (err) {
     console.error("❌ Failed to track usage:", err);

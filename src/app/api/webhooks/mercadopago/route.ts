@@ -34,35 +34,49 @@ export async function POST(req: NextRequest) {
     const paymentData = await payment.get({ id });
 
     if (paymentData.status === "approved") {
-      // Usaremos o metadata do MP para pegar os dados do pacote e do usuário.
-      // É mais seguro e flexível que o external_reference.
+      // Resgate Flexível: Tenta pegar o ID do usuário pelo metadata ou external_reference (Padrão de Assinaturas)
       const metadata = paymentData.metadata || {};
-      const userId = metadata.user_id;
-      const creditsToAssign = parseInt(metadata.credits || "0", 10);
-      const packageName = metadata.package_name || "Pacote Avulso";
+      const userId = metadata.user_id || paymentData.external_reference; 
+      
+      const isSubscription = metadata.is_subscription === "true" || paymentData.description?.toLowerCase().includes("assinatura");
+      const creditsToAssign = parseInt(metadata.credits || (isSubscription ? "60" : "0"), 10);
+      const packageName = metadata.package_name || (isSubscription ? "Assinatura PRO" : "Pacote Avulso");
       const amountPaidBrl = paymentData.transaction_amount || 0;
 
       if (!userId || creditsToAssign <= 0) {
-         console.error("[Webhook] Falta metadata no pagamento aprovado:", metadata);
-         return NextResponse.json({ error: "Metadata inválido" }, { status: 400 });
+         console.error("[Webhook] Falta ID de usuário ou créditos no pagamento aprovado:", paymentData.id);
+         return NextResponse.json({ error: "Dados insuficientes para creditar" }, { status: 400 });
       }
 
-      // Chama a função RPC blindada do nosso banco de dados
-      // Ela atualiza o saldo de créditos (atomizado), atualiza o LTV e salva no credit_transactions
-      const { data, error } = await supabaseAdmin.rpc('add_credits', {
-        target_user_id: userId,
-        credit_amount: creditsToAssign,
-        mp_payment_id: String(id),
-        purchased_package: packageName,
-        paid_amount_brl: amountPaidBrl
-      });
+      let dbResult;
 
-      if (error) {
-        console.error("[Webhook] Erro Fatal no Supabase RPC add_credits:", error);
+      if (isSubscription) {
+        // Fluxo 1: Assinatura (Renovação ou Nova)
+        // Usa a nova RPC que atualiza a data de vencimento
+        dbResult = await supabaseAdmin.rpc('process_subscription_renewal', {
+          target_user_id: userId,
+          plan_name: packageName,
+          mp_subscription_id: String(paymentData.order?.id || paymentData.id), // Idealmente o preapproval_id
+          credits_to_add: creditsToAssign,
+          paid_amount: amountPaidBrl
+        });
+      } else {
+        // Fluxo 2: Pacote Avulso Clássico
+        dbResult = await supabaseAdmin.rpc('add_credits', {
+          target_user_id: userId,
+          credit_amount: creditsToAssign,
+          mp_payment_id: String(id),
+          purchased_package: packageName,
+          paid_amount_brl: amountPaidBrl
+        });
+      }
+
+      if (dbResult.error) {
+        console.error("[Webhook] Erro Fatal no Supabase RPC:", dbResult.error);
         return NextResponse.json({ error: "Falha ao atualizar o banco de dados" }, { status: 500 });
       }
 
-      console.log(`[Webhook] SUCESSO: ${creditsToAssign} créditos p/ usuário ${userId}. Pacote: ${packageName}`);
+      console.log(`[Webhook] SUCESSO: ${creditsToAssign} créditos p/ usuário ${userId}. Modelo: ${isSubscription ? 'Assinatura' : 'Avulso'}`);
       return NextResponse.json({ success: true, message: "Créditos liberados com sucesso!" });
     }
 

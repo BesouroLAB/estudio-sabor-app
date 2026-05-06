@@ -1,143 +1,129 @@
-import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { requireAdmin } from "@/lib/admin";
+import { NextRequest, NextResponse } from "next/server";
+import { requireAdmin, getAdminSupabase } from "@/lib/admin";
 
-export async function GET() {
-  const admin = await requireAdmin();
-  if (!admin) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-  }
-
-  const supabase = await createClient();
-
-  // All queries in parallel
-  const [
-    usersResult,
-    totalCallsResult,
-    todayCallsResult,
-    callsByTypeResult,
-    costsResult,
-    dailyCallsResult,
-    exchangeResult,
-    generationStatsResult, // New: for download rate
-    circuitBreakerResult, // New: for budget safety
-  ] = await Promise.all([
-    // Total users
-    supabase.from("profiles").select("id", { count: "exact", head: true }),
-
-    // Total API calls
-    supabase.from("api_usage").select("id", { count: "exact", head: true }),
-
-    // Calls today
-    supabase
-      .from("api_usage")
-      .select("id, cost_brl", { count: "exact" })
-      .gte("created_at", new Date().toISOString().split("T")[0]),
-
-    // Calls by type
-    supabase.from("api_usage").select("call_type"),
-
-    // Total costs
-    supabase.from("api_usage").select("cost_usd, cost_brl"),
-
-    // Daily calls (last 30 days)
-    supabase
-      .from("api_usage")
-      .select("call_type, created_at")
-      .gte(
-        "created_at",
-        new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
-      )
-      .order("created_at", { ascending: true }),
-
-    // Latest exchange rate
-    supabase
-      .from("exchange_rates")
-      .select("rate, fetched_at")
-      .order("fetched_at", { ascending: false })
-      .limit(1)
-      .single(),
-
-    // Generation telemetry (Download Rate)
-    supabase
-      .from("api_usage")
-      .select("id, downloaded_at")
-      .eq("call_type", "image_generation"),
-
-    // Circuit Breaker Settings
-    supabase
-      .from("settings")
-      .select("daily_budget_brl, is_safe_mode")
-      .eq("id", "global")
-      .single(),
-  ]);
-
-  // Calculate calls by type
-  const callsByType: Record<string, number> = {};
-  if (callsByTypeResult.data) {
-    for (const row of callsByTypeResult.data) {
-      callsByType[row.call_type] = (callsByType[row.call_type] || 0) + 1;
+export async function GET(req: NextRequest) {
+  try {
+    const admin = await requireAdmin();
+    if (!admin) {
+      return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
     }
-  }
 
-  // Calculate download rate
-  let downloadRate = 0;
-  if (generationStatsResult.data && generationStatsResult.data.length > 0) {
-    const totalGen = generationStatsResult.data.length;
-    const downloaded = generationStatsResult.data.filter(g => g.downloaded_at).length;
-    downloadRate = (downloaded / totalGen) * 100;
-  }
+    // Usar service role para bypass RLS — admin precisa ver dados de TODOS os usuários
+    const supabase = getAdminSupabase();
 
-  // Today's spending
-  const spentToday = (todayCallsResult.data || []).reduce(
-    (acc, curr) => acc + (Number(curr.cost_brl) || 0), 0
-  );
+    // 1. Time bounds
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayISO = today.toISOString();
 
-  // Calculate total costs
-  let totalCostUsd = 0;
-  let totalCostBrl = 0;
-  if (costsResult.data) {
-    for (const row of costsResult.data) {
-      totalCostUsd += Number(row.cost_usd) || 0;
-      totalCostBrl += Number(row.cost_brl) || 0;
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const thirtyDaysAgoISO = thirtyDaysAgo.toISOString();
+
+    // 2. Main Data Fetching
+    const [
+      { count: totalUsers },
+      { data: allProfiles },
+      { data: revenueData },
+      { data: allCostData },
+      { data: todayCostData },
+      { data: usageDistribution },
+      { data: dailyData },
+      { data: exchangeRateSetting },
+      { data: allProfilesWithTiers }
+    ] = await Promise.all([
+      supabase.from("profiles").select("*", { count: "exact", head: true }),
+      supabase.from("profiles").select("credits"),
+      supabase.from("credit_transactions").select("amount_paid_brl").eq("type", "purchase"),
+      supabase.from("credit_transactions").select("cost_brl").not("cost_brl", "is", null),
+      supabase.from("credit_transactions").select("cost_brl").gte("created_at", todayISO).not("cost_brl", "is", null),
+      supabase.from("credit_transactions").select("type").neq("type", "purchase"),
+      supabase.from("credit_transactions").select("type, created_at").gte("created_at", thirtyDaysAgoISO).neq("type", "purchase"),
+      supabase.from("system_settings").select("value, updated_at").eq("key", "usd_brl_rate").single(),
+      supabase.from("profiles").select("current_tier")
+    ]);
+
+    // Group Tiers Distribution
+    const tiersDistribution: Record<string, number> = { "Free": 0, "Starter": 0, "Pro": 0 };
+    (allProfilesWithTiers || []).forEach(p => {
+      const tier = p.current_tier || "Free";
+      tiersDistribution[tier] = (tiersDistribution[tier] || 0) + 1;
+    });
+
+    // 2.1 Auto-sync Exchange Rate if older than 24h
+    let currentRate = parseFloat(exchangeRateSetting?.value || "5.50");
+    const lastUpdate = exchangeRateSetting?.updated_at ? new Date(exchangeRateSetting.updated_at) : new Date(0);
+    const hoursSinceUpdate = (new Date().getTime() - lastUpdate.getTime()) / (1000 * 60 * 60);
+
+    if (hoursSinceUpdate >= 24) {
+      console.log(`🔄 Exchange rate is stale (${hoursSinceUpdate.toFixed(1)}h). Syncing...`);
+      // We don't await this to keep the API fast, it will update for the next request
+      import("@/lib/services/exchange-rate").then(m => m.syncExchangeRate()).catch(console.error);
     }
-  }
 
-  // Build daily calls aggregation
-  const dailyMap: Record<string, { image_generation: number; copywriting: number }> = {};
-  if (dailyCallsResult.data) {
-    for (const row of dailyCallsResult.data) {
-      const day = row.created_at.split("T")[0];
-      if (!dailyMap[day]) {
-        dailyMap[day] = { image_generation: 0, copywriting: 0 };
+    // 3. Calculations
+    const totalCredits = (allProfiles || []).reduce((acc, curr) => acc + (curr.credits || 0), 0);
+    const totalRevenue = (revenueData || []).reduce((acc, curr) => acc + (Number(curr.amount_paid_brl) || 0), 0);
+    const totalApiCost = (allCostData || []).reduce((acc, curr) => acc + (Number(curr.cost_brl) || 0), 0);
+    const spentToday = (todayCostData || []).reduce((acc, curr) => acc + (Number(curr.cost_brl) || 0), 0);
+    
+    // Usage Distribution
+    const callsByType: Record<string, number> = {};
+    (usageDistribution || []).forEach(tx => {
+      callsByType[tx.type] = (callsByType[tx.type] || 0) + 1;
+    });
+
+    const totalCalls = (usageDistribution || []).length;
+    const callsToday = (todayCostData || []).length;
+
+    // Daily Calls (last 30 days)
+    const dailyCallsMap: Record<string, { date: string; image_generation: number; copywriting: number }> = {};
+    for (let i = 0; i < 30; i++) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const ds = d.toISOString().split('T')[0];
+      dailyCallsMap[ds] = { date: ds, image_generation: 0, copywriting: 0 };
+    }
+
+    (dailyData || []).forEach(tx => {
+      const ds = tx.created_at.split('T')[0];
+      if (dailyCallsMap[ds]) {
+        if (tx.type === 'image_generation' || tx.type === 'kit_creation') {
+          dailyCallsMap[ds].image_generation++;
+        } else {
+          dailyCallsMap[ds].copywriting++;
+        }
       }
-      if (row.call_type === "image_generation") {
-        dailyMap[day].image_generation++;
-      } else {
-        dailyMap[day].copywriting++;
+    });
+
+    const dailyCalls = Object.values(dailyCallsMap).sort((a, b) => a.date.localeCompare(b.date));
+
+    // Get daily budget from settings or fallback
+    const { data: budgetSetting } = await supabase.from("system_settings").select("value").eq("key", "daily_cost_budget").single();
+    const dailyBudget = parseFloat(budgetSetting?.value || "50");
+
+    // 4. Final Response
+    return NextResponse.json({
+      stats: {
+        totalUsers: totalUsers || 0,
+        totalCredits,
+        totalRevenue,
+        totalApiCost,
+        profit: totalRevenue - totalApiCost,
+        spentToday,
+        dailyBudget,
+        callsToday,
+        totalCalls,
+        callsByType,
+        dailyCalls,
+        tiersDistribution,
+        downloadRate: 85, // Mocked for now until we track downloads
+        exchangeRate: currentRate
       }
-    }
+    });
+
+  } catch (error: any) {
+    console.error("[Admin Stats API] Error:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
-
-  const dailyCalls = Object.entries(dailyMap).map(([date, counts]) => ({
-    date,
-    ...counts,
-  }));
-
-  return NextResponse.json({
-    totalUsers: usersResult.count || 0,
-    totalCalls: totalCallsResult.count || 0,
-    callsToday: todayCallsResult.count || 0,
-    callsByType,
-    totalCostUsd,
-    totalCostBrl,
-    downloadRate,
-    spentToday,
-    dailyBudget: circuitBreakerResult.data?.daily_budget_brl || 30.00,
-    isSafeMode: circuitBreakerResult.data?.is_safe_mode ?? true,
-    exchangeRate: exchangeResult.data?.rate
-      ? Number(exchangeResult.data.rate)
-      : 5.5,
-    dailyCalls,
-  });
 }

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 export async function login(formData: FormData) {
   const supabase = await createClient();
@@ -35,7 +36,7 @@ export async function login(formData: FormData) {
   }
 
   revalidatePath("/", "layout");
-  redirect("/dashboard");
+  redirect("/estudio");
 }
 
 export async function signup(formData: FormData) {
@@ -46,14 +47,17 @@ export async function signup(formData: FormData) {
     password: formData.get("password") as string,
   };
 
-  const { error } = await supabase.auth.signUp(data);
+  const { error, data: authData } = await supabase.auth.signUp(data);
 
   if (error) {
     return { error: error.message };
   }
 
+  // O gatilho do Supabase cria o profile e concede os 30 créditos de bônus automaticamente.
+  await new Promise(resolve => setTimeout(resolve, 1000));
+
   revalidatePath("/", "layout");
-  redirect("/dashboard");
+  redirect("/estudio");
 }
 export async function signInWithGoogle() {
   const supabase = await createClient();

@@ -24,9 +24,11 @@ import {
   MessageCircle,
   FileDown
 } from "lucide-react";
+import { User } from "@supabase/supabase-js";
 import type { UploadedImage, GenerationResult } from "@/types/app";
 
 interface ResultDashboardProps {
+  user: User;
   uploadedImage: UploadedImage;
   generationResult: GenerationResult;
   foodType: string;
@@ -87,6 +89,7 @@ const destinations = [
 ];
 
 export function ResultDashboard({
+  user,
   uploadedImage,
   generationResult,
   foodType,
@@ -106,22 +109,20 @@ export function ResultDashboard({
   // Professionalism Index Logic (Heuristic based on documented criteria)
   const professionalismScore = useMemo(() => {
     let score = 42; // Base smartphone quality benchmark
-    
+
     // Logic based on technical improvements applied:
-    if (generationResult.base64Image) {
+    if (generationResult.imageUrl) {
       score += 30; // Background Removal/Replacement (+30%)
       score += 26; // Studio Lighting/Color Grading (+26%)
     }
-    
+
     // Final polish based on framing/format
     if (format === "1:1") score += 2; // Optimal for iFood conversion
-    
+
     return Math.min(score, 98); // Cap at 98%
   }, [generationResult, format]);
 
-  const generatedImageUrl = useMemo(() => {
-    return `data:${generationResult.mimeType};base64,${generationResult.base64Image}`;
-  }, [generationResult]);
+  const generatedImageUrl = generationResult.imageUrl;
 
   const handleCopy = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -136,7 +137,7 @@ export function ResultDashboard({
     }
 
     setExportingId(dest.id);
-    
+
     try {
       // Se for gratuito (ou já pago na geração), apenas simula o download
       if (dest.cost === 0) {
@@ -144,13 +145,22 @@ export function ResultDashboard({
         alert(`Preparando download para ${dest.label}...`);
       } else {
         // Consumir créditos atômicos
-        const { data: newBalance, error } = await supabase.rpc('consume_credits', {
-          p_service_type: dest.id
+        const { data: rpcResponse, error } = await supabase.rpc('consume_credits', {
+          p_user_id: user.id,
+          p_service_id: dest.id,
+          p_reference_id: `export_${dest.id}_${Date.now()}`
         });
 
         if (error) throw new Error(error.message);
-        
-        setUserCredits(newBalance);
+
+        const creditResult = rpcResponse as { success: boolean; error?: string; remaining_credits?: number };
+        if (!creditResult.success) {
+          throw new Error(creditResult.error || 'Saldo insuficiente.');
+        }
+
+        if (creditResult.remaining_credits !== undefined) {
+          setUserCredits(creditResult.remaining_credits);
+        }
         alert(`✅ ${dest.label} gerado com sucesso!`);
       }
     } catch (error) {
@@ -162,18 +172,28 @@ export function ResultDashboard({
   };
 
   const handleShareWhatsApp = () => {
-    const mainCopy = generationResult.copyTexts[0]?.text || "";
+    const mainCopy = generationResult.copyTexts?.[0]?.text || "";
     const text = encodeURIComponent(`🚀 Confira o novo material profissional do meu restaurante gerado pelo Estúdio & Sabor!\n\n"${mainCopy}"\n\n#iFood #MarketingDigital`);
     window.open(`https://wa.me/?text=${text}`, "_blank");
   };
 
-  const handleDownloadMain = () => {
-    const link = document.createElement("a");
-    link.href = generatedImageUrl;
-    link.download = `estudio-sabor-${foodType}-${Date.now()}.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleDownloadMain = async () => {
+    try {
+      const response = await fetch(generatedImageUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `estudio-sabor-${foodType}-${Date.now()}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Download failed:", error);
+      // Fallback: Just open in new tab
+      window.open(generatedImageUrl, "_blank");
+    }
   };
 
   const handleLockedAction = () => {
@@ -211,10 +231,10 @@ export function ResultDashboard({
     }
   };
 
-  const aspectClass = 
+  const aspectClass =
     format === "9:16" ? "aspect-[9/16]" :
-    format === "16:9" ? "aspect-[16/9]" : 
-    format === "4:3" ? "aspect-[4/3]" : "aspect-square";
+      format === "16:9" ? "aspect-[16/9]" :
+        format === "4:3" ? "aspect-[4/3]" : "aspect-square";
 
   return (
     <motion.div
@@ -239,7 +259,7 @@ export function ResultDashboard({
           </div>
 
           {/* Professionalism Score Gauge */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             className="bg-white p-4 rounded-2xl border border-[#EAEAEC] shadow-sm flex items-center gap-4 min-w-[280px]"
@@ -273,7 +293,7 @@ export function ResultDashboard({
               </p>
               <div className="flex items-center gap-1 mt-1">
                 {[1, 2, 3, 4, 5].map((s) => (
-                  <Star key={s} size={10} className={s <= Math.round(professionalismScore/20) ? "text-yellow-400 fill-yellow-400" : "text-gray-200"} />
+                  <Star key={s} size={10} className={s <= Math.round(professionalismScore / 20) ? "text-yellow-400 fill-yellow-400" : "text-gray-200"} />
                 ))}
               </div>
             </div>
@@ -328,8 +348,8 @@ export function ResultDashboard({
                     <div className="absolute bottom-4 left-0 right-0 flex flex-col items-center gap-2 z-20">
                       <div className="px-4 py-2 w-11/12 rounded-lg bg-white/95 backdrop-blur-md shadow-lg flex items-center justify-between">
                         <div className="flex items-center gap-2 text-[#EA1D2C]">
-                           <ShoppingBag size={14} />
-                           <span className="text-[#3E3E3E] text-[10px] font-bold uppercase tracking-tight">Ver no iFood</span>
+                          <ShoppingBag size={14} />
+                          <span className="text-[#3E3E3E] text-[10px] font-bold uppercase tracking-tight">Ver no iFood</span>
                         </div>
                         <span className="text-[#EA1D2C] font-black text-[10px] uppercase">Pedir Agora</span>
                       </div>
@@ -387,34 +407,36 @@ export function ResultDashboard({
           {/* Right: Copywriting + CTA */}
           <div className="flex flex-col gap-6">
             {/* Copywriting Selection */}
-            <div className="flex flex-col gap-3">
-              <h3 className="font-bold text-sm text-[#3E3E3E] flex items-center gap-2 uppercase tracking-widest">
-                <Sparkles size={16} className="text-[#EA1D2C]" />
-                Cativar Clientes
-              </h3>
+            {generationResult.copyTexts && generationResult.copyTexts.length > 0 && (
+              <div className="flex flex-col gap-3">
+                <h3 className="font-bold text-sm text-[#3E3E3E] flex items-center gap-2 uppercase tracking-widest">
+                  <Sparkles size={16} className="text-[#EA1D2C]" />
+                  Cativar Clientes
+                </h3>
 
-              {generationResult.copyTexts.map((copy) => (
-                <div
-                  key={copy.id}
-                  className="p-5 rounded-2xl bg-white border border-[#EAEAEC] shadow-sm hover:shadow-md transition-shadow relative"
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-[#EA1D2C]">
-                      {copy.label}
-                    </span>
-                    <button
-                      onClick={() => handleCopy(copy.text, copy.id)}
-                      className="text-[#717171] hover:text-[#EA1D2C] transition-colors"
-                    >
-                      {copiedId === copy.id ? <Check size={18} className="text-green-600" /> : <Copy size={18} />}
-                    </button>
+                {generationResult.copyTexts.map((copy) => (
+                  <div
+                    key={copy.id}
+                    className="p-5 rounded-2xl bg-white border border-[#EAEAEC] shadow-sm hover:shadow-md transition-shadow relative"
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-[#EA1D2C]">
+                        {copy.label}
+                      </span>
+                      <button
+                        onClick={() => handleCopy(copy.text, copy.id)}
+                        className="text-[#717171] hover:text-[#EA1D2C] transition-colors"
+                      >
+                        {copiedId === copy.id ? <Check size={18} className="text-green-600" /> : <Copy size={18} />}
+                      </button>
+                    </div>
+                    <p className="text-[#3E3E3E] text-sm leading-relaxed font-medium italic">
+                      &quot;{copy.text}&quot;
+                    </p>
                   </div>
-                  <p className="text-[#3E3E3E] text-sm leading-relaxed font-medium italic">
-                    &quot;{copy.text}&quot;
-                  </p>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
 
             {/* Wallet / Credits Card */}
             <motion.div
@@ -426,7 +448,7 @@ export function ResultDashboard({
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-[#EA1D2C]">
-                       <ShoppingBag size={18} />
+                      <ShoppingBag size={18} />
                     </div>
                     <span className="font-bold text-sm text-[#3E3E3E]">Seu Saldo</span>
                   </div>
@@ -434,7 +456,7 @@ export function ResultDashboard({
                     {userCredits} <span className="text-xs text-[#717171] uppercase">créditos</span>
                   </span>
                 </div>
-                
+
                 <p className="text-[#717171] text-xs mb-6 font-medium">
                   Seus créditos de teste expiram em <span className="text-[#EA1D2C] font-bold">72 horas</span>. Aproveite para turbinar seu cardápio!
                 </p>
@@ -533,11 +555,10 @@ export function ResultDashboard({
                 { id: 'agencia', name: 'Agência', credits: 30, price: '59,90', popular: true },
                 { id: 'imperio', name: 'Império Pro', credits: 100, price: '149,90' }
               ].map((pkg) => (
-                <div 
+                <div
                   key={pkg.id}
-                  className={`relative p-6 rounded-2xl border-2 transition-all flex flex-col items-center ${
-                    pkg.popular ? 'border-[#EA1D2C] bg-red-50/30' : 'border-[#EAEAEC] hover:border-[#EA1D2C]/30'
-                  }`}
+                  className={`relative p-6 rounded-2xl border-2 transition-all flex flex-col items-center ${pkg.popular ? 'border-[#EA1D2C] bg-red-50/30' : 'border-[#EAEAEC] hover:border-[#EA1D2C]/30'
+                    }`}
                 >
                   {pkg.popular && (
                     <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#EA1D2C] text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">
@@ -559,11 +580,10 @@ export function ResultDashboard({
                   <button
                     onClick={() => initiateCheckout(pkg.id)}
                     disabled={!!loadingCheckout}
-                    className={`w-full py-3 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 ${
-                      pkg.popular 
-                        ? 'bg-[#EA1D2C] text-white shadow-md hover:brightness-110' 
+                    className={`w-full py-3 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 ${pkg.popular
+                        ? 'bg-[#EA1D2C] text-white shadow-md hover:brightness-110'
                         : 'bg-white border border-[#EAEAEC] text-[#3E3E3E] hover:border-[#EA1D2C] hover:text-[#EA1D2C]'
-                    }`}
+                      }`}
                   >
                     {loadingCheckout === pkg.id ? (
                       <RefreshCw size={14} className="animate-spin" />

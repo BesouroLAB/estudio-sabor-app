@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/admin";
-import { createClient } from "@/lib/supabase/server";
+import { requireAdmin, getAdminSupabase } from "@/lib/admin";
 
 export async function POST(req: NextRequest) {
   const admin = await requireAdmin();
@@ -18,12 +17,13 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const supabase = await createClient();
+  // Usar service role para bypass RLS — admin atualiza créditos de qualquer usuário
+  const supabase = getAdminSupabase();
 
   // Get current credits
   const { data: profile, error: fetchError } = await supabase
     .from("profiles")
-    .select("credits, email")
+    .select("credits, email, full_name")
     .eq("id", userId)
     .single();
 
@@ -37,6 +37,7 @@ export async function POST(req: NextRequest) {
   const currentCredits = profile.credits ?? 0;
   const newCredits = Math.max(0, currentCredits + amount);
 
+  // Update credits
   const { error: updateError } = await supabase
     .from("profiles")
     .update({ credits: newCredits })
@@ -44,11 +45,18 @@ export async function POST(req: NextRequest) {
 
   if (updateError) {
     console.error("❌ Admin credit update failed:", updateError);
-    return NextResponse.json(
-      { error: updateError.message },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: updateError.message }, { status: 500 });
   }
+
+  // Log Transaction
+  await supabase.from("credit_transactions").insert({
+    user_id: userId,
+    amount: amount,
+    type: "admin_adjustment",
+    package_name: `Ajuste Admin (${admin.email})`,
+    full_name: profile.full_name || "Unknown User",
+    reference_id: `adm_${Date.now()}_${userId.slice(0, 4)}`
+  });
 
   console.log(
     `🔧 Admin ${admin.email} adjusted credits for ${profile.email}: ${currentCredits} → ${newCredits} (${amount > 0 ? "+" : ""}${amount})`

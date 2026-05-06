@@ -96,95 +96,104 @@ export function LoadingView({ foodType, style, error, onRetry, onBack, onGoToSto
             animate={{ opacity: 1, scale: 1 }}
             className="w-full max-w-2xl"
           >
-            {error.toLowerCase().includes("saldo") || error.toLowerCase().includes("crédito") ? (
-              <div className="rounded-[32px] p-8 border border-[#EA1D2C]/30 shadow-[0_20px_50px_rgba(255,87,34,0.15)] bg-white/80">
-                <div className="text-center mb-8">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#EA1D2C] to-[#FC6803] flex items-center justify-center text-white mx-auto mb-4 shadow-lg shadow-red-500/20">
-                    <Sparkles size={32} />
+            {(() => {
+              const lowerError = error.toLowerCase();
+              const isCreditError = 
+                lowerError.includes("saldo") || 
+                lowerError.includes("crédito") || 
+                lowerError.includes("credito") ||
+                lowerError.includes("insuficiente");
+                
+              return isCreditError ? (
+                <div className="rounded-[32px] p-8 border border-[#EA1D2C]/30 shadow-[0_20px_50px_rgba(255,87,34,0.15)] bg-white/80">
+                  <div className="text-center mb-8">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#EA1D2C] to-[#FC6803] flex items-center justify-center text-white mx-auto mb-4 shadow-lg shadow-red-500/20">
+                      <Sparkles size={32} />
+                    </div>
+                    <h3 className="text-2xl font-bold text-[#3E3E3E] mb-2">
+                      Seu saldo de créditos acabou
+                    </h3>
+                    <p className="text-[#717171] text-sm leading-relaxed max-w-md mx-auto">
+                      Não pare agora! Escolha um pacote abaixo para continuar transformando suas fotos em vendas.
+                    </p>
                   </div>
-                  <h3 className="text-2xl font-bold text-[#3E3E3E] mb-2">
-                    Seu saldo de créditos acabou
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                    <button 
+                      onClick={onGoToStore}
+                      className="group relative rounded-2xl p-5 border border-[#EAEAEC] hover:border-[#FC6803] transition-all text-left flex items-start gap-4"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
+                        <Rocket size={20} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-[#3E3E3E] group-hover:text-[#FC6803] transition-colors">Kit Emergência</p>
+                        <p className="text-xs text-[#717171]">10 créditos • R$ 29,90</p>
+                      </div>
+                    </button>
+
+                    <button 
+                      onClick={onGoToStore}
+                      className="group relative rounded-2xl p-5 border border-[#FC6803] bg-[#FC6803]/5 shadow-md text-left flex items-start gap-4"
+                    >
+                      <div className="absolute -top-2 -right-2 px-2 py-0.5 bg-[#FC6803] text-white text-[8px] font-bold rounded-full uppercase tracking-wider">Popular</div>
+                      <div className="w-10 h-10 rounded-xl bg-[#FC6803]/10 flex items-center justify-center text-[#FC6803]">
+                        <Star size={20} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-[#3E3E3E]">Agência Digital</p>
+                        <p className="text-xs text-[#717171]">30 créditos • R$ 59,90</p>
+                      </div>
+                    </button>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <button
+                      onClick={onBack}
+                      className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-2xl border border-[#EAEAEC] text-[#717171] hover:text-[#3E3E3E] transition-all text-sm font-bold"
+                    >
+                      <ArrowLeft size={16} />
+                      Voltar
+                    </button>
+                    <button
+                      onClick={onGoToStore}
+                      className="flex-[2] flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-gradient-to-r from-[#EA1D2C] to-[#FC6803] text-white font-bold text-sm shadow-xl shadow-red-500/30 hover:scale-[1.02] transition-all active:scale-[0.98]"
+                    >
+                      Ver todos os pacotes
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="rounded-[32px] p-8 sm:p-12 border border-[#EAEAEC] shadow-2xl flex flex-col items-center text-center bg-white/80">
+                  <div className="w-20 h-20 rounded-full bg-red-50 flex items-center justify-center text-[#EA1D2C] mb-6">
+                    <RotateCcw size={40} />
+                  </div>
+                  <h3 className="text-2xl font-bold text-[#3E3E3E] mb-4">
+                    Ops! Algo deu errado
                   </h3>
-                  <p className="text-[#717171] text-sm leading-relaxed max-w-md mx-auto">
-                    Não pare agora! Escolha um pacote abaixo para continuar transformando suas fotos em vendas.
+                  <p className="text-[#717171] mb-10 max-w-sm leading-relaxed">
+                    {error}
                   </p>
-                </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-                  <button 
-                    onClick={onGoToStore}
-                    className="group relative rounded-2xl p-5 border border-[#EAEAEC] hover:border-[#FC6803] transition-all text-left flex items-start gap-4"
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
-                      <Rocket size={20} />
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-[#3E3E3E] group-hover:text-[#FC6803] transition-colors">Kit Emergência</p>
-                      <p className="text-xs text-[#717171]">10 créditos • R$ 29,90</p>
-                    </div>
-                  </button>
-
-                  <button 
-                    onClick={onGoToStore}
-                    className="group relative rounded-2xl p-5 border border-[#FC6803] bg-[#FC6803]/5 shadow-md text-left flex items-start gap-4"
-                  >
-                    <div className="absolute -top-2 -right-2 px-2 py-0.5 bg-[#FC6803] text-white text-[8px] font-bold rounded-full uppercase tracking-wider">Popular</div>
-                    <div className="w-10 h-10 rounded-xl bg-[#FC6803]/10 flex items-center justify-center text-[#FC6803]">
-                      <Star size={20} />
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-[#3E3E3E]">Agência Digital</p>
-                      <p className="text-xs text-[#717171]">30 créditos • R$ 59,90</p>
-                    </div>
-                  </button>
+                  <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                    <button
+                      onClick={onBack}
+                      className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-2xl border border-[#EAEAEC] text-[#717171] hover:text-[#3E3E3E] hover:bg-gray-50 transition-all text-sm font-bold"
+                    >
+                      <ArrowLeft size={16} />
+                      Voltar
+                    </button>
+                    <button
+                      onClick={onRetry}
+                      className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-8 py-3 rounded-2xl bg-[#EA1D2C] hover:bg-[#D01925] text-white font-bold text-sm shadow-lg shadow-red-500/20 transition-all active:scale-[0.98]"
+                    >
+                      <RotateCcw size={16} />
+                      Tentar novamente
+                    </button>
+                  </div>
                 </div>
-
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <button
-                    onClick={onBack}
-                    className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-2xl border border-[#EAEAEC] text-[#717171] hover:text-[#3E3E3E] transition-all text-sm font-bold"
-                  >
-                    <ArrowLeft size={16} />
-                    Voltar
-                  </button>
-                  <button
-                    onClick={onGoToStore}
-                    className="flex-[2] flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-gradient-to-r from-[#EA1D2C] to-[#FC6803] text-white font-bold text-sm shadow-xl shadow-red-500/30 hover:scale-[1.02] transition-all active:scale-[0.98]"
-                  >
-                    Ver todos os pacotes
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="rounded-[32px] p-8 sm:p-12 border border-[#EAEAEC] shadow-2xl flex flex-col items-center text-center bg-white/80">
-                <div className="w-20 h-20 rounded-full bg-red-50 flex items-center justify-center text-[#EA1D2C] mb-6">
-                  <RotateCcw size={40} />
-                </div>
-                <h3 className="text-2xl font-bold text-[#3E3E3E] mb-4">
-                  Ops! Algo deu errado
-                </h3>
-                <p className="text-[#717171] mb-10 max-w-sm leading-relaxed">
-                  {error}
-                </p>
-
-                <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                  <button
-                    onClick={onBack}
-                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-2xl border border-[#EAEAEC] text-[#717171] hover:text-[#3E3E3E] hover:bg-gray-50 transition-all text-sm font-bold"
-                  >
-                    <ArrowLeft size={16} />
-                    Voltar
-                  </button>
-                  <button
-                    onClick={onRetry}
-                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-8 py-3 rounded-2xl bg-[#EA1D2C] hover:bg-[#D01925] text-white font-bold text-sm shadow-lg shadow-red-500/20 transition-all active:scale-[0.98]"
-                  >
-                    <RotateCcw size={16} />
-                    Tentar novamente
-                  </button>
-                </div>
-              </div>
-            )}
+              );
+            })()}
           </motion.div>
         ) : (
           <>

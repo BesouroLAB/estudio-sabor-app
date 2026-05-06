@@ -29,31 +29,31 @@ const navSections = [
   {
     label: null,
     items: [
-      { name: "Início", href: "/dashboard", icon: Home },
-      { name: "Criar Foto", href: "/dashboard/create", icon: PlusSquare, highlight: true },
+      { name: "Estúdio de Criação", href: "/estudio", icon: PlusSquare, highlight: true },
     ],
   },
   {
     label: "Meus Dados",
     items: [
-      { name: "Minhas Criações", href: "/dashboard/history", icon: History },
-      { name: "Templates & Promos", href: "/dashboard/templates", icon: LayoutTemplate },
+      { name: "Minhas Criações", href: "/estudio/minhas-criacoes", icon: History },
+      { name: "Templates & Promos", href: "/estudio/templates-de-venda", icon: LayoutTemplate },
     ],
   },
   {
     label: "Financeiro",
     items: [
-      { name: "Extrato de Créditos", href: "/dashboard/balance", icon: CreditCard },
-      { name: "Loja de Créditos", href: "/dashboard/store", icon: ShoppingBag },
+      { name: "Extrato de Créditos", href: "/estudio/extrato-de-creditos", icon: CreditCard },
+      { name: "Loja de Créditos", href: "/estudio/loja-de-creditos", icon: ShoppingBag },
     ],
   },
 ];
 
 interface DashboardSidebarProps {
   isAdmin?: boolean;
+  isVisitor?: boolean;
 }
 
-export function DashboardSidebar({ isAdmin = false }: DashboardSidebarProps) {
+export function DashboardSidebar({ isAdmin = false, isVisitor = false }: DashboardSidebarProps) {
   const pathname = usePathname();
   const { sidebarCollapsed, toggleSidebar } = useDashboard();
 
@@ -64,10 +64,11 @@ export function DashboardSidebar({ isAdmin = false }: DashboardSidebarProps) {
         animate={{ width: sidebarCollapsed ? 72 : 240 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
         className="hidden md:flex flex-col fixed h-screen z-40 bg-white border-r border-[#EAEAEC] select-none"
+        suppressHydrationWarning
       >
         {/* Logo */}
-        <div className="flex items-center justify-center border-b border-[#EAEAEC] h-28 px-4">
-          <Link href="/dashboard" className="flex items-center shrink-0">
+        <div className="flex items-center justify-center border-b border-[#EAEAEC] h-28 px-4" suppressHydrationWarning>
+          <Link href="/estudio" className="flex items-center shrink-0">
             {sidebarCollapsed ? (
               <img
                 src={LOGO_PEPPER}
@@ -85,9 +86,9 @@ export function DashboardSidebar({ isAdmin = false }: DashboardSidebarProps) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 py-4 overflow-y-auto scrollbar-hide">
+        <nav className="flex-1 py-4 overflow-y-auto scrollbar-hide" suppressHydrationWarning>
           {navSections.map((section, sIdx) => (
-            <div key={sIdx} className={cn(sIdx > 0 && "mt-4")}>
+            <div key={sIdx} className={cn(sIdx > 0 && "mt-4")} suppressHydrationWarning>
               {/* Section Label */}
               <AnimatePresence>
                 {section.label && !sidebarCollapsed && (
@@ -103,7 +104,7 @@ export function DashboardSidebar({ isAdmin = false }: DashboardSidebarProps) {
               </AnimatePresence>
 
               {/* Section Items */}
-              <div className={cn("flex flex-col gap-0.5", sidebarCollapsed ? "px-2" : "px-3")}>
+              <div className={cn("flex flex-col gap-0.5", sidebarCollapsed ? "px-2" : "px-3")} suppressHydrationWarning>
                 {section.items.map((item) => {
                   const isActive = pathname === item.href;
                   const Icon = item.icon;
@@ -160,9 +161,9 @@ export function DashboardSidebar({ isAdmin = false }: DashboardSidebarProps) {
         </nav>
 
         {/* Bottom Actions */}
-        <div className={cn("border-t border-[#EAEAEC] py-3 flex flex-col gap-0.5", sidebarCollapsed ? "px-2" : "px-3")}>
+        <div className={cn("border-t border-[#EAEAEC] py-3 flex flex-col gap-0.5", sidebarCollapsed ? "px-2" : "px-3")} suppressHydrationWarning>
           <Link
-            href="/dashboard/settings"
+            href="/estudio/configuracoes-da-conta"
             title={sidebarCollapsed ? "Configurações" : undefined}
             className={cn(
               "flex items-center gap-3 rounded-xl text-sm font-medium text-[#717171] hover:text-[#3E3E3E] hover:bg-[#F7F7F7] transition-all",
@@ -209,32 +210,34 @@ export function DashboardSidebar({ isAdmin = false }: DashboardSidebarProps) {
             </Link>
           )}
 
-          <button
-            onClick={async () => {
-              const supabase = createClient();
-              await supabase.auth.signOut();
-              window.location.href = "/login";
-            }}
-            title={sidebarCollapsed ? "Sair" : undefined}
-            className={cn(
-              "flex items-center gap-3 rounded-xl text-sm font-medium text-[#717171] hover:text-[#EA1D2C] hover:bg-red-50 transition-all w-full text-left",
-              sidebarCollapsed ? "justify-center px-0 py-3" : "px-3 py-2.5"
-            )}
-          >
-            <LogOut size={18} className="shrink-0" />
-            <AnimatePresence>
-              {!sidebarCollapsed && (
-                <motion.span
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="whitespace-nowrap"
-                >
-                  Sair
-                </motion.span>
+          {!isVisitor && (
+            <button
+              onClick={async () => {
+                const supabase = createClient();
+                await supabase.auth.signOut();
+                window.location.href = "/login";
+              }}
+              title={sidebarCollapsed ? "Sair" : undefined}
+              className={cn(
+                "flex items-center gap-3 rounded-xl text-sm font-medium text-[#717171] hover:text-[#EA1D2C] hover:bg-red-50 transition-all w-full text-left",
+                sidebarCollapsed ? "justify-center px-0 py-3" : "px-3 py-2.5"
               )}
-            </AnimatePresence>
-          </button>
+            >
+              <LogOut size={18} className="shrink-0" />
+              <AnimatePresence>
+                {!sidebarCollapsed && (
+                  <motion.span
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="whitespace-nowrap"
+                  >
+                    Sair
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </button>
+          )}
         </div>
 
         {/* Collapse Toggle */}
@@ -249,13 +252,12 @@ export function DashboardSidebar({ isAdmin = false }: DashboardSidebarProps) {
 
       {/* Mobile Bottom Bar - compact and functional */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-[#EAEAEC] safe-area-bottom">
-        <div className="flex items-center justify-around py-2 px-1">
+        <div className="flex items-center justify-around py-2 px-1" suppressHydrationWarning>
           {[
-            { name: "Início", href: "/dashboard", icon: Home },
-            { name: "Criar", href: "/dashboard/create", icon: PlusSquare },
-            { name: "Projetos", href: "/dashboard/history", icon: History },
-            { name: "Loja", href: "/dashboard/store", icon: ShoppingBag },
-            { name: "Config", href: "/dashboard/settings", icon: Settings },
+            { name: "Estúdio", href: "/estudio", icon: PlusSquare },
+            { name: "Projetos", href: "/estudio/minhas-criacoes", icon: History },
+            { name: "Loja", href: "/estudio/loja-de-creditos", icon: ShoppingBag },
+            { name: "Config", href: "/estudio/configuracoes-da-conta", icon: Settings },
           ].map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
