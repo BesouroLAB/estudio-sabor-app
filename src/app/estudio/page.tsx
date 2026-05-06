@@ -27,7 +27,7 @@ export default async function DashboardPage() {
       .single();
     
     creditsRemaining = profile?.credits ?? 0;
-    userName = profile?.full_name || user.email?.split("@")[0] || "Usuário";
+    userName = profile?.full_name || user?.email?.split("@")[0] || "Usuário";
   } else {
     // Tem 30 créditos para testarmos as coisas
     creditsRemaining = 30;

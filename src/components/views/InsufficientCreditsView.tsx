@@ -35,7 +35,7 @@ export function InsufficientCreditsView({ onBack, onGoToStore }: InsufficientCre
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          {/* Kit Emergência */}
+          {/* Kit Essencial */}
           <motion.div
             whileHover={{ y: -8 }}
             className="p-6 rounded-[32px] bg-white border border-[#EAEAEC] hover:border-[#EA1D2C]/30 transition-all shadow-sm hover:shadow-xl group"
@@ -43,7 +43,7 @@ export function InsufficientCreditsView({ onBack, onGoToStore }: InsufficientCre
             <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all">
               <Rocket size={24} />
             </div>
-            <h3 className="font-bold text-lg text-[#3E3E3E] mb-1 text-left">Kit Emergência</h3>
+            <h3 className="font-bold text-lg text-[#3E3E3E] mb-1 text-left">Kit Essencial</h3>
             <p className="text-2xl font-bold text-[#1A1A1A] mb-4 text-left">R$ 29,90</p>
             <ul className="space-y-2 mb-6 text-left">
               <li className="text-xs text-[#717171] flex items-center gap-2">
@@ -52,7 +52,7 @@ export function InsufficientCreditsView({ onBack, onGoToStore }: InsufficientCre
               </li>
               <li className="text-xs text-[#717171] flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                Válido por tempo ilimitado
+                R$ 2,99 por foto
               </li>
             </ul>
             <button 
@@ -63,18 +63,18 @@ export function InsufficientCreditsView({ onBack, onGoToStore }: InsufficientCre
             </button>
           </motion.div>
 
-          {/* Agência Digital */}
+          {/* Combo Cardápio */}
           <motion.div
             whileHover={{ y: -8 }}
             className="p-6 rounded-[32px] bg-white border-2 border-[#EA1D2C] relative shadow-2xl group"
           >
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-[#EA1D2C] to-[#FC6803] text-white text-[10px] font-bold rounded-full uppercase tracking-widest shadow-lg">
-              Melhor Custo
+              Favorito
             </div>
             <div className="w-12 h-12 rounded-2xl bg-red-50 text-[#EA1D2C] flex items-center justify-center mb-6 group-hover:bg-[#EA1D2C] group-hover:text-white transition-all">
               <Star size={24} />
             </div>
-            <h3 className="font-bold text-lg text-[#3E3E3E] mb-1 text-left">Agência Digital</h3>
+            <h3 className="font-bold text-lg text-[#3E3E3E] mb-1 text-left">Combo Cardápio</h3>
             <p className="text-2xl font-bold text-[#1A1A1A] mb-4 text-left">R$ 59,90</p>
             <ul className="space-y-2 mb-6 text-left">
               <li className="text-xs text-[#717171] flex items-center gap-2">
@@ -83,7 +83,7 @@ export function InsufficientCreditsView({ onBack, onGoToStore }: InsufficientCre
               </li>
               <li className="text-xs text-[#717171] flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                Suporte Prioritário
+                R$ 1,99 por foto
               </li>
             </ul>
             <button 
@@ -94,7 +94,7 @@ export function InsufficientCreditsView({ onBack, onGoToStore }: InsufficientCre
             </button>
           </motion.div>
 
-          {/* Kit Império */}
+          {/* Kit Dominação */}
           <motion.div
             whileHover={{ y: -8 }}
             className="p-6 rounded-[32px] bg-white border border-[#EAEAEC] hover:border-[#EA1D2C]/30 transition-all shadow-sm hover:shadow-xl group"
@@ -102,7 +102,7 @@ export function InsufficientCreditsView({ onBack, onGoToStore }: InsufficientCre
             <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-6 group-hover:bg-purple-600 group-hover:text-white transition-all">
               <Diamond size={24} />
             </div>
-            <h3 className="font-bold text-lg text-[#3E3E3E] mb-1 text-left">Kit Império Pro</h3>
+            <h3 className="font-bold text-lg text-[#3E3E3E] mb-1 text-left">Kit Dominação</h3>
             <p className="text-2xl font-bold text-[#1A1A1A] mb-4 text-left">R$ 149,90</p>
             <ul className="space-y-2 mb-6 text-left">
               <li className="text-xs text-[#717171] flex items-center gap-2">
@@ -111,7 +111,7 @@ export function InsufficientCreditsView({ onBack, onGoToStore }: InsufficientCre
               </li>
               <li className="text-xs text-[#717171] flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                Acesso Early Bird
+                R$ 1,49 por foto
               </li>
             </ul>
             <button 

@@ -17,7 +17,7 @@ interface DashboardContextType {
   sidebarCollapsed: boolean;
   toggleSidebar: () => void;
   userCredits: number;
-  setUserCredits: (credits: number) => void;
+  setUserCredits: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);

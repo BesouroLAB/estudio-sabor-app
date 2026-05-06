@@ -48,10 +48,10 @@ export default async function DashboardLayout({
     userName = profile?.full_name || formattedEmailPrefix || "Usuário";
     
     // Verificação robusta de admin (e-mail ou role)
-    const isAdminEmail = user.email?.toLowerCase().includes("tiagofernand9s") || 
-                         user.email?.toLowerCase().includes("besourolab");
+    const isAdminEmail = !!(user.email?.toLowerCase().includes("tiagofernand9s") || 
+                           user.email?.toLowerCase().includes("besourolab"));
     
-    isAdmin = profile?.role === "admin" || isAdminEmail;
+    isAdmin = (profile?.role === "admin") || isAdminEmail;
   }
 
   const { data: settings } = await supabase

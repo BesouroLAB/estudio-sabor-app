@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowLeft, ImageIcon, Loader2, Sparkles, Upload, Zap } from "lucide-react";
+import { ArrowLeft, ImageIcon, Loader2, Sparkles, Upload, Zap, Download } from "lucide-react";
 import { useDashboard } from "@/context/DashboardContext";
 import { uploadImage, generateImage } from "@/services/api";
 import { createClient } from "@/lib/supabase/client";

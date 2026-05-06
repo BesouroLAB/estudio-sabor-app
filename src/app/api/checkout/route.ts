@@ -12,22 +12,22 @@ const PACKAGES = {
     is_subscription: true
   },
   emergencia: {
-    title: 'Kit Emergência (10 Créditos)',
+    title: 'Kit Essencial (10 Créditos)',
     price: 29.90,
     credits: 10,
-    package_name: 'Kit Emergência'
+    package_name: 'Kit Essencial'
   },
   agencia: {
-    title: 'Kit Agência Digital (30 Créditos)',
+    title: 'Combo Cardápio Completo (30 Créditos)',
     price: 59.90,
     credits: 30,
-    package_name: 'Kit Agência Digital'
+    package_name: 'Combo Cardápio Completo'
   },
   imperio: {
-    title: 'Kit Império / Pro (100 Créditos)',
+    title: 'Kit Dominação Local (100 Créditos)',
     price: 149.90,
     credits: 100,
-    package_name: 'Kit Império'
+    package_name: 'Kit Dominação Local'
   }
 };
 

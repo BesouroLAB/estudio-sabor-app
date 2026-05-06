@@ -10,7 +10,7 @@ import { useDashboard } from "@/context/DashboardContext";
 import Link from "next/link";
 
 interface DashboardHeaderProps {
-  user: User;
+  user: User | null;
   credits: number;
   userName?: string;
   supportLink?: string;
@@ -106,7 +106,7 @@ export function DashboardHeader({
               className="flex items-center gap-2.5 transition-all cursor-pointer group text-left"
             >
               <span className="hidden sm:block text-xs font-semibold text-[#3E3E3E] group-hover:text-[#717171] transition-colors max-w-[120px] truncate">
-                {userName || user.email?.split("@")[0]}
+                {userName || user?.email?.split("@")[0] || "Visitante"}
               </span>
               <div className="w-8 h-8 rounded-full bg-[#F7F7F7] flex items-center justify-center transition-all group-hover:bg-[#EAEAEC]">
                 <UserIcon
@@ -129,7 +129,7 @@ export function DashboardHeader({
                   transition={{ duration: 0.12 }}
                   className="absolute right-0 top-full mt-2 w-52 bg-white rounded-xl shadow-lg border border-[#EAEAEC] p-1.5 z-50"
                 >
-                  {user.id === "mock-temporario" ? (
+                  {user?.id === "mock-temporario" ? (
                     <div className="p-3 bg-red-50 rounded-lg mb-1.5 border border-red-100">
                       <p className="text-[10px] font-bold text-[#EA1D2C] uppercase tracking-wider mb-1.5">Modo Visitante</p>
                       <p className="text-[10px] text-[#717171] leading-snug mb-2.5">Crie uma conta para salvar suas criações.</p>
@@ -163,7 +163,7 @@ export function DashboardHeader({
 
                   <div className="h-px bg-[#EAEAEC] my-1" />
 
-                  {user.id === "mock-temporario" ? (
+                  {user?.id === "mock-temporario" ? (
                     <button
                       onClick={() => { router.push("/login"); setDropdownOpen(false); }}
                       className="w-full text-left px-3 py-2 text-sm text-[#3E3E3E] hover:bg-[#F7F7F7] rounded-lg transition-colors flex items-center gap-2.5"
